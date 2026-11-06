@@ -122,11 +122,11 @@ export const FeaturedCollection: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {filteredArtworks.map((item) => (
               <div
                 key={item.id}
-                className="group linear-card rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5"
+                className="group linear-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5"
               >
                 <div>
                   {/* Image container */}
@@ -135,7 +135,7 @@ export const FeaturedCollection: React.FC = () => {
                       src={item.image}
                       alt={item.title}
                       fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-108"
                     />
 
@@ -143,9 +143,9 @@ export const FeaturedCollection: React.FC = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#06110a] via-transparent to-black/30 pointer-events-none" />
 
                     {/* Top Badges */}
-                    <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 z-10">
+                    <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 flex items-center gap-1.5 z-10">
                       {item.badge && (
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[#0a1b12]/90 text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm backdrop-blur-md">
+                        <span className="px-1.5 sm:px-2 py-0.5 rounded-md text-[8px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#0a1b12]/90 text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm backdrop-blur-md">
                           {item.badge}
                         </span>
                       )}
@@ -154,36 +154,36 @@ export const FeaturedCollection: React.FC = () => {
                     {/* Quick View Button on Image */}
                     <button
                       onClick={() => setSelectedArtworkForModal(item)}
-                      className="absolute bottom-2.5 right-2.5 z-10 p-2 rounded-lg bg-[#06110a]/80 text-[#e5ede7] border border-white/10 opacity-90 group-hover:opacity-100 hover:text-[#f4dc8a] hover:border-[#d4af37] transition-all backdrop-blur-sm"
+                      className="absolute bottom-2 right-2 sm:bottom-2.5 sm:right-2.5 z-10 p-1.5 sm:p-2 rounded-lg bg-[#06110a]/80 text-[#e5ede7] border border-white/10 opacity-90 group-hover:opacity-100 hover:text-[#f4dc8a] hover:border-[#d4af37] transition-all backdrop-blur-sm"
                       title="Inspect Artwork Details"
                     >
-                      <Eye className="w-4 h-4" />
+                      <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
                   </div>
 
                   {/* Artwork Information */}
-                  <div className="p-4 space-y-2">
-                    <div className="flex items-center justify-between text-[11px] text-[#8fa89a]">
+                  <div className="p-2.5 sm:p-4 space-y-1 sm:space-y-2">
+                    <div className="flex items-center justify-between text-[9px] sm:text-[11px] text-[#8fa89a]">
                       <span className="font-mono uppercase">{item.dimensions}</span>
                       <span className="text-emerald-400 font-medium">● In Studio</span>
                     </div>
 
-                    <h3 className="font-bold text-sm text-white group-hover:text-[#f4dc8a] transition-colors line-clamp-1">
+                    <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-[#f4dc8a] transition-colors line-clamp-1">
                       {item.title}
                     </h3>
 
                     {item.titleBangla && (
-                      <p className="text-xs text-[#8fa89a] line-clamp-1 font-serif">
+                      <p className="text-[10px] sm:text-xs text-[#8fa89a] line-clamp-1 font-serif">
                         {item.titleBangla}
                       </p>
                     )}
 
-                    <p className="text-[12px] text-[#9cb5a6] line-clamp-2 leading-relaxed">
+                    <p className="hidden sm:block text-[12px] text-[#9cb5a6] line-clamp-2 leading-relaxed">
                       {item.description}
                     </p>
 
                     {item.finish && (
-                      <span className="inline-block px-2 py-0.5 rounded text-[10px] bg-[#0a1f14] text-[#f4dc8a] border border-white/5">
+                      <span className="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] bg-[#0a1f14] text-[#f4dc8a] border border-white/5">
                         {item.finish}
                       </span>
                     )}
@@ -191,35 +191,35 @@ export const FeaturedCollection: React.FC = () => {
                 </div>
 
                 {/* Bottom Action Area: Price & 3D Button */}
-                <div className="p-4 pt-2 border-t border-white/5 space-y-3">
+                <div className="p-2.5 sm:p-4 pt-1.5 sm:pt-2 border-t border-white/5 space-y-2 sm:space-y-3">
                   <div className="flex items-baseline justify-between">
                     <div>
-                      <span className="text-lg font-extrabold text-[#fceb9e]">
+                      <span className="text-sm sm:text-lg font-extrabold text-[#fceb9e]">
                         ৳{item.price.toLocaleString()}
                       </span>
                       {item.originalPrice && (
-                        <span className="text-xs text-[#8fa89a] line-through ml-2">
+                        <span className="text-[10px] sm:text-xs text-[#8fa89a] line-through ml-1 sm:ml-2">
                           ৳{item.originalPrice.toLocaleString()}
                         </span>
                       )}
                     </div>
-                    <span className="text-[10px] text-[#8fa89a]">Framed & Ready</span>
+                    <span className="hidden sm:inline text-[10px] text-[#8fa89a]">Framed & Ready</span>
                   </div>
 
                   {/* 3D Action Button */}
                   <button
                     onClick={() => handleAddToCart(item)}
-                    className="w-full btn-3d-gold py-2.5 text-xs font-bold"
+                    className="w-full btn-3d-gold py-2 sm:py-2.5 text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 sm:gap-1.5"
                   >
                     {justAddedId === item.id ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-[#0f1811]" />
-                        <span>Added to Cart!</span>
+                        <span>Added!</span>
                       </>
                     ) : (
                       <>
                         <ShoppingBag className="w-3.5 h-3.5 text-[#0f1811]" />
-                        <span>Add to Collection</span>
+                        <span>Add to Cart</span>
                       </>
                     )}
                   </button>

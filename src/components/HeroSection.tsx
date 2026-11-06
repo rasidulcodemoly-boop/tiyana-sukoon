@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { useStore } from "../context/StoreContext";
-import { ArrowRight, Sparkles, ZoomIn } from "lucide-react";
+import { ArrowRight, ZoomIn } from "lucide-react";
 
 export const HeroSection: React.FC = () => {
   const { setSelectedArtworkForModal, artworks } = useStore();
@@ -23,11 +23,10 @@ export const HeroSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-end">
           {/* Left Side: Eyebrow + Headline */}
           <div className="lg:col-span-7 space-y-4 text-center lg:text-left">
-            {/* Eyebrow Text */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0b1f14] border border-[#d4af37]/30 text-xs font-medium text-[#f4dc8a] shadow-[0_0_15px_rgba(212,175,55,0.15)]">
-              <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" />
-              <span className="tracking-wide">হস্তনির্মিত ইসলামিক ক্যালিগ্রাফি স্টুডিও</span>
-            </div>
+            {/* Eyebrow Text (Clean - No Icon, No Outline) */}
+            <p className="text-xs sm:text-sm font-semibold text-[#d4af37] tracking-wider uppercase">
+              হস্তনির্মিত ইসলামিক ক্যালিগ্রাফি স্টুডিও
+            </p>
 
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">

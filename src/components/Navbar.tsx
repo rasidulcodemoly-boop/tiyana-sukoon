@@ -194,15 +194,6 @@ export const Navbar: React.FC = () => {
               )}
             </button>
 
-            {/* Desktop Commission Piece CTA (Gold 3D - Strictly Hidden on Mobile & Tablet) */}
-            <a
-              href="#custom-commission"
-              className="hidden lg:inline-flex btn-3d-gold px-4 py-2.5 text-xs tracking-wide"
-            >
-              <Palette className="w-3.5 h-3.5 text-[#0f1811]" />
-              <span>Commission Piece</span>
-            </a>
-
             {/* Mobile Hamburger Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

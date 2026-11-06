@@ -36,7 +36,7 @@ export const HeroSection: React.FC = () => {
 
             {/* Short Minimalist Description */}
             <p className="text-base sm:text-lg text-[#9cb5a6] max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
-              যেখানে ক্যালিগ্রাফির প্রতিটি সোনালী আঁচড়ে জেগে ওঠে প্রশান্তি। খাঁটি ২৪K গোল্ড লিফ ও টেক্সচার্ড ক্যানভাসে তৈরি অরিজিনাল আর্টওয়ার্ক।
+              যেখানে ক্যালিগ্রাফির প্রতিটি সোনালী আঁচড়ে জেগে ওঠে প্রশান্তি।
             </p>
 
             {/* Exactly 2 Buttons */}

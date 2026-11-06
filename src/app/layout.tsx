@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "https://tiyana-sukoon.vercel.app"
+  ),
   title: "Tiyana's Sukoon | Handmade Art & Arabic Calligraphy",
   description:
     "Art for your peace. Peace for your soul. Premium handmade Islamic art, custom Arabic calligraphy, canvas paintings, and bespoke gift keepsakes in Dhaka, Bangladesh.",

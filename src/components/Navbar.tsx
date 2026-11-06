@@ -119,8 +119,8 @@ export const Navbar: React.FC = () => {
               </div>
             </div>
 
-            {/* Brand Title and Tagline (Desktop Only - Hidden on Mobile) */}
-            <div className="hidden sm:flex min-w-0 flex-col justify-center">
+            {/* Brand Title and Tagline (Desktop Only - Strictly Hidden on Mobile & Tablet) */}
+            <div className="hidden md:flex min-w-0 flex-col justify-center">
               <div className="flex items-center gap-1.5">
                 <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-white group-hover:text-[#f4dc8a] transition-colors truncate">
                   Tiyana&apos;s Sukoon
@@ -194,10 +194,10 @@ export const Navbar: React.FC = () => {
               )}
             </button>
 
-            {/* Desktop Commission Piece CTA (Gold 3D) */}
+            {/* Desktop Commission Piece CTA (Gold 3D - Strictly Hidden on Mobile & Tablet) */}
             <a
               href="#custom-commission"
-              className="hidden sm:inline-flex btn-3d-gold px-4 py-2.5 text-xs tracking-wide"
+              className="hidden lg:inline-flex btn-3d-gold px-4 py-2.5 text-xs tracking-wide"
             >
               <Palette className="w-3.5 h-3.5 text-[#0f1811]" />
               <span>Commission Piece</span>
@@ -248,7 +248,7 @@ export const Navbar: React.FC = () => {
                 >
                   <div className="flex items-center gap-3">
                     <Sparkles className="w-4 h-4 text-[#d4af37]" />
-                    <span>Custom Art Commission</span>
+                    <span>Custom Art</span>
                   </div>
                   <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-[#d4af37]/20 text-[#fceb9e] border border-[#d4af37]/40">
                     Bespoke

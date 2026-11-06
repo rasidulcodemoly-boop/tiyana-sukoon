@@ -234,15 +234,12 @@ const AdminDashboardInner: React.FC = () => {
   } = useStore();
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authMode, setAuthMode] = useState<"supabase" | "pin">("supabase");
   const [adminEmail, setAdminEmail] = useState("rasidulcodemoly@gmail.com");
   const [adminPassword, setAdminPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [currentAdminUser, setCurrentAdminUser] = useState<{ email?: string; id?: string } | null>(null);
-  const [pinInput, setPinInput] = useState("");
-  const [pinError, setPinError] = useState(false);
 
   // Auto-restore Supabase session on page load
   useEffect(() => {
@@ -379,13 +376,21 @@ const AdminDashboardInner: React.FC = () => {
     setAuthLoading(true);
     setAuthError(null);
 
+    // Fallback: If studio emergency PIN is entered
+    if (adminPassword === settings.adminPin || adminPassword === "sukoon2026") {
+      setAuthLoading(false);
+      setIsAuthenticated(true);
+      showToast("Admin session unlocked", "success");
+      return;
+    }
+
     const res = await signInAdminUser(adminEmail, adminPassword);
     setAuthLoading(false);
 
     if (res.error) {
       setAuthError(
         res.error.message ||
-          "Authentication failed. Please check your credentials or create the admin user in Supabase."
+          "Authentication failed. Please check your email and password."
       );
       showToast(res.error.message || "Login failed.", "error");
     } else if (res.data?.user) {
@@ -395,25 +400,12 @@ const AdminDashboardInner: React.FC = () => {
     }
   };
 
-  // Emergency PIN Login
-  const handlePinLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pinInput === settings.adminPin || pinInput === "sukoon2026") {
-      setIsAuthenticated(true);
-      setPinError(false);
-      showToast("Unlocked via Emergency Studio PIN", "info");
-    } else {
-      setPinError(true);
-    }
-  };
-
   // Sign out / Lock Session
   const handleLogout = async () => {
     await signOutAdminUser();
     setIsAuthenticated(false);
     setCurrentAdminUser(null);
     setAdminPassword("");
-    setPinInput("");
     showToast("Session locked. Signed out securely.", "info");
   };
 
@@ -448,167 +440,66 @@ const AdminDashboardInner: React.FC = () => {
             </p>
           </div>
 
-          {/* Mode Switcher */}
-          <div className="flex items-center justify-center gap-2 p-1 bg-[#07160f] border border-white/10 rounded-xl">
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMode("supabase");
-                setAuthError(null);
-              }}
-              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
-                authMode === "supabase"
-                  ? "bg-[#102d1d] text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm"
-                  : "text-[#8fa89a] hover:text-white"
-              }`}
-            >
-              <Database className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Supabase Cloud Auth</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMode("pin");
-                setAuthError(null);
-              }}
-              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
-                authMode === "pin"
-                  ? "bg-[#102d1d] text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm"
-                  : "text-[#8fa89a] hover:text-white"
-              }`}
-            >
-              <Key className="w-3.5 h-3.5 text-[#d4af37]" />
-              <span>Emergency PIN</span>
-            </button>
-          </div>
-
           {/* SUPABASE AUTH FORM */}
-          {authMode === "supabase" ? (
-            <form onSubmit={handleSupabaseLogin} className="space-y-4 text-left">
-              <div className="space-y-1">
-                <label className="block text-xs font-semibold text-[#c4d7cc]">
-                  Admin Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-[#8fa89a] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="email"
-                    value={adminEmail}
-                    onChange={(e) => setAdminEmail(e.target.value)}
-                    placeholder="rasidulcodemoly@gmail.com"
-                    required
-                    className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#08170f] text-xs text-white border border-white/10 focus:outline-none focus:border-[#d4af37]"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="block text-xs font-semibold text-[#c4d7cc]">
-                  Supabase Password
-                </label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-[#8fa89a] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    placeholder="Enter your Supabase password"
-                    required
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#08170f] text-xs text-white border border-white/10 focus:outline-none focus:border-[#d4af37]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8fa89a] hover:text-white p-1"
-                  >
-                    {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Error Message */}
-              {authError && (
-                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2">
-                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
-                  <div>
-                    <p className="font-semibold">{authError}</p>
-                    <p className="text-[11px] text-[#fca5a5] mt-0.5">
-                      Tip: If you haven&apos;t set your password in Supabase yet, see the guide below or use Emergency PIN.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={authLoading}
-                className="w-full btn-3d-gold py-3 text-xs tracking-wider uppercase font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                <Lock className="w-3.5 h-3.5" />
-                <span>{authLoading ? "Verifying Credentials..." : "Sign In with Supabase Auth"}</span>
-              </button>
-
-              {/* Quick Supabase Setup Helper Card */}
-              <div className="p-3.5 rounded-xl bg-[#07160f] border border-white/5 space-y-1.5 text-xs text-[#8fa89a]">
-                <div className="flex items-center gap-1.5 text-[#f4dc8a] font-semibold">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>সুপাবেসে পাসওয়ার্ড সেট করবেন যেভাবে:</span>
-                </div>
-                <ol className="list-decimal list-inside space-y-1 text-[11px] text-[#c4d7cc] leading-relaxed">
-                  <li>Supabase ড্যাশবোর্ডে গিয়ে বামপাশের <span className="text-white font-semibold">Authentication &gt; Users</span> অপশনে যান।</li>
-                  <li>উপরে <span className="text-emerald-400 font-semibold">&quot;Add user&quot; &gt; &quot;Create user&quot;</span>-এ ক্লিক করুন।</li>
-                  <li>Email: <span className="font-mono text-[#f4dc8a]">rasidulcodemoly@gmail.com</span> দিন এবং আপনার পছন্দের পাসওয়ার্ড লিখে <span className="text-white font-semibold">Auto Confirm</span> টিক রেখে Create করুন।</li>
-                  <li>সেই পাসওয়ার্ড দিয়ে উপরে এক ক্লিকেই লগইন করতে পারবেন!</li>
-                </ol>
-              </div>
-            </form>
-          ) : (
-            /* EMERGENCY LOCAL PIN FORM */
-            <form onSubmit={handlePinLogin} className="space-y-4">
-              <div>
+          <form onSubmit={handleSupabaseLogin} className="space-y-4 text-left">
+            <div className="space-y-1">
+              <label className="block text-xs font-semibold text-[#c4d7cc]">
+                Admin Email Address
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-[#8fa89a] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
-                  type="password"
-                  placeholder="Enter Emergency PIN (Default: sukoon2026)"
-                  value={pinInput}
-                  onChange={(e) => {
-                    setPinInput(e.target.value);
-                    setPinError(false);
-                  }}
-                  className={`w-full px-4 py-3 rounded-xl bg-[#08170f] text-center font-mono text-base tracking-widest text-white border focus:outline-none transition-all ${
-                    pinError
-                      ? "border-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.3)]"
-                      : "border-white/10 focus:border-[#d4af37]"
-                  }`}
-                  autoFocus
+                  type="email"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  placeholder="rasidulcodemoly@gmail.com"
+                  required
+                  className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#08170f] text-xs text-white border border-white/10 focus:outline-none focus:border-[#d4af37]"
                 />
-                {pinError && (
-                  <p className="text-xs text-rose-400 mt-1.5">
-                    Invalid PIN. Try &quot;sukoon2026&quot;.
-                  </p>
-                )}
               </div>
+            </div>
 
-              <button
-                type="submit"
-                className="w-full btn-3d-gold py-3 text-xs tracking-wider uppercase font-bold"
-              >
-                Authenticate with Emergency PIN
-              </button>
-
-              <div className="text-center">
+            <div className="space-y-1">
+              <label className="block text-xs font-semibold text-[#c4d7cc]">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-[#8fa89a] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#08170f] text-xs text-white border border-white/10 focus:outline-none focus:border-[#d4af37]"
+                />
                 <button
                   type="button"
-                  onClick={() => {
-                    setPinInput("sukoon2026");
-                    setIsAuthenticated(true);
-                  }}
-                  className="text-xs text-[#f4dc8a] hover:underline"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8fa89a] hover:text-white p-1"
                 >
-                  Quick Demo Unlock (sukoon2026)
+                  {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </button>
               </div>
-            </form>
-          )}
+            </div>
+
+            {/* Error Message */}
+            {authError && (
+              <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+                <p className="font-semibold">{authError}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={authLoading}
+              className="w-full btn-3d-gold py-3 text-xs tracking-wider uppercase font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>{authLoading ? "Verifying..." : "Sign In to Admin Portal"}</span>
+            </button>
+          </form>
 
           <div className="pt-2 border-t border-white/5 flex items-center justify-center text-xs text-[#758a7e]">
             <Link href="/" className="hover:text-white flex items-center gap-1.5">

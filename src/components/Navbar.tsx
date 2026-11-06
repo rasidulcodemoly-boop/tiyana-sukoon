@@ -9,7 +9,6 @@ import {
   Sparkles,
   Menu,
   X,
-  ShieldCheck,
   Palette,
   PhoneCall,
   ExternalLink,
@@ -121,14 +120,9 @@ export const Navbar: React.FC = () => {
 
             {/* Brand Title and Tagline (Desktop Only - Strictly Hidden on Mobile & Tablet) */}
             <div className="hidden md:flex min-w-0 flex-col justify-center">
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-white group-hover:text-[#f4dc8a] transition-colors truncate">
-                  Tiyana&apos;s Sukoon
-                </span>
-                <span className="text-[9px] sm:text-[10px] uppercase font-mono px-1.5 py-0.2 sm:py-0.5 rounded bg-[#d4af37]/15 text-[#f4dc8a] border border-[#d4af37]/30 shrink-0">
-                  Studio
-                </span>
-              </div>
+              <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-white group-hover:text-[#f4dc8a] transition-colors truncate">
+                Tiyana&apos;s Sukoon
+              </span>
               <p className="text-[10px] sm:text-[11px] text-[#8fa89a] font-normal tracking-wide truncate">
                 Art for your peace <span className="hidden xs:inline">• Dhaka</span>
               </p>
@@ -145,10 +139,9 @@ export const Navbar: React.FC = () => {
             </a>
             <a
               href="#custom-commission"
-              className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all flex items-center gap-1.5"
+              className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#f4dc8a]" />
-              <span>Custom Art</span>
+              Custom Art
             </a>
             <a
               href="#gallery"
@@ -168,14 +161,6 @@ export const Navbar: React.FC = () => {
             >
               Reviews
             </a>
-            <Link
-              href="/admin"
-              className="px-3.5 py-1.5 text-xs font-medium text-[#f4dc8a] hover:bg-[#d4af37]/20 rounded-full transition-all flex items-center gap-1"
-              title="Admin Dashboard"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#f4dc8a]" />
-              <span>Admin</span>
-            </Link>
           </nav>
 
           {/* Right Action Area: Cart, Commission CTA & Mobile Hamburger */}
@@ -282,17 +267,6 @@ export const Navbar: React.FC = () => {
                   <span className="text-xs text-[#fceb9e] font-bold">5.0 ★</span>
                 </a>
 
-                <Link
-                  href="/admin"
-                  onClick={closeMenu}
-                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#f4dc8a] hover:bg-[#0c2417] transition-all border border-transparent hover:border-white/5"
-                >
-                  <div className="flex items-center gap-3">
-                    <ShieldCheck className="w-4 h-4 text-[#d4af37]" />
-                    <span>Admin Studio Portal</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[#6e8578]" />
-                </Link>
               </div>
 
               {/* Action Buttons Section */}

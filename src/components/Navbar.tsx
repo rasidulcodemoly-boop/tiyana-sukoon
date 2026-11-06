@@ -106,7 +106,7 @@ export const Navbar: React.FC = () => {
             className="flex items-center gap-2.5 sm:gap-3 group min-w-0"
           >
             {/* Studio Logo Emblem */}
-            <div className="relative w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full p-[2px] bg-gradient-to-tr from-[#d4af37] via-[#f5d77f] to-[#0e2a1b] shadow-[0_0_15px_rgba(212,175,55,0.25)] transition-transform duration-300 group-hover:scale-105">
+            <div className="relative w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full p-[2px] bg-gradient-to-tr from-[#d4af37] via-[#f5d77f] to-[#0e2a1b] shadow-[0_0_15px_rgba(212,175,55,0.25)] transition-transform duration-300 group-hover:scale-105">
               <div className="w-full h-full rounded-full overflow-hidden bg-[#06110a]">
                 <Image
                   src={settings.siteLogo || "/brand/logo.jpg"}
@@ -119,8 +119,8 @@ export const Navbar: React.FC = () => {
               </div>
             </div>
 
-            {/* Brand Title and Tagline */}
-            <div className="min-w-0 flex flex-col justify-center">
+            {/* Brand Title and Tagline (Desktop Only - Hidden on Mobile) */}
+            <div className="hidden sm:flex min-w-0 flex-col justify-center">
               <div className="flex items-center gap-1.5">
                 <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-white group-hover:text-[#f4dc8a] transition-colors truncate">
                   Tiyana&apos;s Sukoon
@@ -315,16 +315,6 @@ export const Navbar: React.FC = () => {
                 >
                   <MessageCircle className="w-4 h-4 text-[#25d366]" />
                   <span>Order via WhatsApp Chat</span>
-                </a>
-
-                {/* Direct Commission CTA */}
-                <a
-                  href="#custom-commission"
-                  onClick={closeMenu}
-                  className="w-full btn-3d-gold py-2.5 text-xs text-center justify-center font-bold tracking-wide flex items-center gap-2"
-                >
-                  <Palette className="w-4 h-4 text-[#06110a]" />
-                  <span>Commission a Custom Piece</span>
                 </a>
 
                 {/* Direct Phone Call */}

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useStore } from "../context/StoreContext";
 import { ArrowRight, ZoomIn } from "lucide-react";
@@ -8,9 +8,71 @@ import { ArrowRight, ZoomIn } from "lucide-react";
 export const HeroSection: React.FC = () => {
   const { setSelectedArtworkForModal, artworks } = useStore();
 
-  // Pick top 10 signature artworks and duplicate for infinite continuous horizontal marquee loop
-  const carouselArtworks = artworks.slice(0, 10);
+  // Desktop Carousel: Top 10 artworks duplicated for infinite marquee
+  const carouselArtworks = artworks.length > 0 ? artworks.slice(0, 8) : [];
   const displayArtworks = [...carouselArtworks, ...carouselArtworks];
+
+  // Mobile View: 2 images displayed simultaneously, cycling 1-by-1 every 3 seconds
+  const [mobileIndex, setMobileIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+
+  // Cloned items to ensure seamless infinite looping for 2-column view
+  const mobileDisplayArtworks =
+    carouselArtworks.length >= 2
+      ? [...carouselArtworks, carouselArtworks[0], carouselArtworks[1]]
+      : carouselArtworks;
+
+  // Auto-advance by 1 image every 3 seconds
+  useEffect(() => {
+    if (carouselArtworks.length < 2 || isPaused) return;
+
+    const timer = setInterval(() => {
+      setIsTransitioning(true);
+      setMobileIndex((prev) => prev + 1);
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [carouselArtworks.length, isPaused]);
+
+  // Seamless reset when looping past the last item
+  const handleTransitionEnd = () => {
+    if (mobileIndex >= carouselArtworks.length) {
+      setIsTransitioning(false);
+      setMobileIndex(0);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsTransitioning(true);
+        });
+      });
+    }
+  };
+
+  // Touch swipe support for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsPaused(true);
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current !== null) {
+      const touchEndX = e.changedTouches[0].clientX;
+      const diff = touchStartX.current - touchEndX;
+      if (diff > 40) {
+        // Swiped left -> next
+        setIsTransitioning(true);
+        setMobileIndex((prev) => (prev >= carouselArtworks.length ? 0 : prev + 1));
+      } else if (diff < -40) {
+        // Swiped right -> prev
+        setIsTransitioning(true);
+        setMobileIndex((prev) => (prev <= 0 ? carouselArtworks.length - 1 : prev - 1));
+      }
+      touchStartX.current = null;
+    }
+    // Resume auto-slide after brief delay
+    setTimeout(() => setIsPaused(false), 1500);
+  };
 
   return (
     <section className="relative pt-8 pb-14 md:pt-16 md:pb-24 overflow-hidden">
@@ -65,8 +127,96 @@ export const HeroSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Bottom Section: Animated Horizontal Infinite Carousel Slide Animation */}
-      <div className="mt-12 sm:mt-16 pt-2 relative w-full overflow-hidden">
+      {/* MOBILE VIEW ONLY: 2 Images displayed side-by-side, changing 1-by-1 every 3 seconds */}
+      <div className="block md:hidden mt-8 px-4 w-full max-w-md mx-auto">
+        {/* 2-Card Slider Viewport */}
+        <div
+          className="relative overflow-hidden rounded-2xl p-1"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          <div
+            className="flex gap-3 will-change-transform"
+            style={{
+              transform: `translateX(calc(-${mobileIndex} * (50% + 6px)))`,
+              transition: isTransitioning
+                ? "transform 600ms cubic-bezier(0.25, 1, 0.5, 1)"
+                : "none",
+            }}
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {mobileDisplayArtworks.map((art, idx) => (
+              <div
+                key={`mob-${art.id}-${idx}`}
+                onClick={() => setSelectedArtworkForModal(art)}
+                className="relative w-[calc(50%-6px)] shrink-0 aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer border border-[#d4af37]/35 bg-[#08180f] shadow-[0_10px_25px_rgba(0,0,0,0.7)] active:scale-[0.98] transition-all"
+                title="Click to view full piece"
+              >
+                {/* Artwork Image */}
+                <Image
+                  src={art.image}
+                  alt={art.title}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 250px"
+                  className="object-cover"
+                  priority={idx < 4}
+                />
+
+                {/* Subtle dark gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#06110a]/95 via-[#06110a]/25 to-transparent pointer-events-none" />
+
+                {/* Top Category Badge */}
+                <div className="absolute top-2 left-2 z-10 pointer-events-none">
+                  <span className="px-1.5 py-0.5 rounded text-[8px] uppercase font-mono font-bold bg-[#06110a]/85 text-[#f4dc8a] border border-[#d4af37]/30 backdrop-blur-xs">
+                    {art.category}
+                  </span>
+                </div>
+
+                {/* Bottom Title & Price */}
+                <div className="absolute bottom-0 inset-x-0 p-2.5 z-10 space-y-0.5 pointer-events-none">
+                  <h3 className="text-[11px] font-bold text-white truncate">
+                    {art.title}
+                  </h3>
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-[#8fa89a] font-mono text-[9px]">
+                      {art.dimensions}
+                    </span>
+                    <span className="font-extrabold text-[#fceb9e] font-mono text-[11px]">
+                      ৳{art.price.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Carousel Indicators for Mobile */}
+        {carouselArtworks.length > 1 && (
+          <div className="flex justify-center items-center gap-1.5 mt-3.5">
+            {carouselArtworks.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setIsTransitioning(true);
+                  setMobileIndex(i);
+                }}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  mobileIndex % carouselArtworks.length === i
+                    ? "w-6 bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] shadow-[0_0_8px_rgba(212,175,55,0.5)]"
+                    : "w-1.5 bg-white/20 hover:bg-white/40"
+                }`}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* DESKTOP VIEW ONLY: Animated Horizontal Infinite Continuous Marquee Loop */}
+      <div className="hidden md:block mt-12 sm:mt-16 pt-2 relative w-full overflow-hidden">
         {/* Left & Right Smooth Edge Fade Masks */}
         <div className="absolute left-0 inset-y-0 w-16 sm:w-32 bg-gradient-to-r from-[#06110a] via-[#06110a]/80 to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 inset-y-0 w-16 sm:w-32 bg-gradient-to-l from-[#06110a] via-[#06110a]/80 to-transparent z-10 pointer-events-none" />
@@ -75,7 +225,7 @@ export const HeroSection: React.FC = () => {
         <div className="animate-marquee gap-4 sm:gap-6 py-2">
           {displayArtworks.map((art, idx) => (
             <div
-              key={`${art.id}-${idx}`}
+              key={`desk-${art.id}-${idx}`}
               onClick={() => setSelectedArtworkForModal(art)}
               className="group relative w-[220px] sm:w-[270px] md:w-[310px] aspect-[4/5] shrink-0 rounded-2xl overflow-hidden cursor-pointer border border-white/10 bg-[#08180f] shadow-xl hover:border-[#d4af37]/60 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(212,175,55,0.2)]"
               title="Click to view full piece"

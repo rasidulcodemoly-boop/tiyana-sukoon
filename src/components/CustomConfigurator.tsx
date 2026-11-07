@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useStore } from "../context/StoreContext";
 import {
   Sparkles,
-  Palette,
   Check,
   Send,
   MessageCircle,
@@ -145,10 +144,6 @@ ${customerNotes ? `- Notes: ${customerNotes}` : ""}`;
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0d2218] border border-[#d4af37]/40 text-xs font-semibold text-[#f4dc8a]">
-            <Palette className="w-3.5 h-3.5 text-[#d4af37]" />
-            <span>Interactive Bespoke Commission Builder</span>
-          </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Design Your Custom Islamic Canvas
           </h2>

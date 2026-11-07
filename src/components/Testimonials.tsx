@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Star, ShieldCheck, MessageSquareHeart, CheckCircle2 } from "lucide-react";
+import { Star, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { initialReviews } from "../data/initialData";
 
 export const Testimonials: React.FC = () => {
@@ -10,10 +10,6 @@ export const Testimonials: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3 mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0d2218] border border-[#d4af37]/30 text-xs font-semibold text-[#f4dc8a]">
-            <MessageSquareHeart className="w-3.5 h-3.5 text-[#d4af37]" />
-            <span>Customer Stories • শুভাকাঙ্ক্ষীদের প্রতিক্রিয়া</span>
-          </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Loved in Homes Across Bangladesh
           </h2>

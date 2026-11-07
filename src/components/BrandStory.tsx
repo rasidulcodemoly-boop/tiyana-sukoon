@@ -83,11 +83,6 @@ export const BrandStory: React.FC = () => {
 
           {/* Right Column: Story Copy & Pillars */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0d2218] border border-[#d4af37]/30 text-xs font-semibold text-[#f4dc8a]">
-              <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" />
-              <span>The Sukoon Philosophy • সুকূনের কথা</span>
-            </div>
-
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
               Art Designed to Bring Serenity to Modern Homes
             </h2>

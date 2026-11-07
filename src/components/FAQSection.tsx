@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown, HelpCircle, ShieldAlert, Truck, Sparkles } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 interface FAQItem {
   q: string;
@@ -47,10 +47,6 @@ export const FAQSection: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center space-y-3 mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0d2218] border border-[#d4af37]/30 text-xs font-semibold text-[#f4dc8a]">
-            <HelpCircle className="w-3.5 h-3.5 text-[#d4af37]" />
-            <span>Common Questions • সচরাচর জিজ্ঞাসা</span>
-          </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Frequently Asked Questions
           </h2>

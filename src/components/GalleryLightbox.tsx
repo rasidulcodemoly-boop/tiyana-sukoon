@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useStore } from "../context/StoreContext";
 import {
   X,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   ZoomIn,
@@ -58,10 +57,6 @@ export const GalleryLightbox: React.FC = () => {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0d2218] border border-[#d4af37]/30 text-xs font-semibold text-[#f4dc8a]">
-              <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" />
-              <span>Authentic Facebook Page Archives • গ্যালারি</span>
-            </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
               Tiyana&apos;s Sukoon Visual Archives
             </h2>

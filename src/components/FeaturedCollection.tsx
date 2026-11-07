@@ -9,7 +9,6 @@ import {
   Eye,
   Check,
   Search,
-  Sparkles,
 } from "lucide-react";
 
 export const FeaturedCollection: React.FC = () => {
@@ -59,10 +58,6 @@ export const FeaturedCollection: React.FC = () => {
         {/* Header Section (Linear Style) */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0d2218] border border-[#d4af37]/30 text-xs font-medium text-[#f4dc8a]">
-              <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" />
-              <span>Studio Collection • হস্তনির্মিত শিল্পকর্ম</span>
-            </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
               Featured Artwork & Calligraphy
             </h2>

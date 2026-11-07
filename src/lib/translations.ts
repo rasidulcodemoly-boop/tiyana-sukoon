@@ -1,0 +1,293 @@
+export type Language = "en" | "bn";
+
+export const translations = {
+  en: {
+    // Top banner
+    announcement: "🌿 Ramadan & Eid 2026 Calligraphy Slots Open • Free Delivery Inside Dhaka on Orders Over ৳4,000",
+    whatsapp: "WhatsApp",
+    callStudio: "Call Studio",
+
+    // Brand
+    brandName: "Tiyana's Sukoon",
+    brandTagline: "Art for your peace • Dhaka",
+
+    // Navbar
+    navCollections: "Collections",
+    navCustomArt: "Custom Art",
+    navGallery: "Gallery",
+    navPhilosophy: "Philosophy",
+    navReviews: "Reviews",
+    navOrderWhatsApp: "Order via WhatsApp Chat",
+    navGuarantee: "✨ 100% Hand-painted in Dhaka Studio • Nationwide Delivery",
+
+    // Hero Section
+    heroEyebrow: "Handcrafted Islamic Calligraphy Studio",
+    heroHeadline1: "Art for your peace.",
+    heroHeadline2: "Peace for your soul.",
+    heroSubheadline: "Where every golden stroke of calligraphy awakens serenity. Pure Islamic calligraphy & premium textured canvas art.",
+    heroBtnCollections: "View Collections",
+    heroBtnCustom: "Custom Art Order",
+
+    // Featured Collection
+    colHeading: "Featured Artwork & Calligraphy",
+    colDesc: "Each piece is individually handcrafted in our Dhaka studio using traditional Arabic calligraphy techniques, genuine gold foil, and archival grade canvas.",
+    colSearchPlaceholder: "Search verses, sizes, gifts...",
+    colCatAll: "All Artworks",
+    colCatCalligraphy: "Arabic Calligraphy",
+    colCatCanvas: "Canvas Paintings",
+    colCatMiniEasels: "Mini Easels",
+    colCatBookmarks: "Bookmarks & Sets",
+    colCatCustom: "Custom Pieces",
+    colNoResults: "No artworks match your search or category filter.",
+    colClearSearch: "Clear Filters",
+    colAddToCart: "Add to Cart",
+    colAdded: "Added!",
+    colQuickView: "Quick View",
+    colInStock: "In Stock",
+    colMadeToOrder: "Made to Order",
+
+    // Custom Configurator
+    confHeading: "Design Your Custom Islamic Canvas",
+    confDesc: "Select your preferred verse, canvas dimensions, and framing finish. Get an instant estimate and commission our master calligrapher directly.",
+    confStep1: "1. Artwork Theme & Sacred Text",
+    confCustomTextPlaceholder: "Or type your personalized Ayah, names, wedding dua, or custom message...",
+    confStep2: "2. Canvas Dimensions & Scale",
+    confStep3: "3. Framing & Display Finish",
+    confStep4: "4. Your Contact Details",
+    confNamePlaceholder: "Your Full Name *",
+    confPhonePlaceholder: "017XXXXXXXX (Mobile / WhatsApp) *",
+    confNotesPlaceholder: "Special requests, room color scheme, delivery instructions...",
+    confEstTotal: "Estimated Total",
+    confFreeShippingDhaka: "Free delivery inside Dhaka included",
+    confBtnSubmit: "Submit Commission Request",
+    confBtnSubmitting: "Submitting Request...",
+    confBtnWhatsApp: "Order Directly via WhatsApp",
+    confInquirySuccess: "Assalamu Alaikum! Your commission inquiry has been received. We will contact you shortly with sketches.",
+
+    // Gallery Lightbox
+    galHeading: "Tiyana's Sukoon Visual Archives",
+    galDesc: "Photographed directly in our Dhaka studio. Explore finished canvases, desert sand texture artworks, Ayat al-Kursi, Surah Al-Falaq, and bespoke keepsakes.",
+    galTabAll: "All Archives",
+    galTabCalligraphy: "Calligraphy",
+    galTabCanvas: "Canvases & Easels",
+    galTabBookmarks: "Bookmarks & Gifts",
+    galTabCustom: "Custom Sets",
+    galClickToEnlarge: "Click to inspect details",
+    galInquireThisPiece: "Inquire About This Piece",
+
+    // Brand Story
+    storyHeading: "Art Designed to Bring Serenity to Modern Homes",
+    storyP1: "In an increasingly noisy and chaotic world, Tiyana's Sukoon was founded with a simple yet profound vision: to bring Sukoon (tranquility, spiritual calm, peace of soul) into your daily living spaces.",
+    storyP2: "We believe sacred Islamic verses and Arabic calligraphy shouldn't just be words on a wall; they should be an intimate reminder of divine grace, warmth, and stillness. By pairing deep obsidian emerald greens with luminous gold leaf, each painting reacts dynamically to morning sunlight and warm evening lamps.",
+    storyLocationTitle: "Studio Location",
+    storyLocationCity: "Dhaka, Bangladesh",
+    storyLocationDesc: "Private commissions available nationwide via secure courier.",
+    pillar1Title: "Sacred Hand Lettering",
+    pillar1Desc: "Every curve of Thuluth, Diwani, and Naskh script is crafted by hand using traditional calligraphy pens, not printed or automated.",
+    pillar2Title: "24K Gold Leaf Gilding",
+    pillar2Desc: "Genuine imitation 24K gold foil meticulously laid with gilding size, sealed with UV protection so the gold never tarnishes.",
+    pillar3Title: "Archival Linen Canvases",
+    pillar3Desc: "Heavyweight 380gsm primed linen canvases wrapped tightly around kiln-dried pine wood stretcher bars for lifetime longevity.",
+    pillar4Title: "Reinforced Safe Shipping",
+    pillar4Desc: "Each framed canvas is packed in triple-wall corrugated carton, foam edge bumpers, and wooden corner guards for damage-free transit.",
+
+    // Testimonials
+    revHeading: "Loved in Homes Across Bangladesh",
+    revDesc: "Read verified reviews from art lovers, interior designers, and gift seekers who welcomed Tiyana's Sukoon into their sacred spaces.",
+    revVerified: "Verified Buyer",
+
+    // FAQ
+    faqHeading: "Frequently Asked Questions",
+    faqDesc: "Everything you need to know about commissions, framing, delivery safety, and artwork preservation.",
+
+    // Cart & Checkout
+    cartTitle: "Your Shopping Bag",
+    cartEmptyTitle: "Your bag is empty",
+    cartEmptyDesc: "Browse our original calligraphy collection and discover the perfect piece for your home.",
+    cartBrowseBtn: "Explore Artworks",
+    cartSubtotal: "Subtotal",
+    cartDelivery: "Delivery",
+    cartDeliveryDhaka: "Inside Dhaka (৳80 / Free over ৳4k)",
+    cartDeliveryOutside: "Outside Dhaka (৳150)",
+    cartTotal: "Total Amount",
+    cartCheckoutBtn: "Proceed to Checkout",
+    cartOrderSuccess: "Thank You! Order Placed Successfully",
+    cartOrderSuccessDesc: "Your order has been recorded. Our studio team will call or WhatsApp you within 2 business hours for delivery dispatch.",
+    cartCheckoutTitle: "Cash on Delivery Checkout",
+    cartFullName: "Full Name *",
+    cartPhone: "Phone Number (017XXXXXXXX) *",
+    cartAddress: "Full Delivery Address (House, Road, Area, City) *",
+    cartZone: "Delivery Area",
+    cartZoneInside: "Inside Dhaka City (৳80)",
+    cartZoneOutside: "Outside Dhaka (৳150)",
+    cartNotes: "Order notes (optional)",
+    cartPlaceOrderBtn: "Confirm Order (Cash on Delivery)",
+    cartPlacingOrder: "Placing Order...",
+
+    // Quick View Modal
+    modalDimensions: "Dimensions",
+    modalMedium: "Medium & Technique",
+    modalFinish: "Protective Finish",
+    modalFrameIncluded: "Floating Frame Included",
+    modalFreeShipping: "Free Delivery in Dhaka for this item",
+    modalAddToCart: "Add to Shopping Bag",
+    modalOrderWhatsApp: "Order via WhatsApp",
+
+    // Footer
+    footDesc: "\"Where colors meet emotions, and every stroke tells a story.\" Bespoke Arabic calligraphy, textured modern canvases, and Islamic keepsakes handcrafted with devotion in Dhaka, Bangladesh.",
+    footExplore: "Explore",
+    footCategories: "Art Categories",
+    footStudio: "Studio & Inquiries",
+    footHours: "Sat - Thu: 10:00 AM - 10:00 PM",
+    footAdmin: "Admin Management Panel",
+    footCopyright: "Tiyana's Sukoon. All Rights Reserved. Handcrafted with devotion in Dhaka.",
+    footBadge1: "100% Authentic Hand-Lettering",
+    footBadge2: "Secure Cash on Delivery",
+    footBadge3: "Breakage-Safe Guarantee",
+  },
+
+  bn: {
+    // Top banner
+    announcement: "🌿 রমজান ও ঈদ ২০২৬ ক্যালিগ্রাফি স্লট ওপেন • ৪,০০০ টাকার উপরে অর্ডারে ঢাকা সিটিতে ফ্রি ডেলিভারি",
+    whatsapp: "হোয়াটসঅ্যাপ",
+    callStudio: "স্টুডিওতে কল করুন",
+
+    // Brand
+    brandName: "তিয়ানা'স সুকূন",
+    brandTagline: "আপনার প্রশান্তির জন্য শিল্প • ঢাকা",
+
+    // Navbar
+    navCollections: "কালেকশন",
+    navCustomArt: "কাস্টম আর্ট",
+    navGallery: "গ্যালারি",
+    navPhilosophy: "সুকূনের দর্শন",
+    navReviews: "রিভিউ",
+    navOrderWhatsApp: "হোয়াটসঅ্যাপে সরাসরি অর্ডার করুন",
+    navGuarantee: "✨ ১০০% হাতে তৈরি আর্টওয়ার্ক • ঢাকা স্টুডিও • সারাদেশে ডেলিভারি",
+
+    // Hero Section
+    heroEyebrow: "হস্তনির্মিত ইসলামিক ক্যালিগ্রাফি স্টুডিও",
+    heroHeadline1: "Art for your peace.",
+    heroHeadline2: "Peace for your soul.",
+    heroSubheadline: "যেখানে ক্যালিগ্রাফির প্রতিটি সোনালী আঁচড়ে জেগে ওঠে প্রশান্তি। খাঁটি ইসলামিক ক্যালিগ্রাফি ও প্রিমিয়াম টেক্সচার্ড ক্যানভাস আর্ট।",
+    heroBtnCollections: "কালেকশন দেখুন",
+    heroBtnCustom: "কাস্টম আর্ট অর্ডার",
+
+    // Featured Collection
+    colHeading: "বাছাইকৃত আর্টওয়ার্ক ও ক্যালিগ্রাফি",
+    colDesc: "আমাদের ঢাকা স্টুডিওতে প্রতিটি শিল্পকর্ম ঐতিহ্যবাহী আরবি ক্যালিগ্রাফি শৈলী, খাঁটি গোল্ড ফয়েল ও প্রিমিয়াম লিনেন ক্যানভাসে স্বতন্ত্রভাবে হাতে তৈরি।",
+    colSearchPlaceholder: "আয়াত, সাইজ বা উপহার সামগ্রী খুঁজুন...",
+    colCatAll: "সকল আর্টওয়ার্ক",
+    colCatCalligraphy: "আরবি ক্যালিগ্রাফি",
+    colCatCanvas: "ক্যানভাস পেইন্টিং",
+    colCatMiniEasels: "মিনি ইজেল আর্ট",
+    colCatBookmarks: "বুকমার্ক ও গিফট সেট",
+    colCatCustom: "কাস্টম পিস",
+    colNoResults: "আপনার পছন্দের ক্যাটাগরি বা সার্চে কোনো আর্টওয়ার্ক খুঁজে পাওয়া যায়নি।",
+    colClearSearch: "ফিল্টার ক্লিয়ার করুন",
+    colAddToCart: "কার্টে যোগ করুন",
+    colAdded: "যুক্ত হয়েছে!",
+    colQuickView: "বিস্তারিত দেখুন",
+    colInStock: "স্টকে আছে",
+    colMadeToOrder: "অর্ডারে তৈরি",
+
+    // Custom Configurator
+    confHeading: "আপনার কাস্টম ইসলামিক ক্যানভাস ডিজাইন করুন",
+    confDesc: "পছন্দের আয়াত, ক্যানভাস সাইজ এবং ফ্রেম নির্বাচন করে ইনস্ট্যান্ট এস্টিমেট পান এবং সরাসরি আমাদের মাস্টার ক্যালিগ্রাফারকে অর্ডার দিন।",
+    confStep1: "১. আর্টওয়ার্ক থিম ও পবিত্র আয়াত নির্বাচন",
+    confCustomTextPlaceholder: "বা আপনার পছন্দের যেকোনো আয়াত, কাপল নাম, দোয়া বা বার্তা বাংলায় বা আরবিতে লিখুন...",
+    confStep2: "২. ক্যানভাস সাইজ ও মাপ",
+    confStep3: "৩. ফ্রেম ও ফিনিশিং",
+    confStep4: "৪. আপনার যোগাযোগের তথ্য",
+    confNamePlaceholder: "আপনার পুরো নাম *",
+    confPhonePlaceholder: "০১XXXXXXXXX (মোবাইল / হোয়াটসঅ্যাপ) *",
+    confNotesPlaceholder: "রঙের পছন্দ, ঘরের দেয়ালের বিবরণ বা বিশেষ কোনো নির্দেশ থাকলে লিখুন...",
+    confEstTotal: "আনুমানিক সর্বমোট",
+    confFreeShippingDhaka: "ঢাকা সিটিতে ফ্রি হোম ডেলিভারি অন্তর্ভুক্ত",
+    confBtnSubmit: "কমিশন রিকোয়েস্ট পাঠান",
+    confBtnSubmitting: "রিকোয়েস্ট পাঠানো হচ্ছে...",
+    confBtnWhatsApp: "সরাসরি হোয়াটসঅ্যাপে অর্ডার করুন",
+    confInquirySuccess: "আসসালামু আলাইকুম! আপনার কাস্টম কমিশন রিকোয়েস্ট গৃহীত হয়েছে। দ্রুতই আমরা আপনার সাথে যোগাযোগ করব।",
+
+    // Gallery Lightbox
+    galHeading: "তিয়ানা'স সুকূন ভিজ্যুয়াল আর্কাইভ",
+    galDesc: "আমাদের ঢাকা স্টুডিওতে তোলা মূল শিল্পকর্মের আলোকচিত্র। আয়াতুল কুরসী, সূরা ফালাক, চার কুল ও সোনালী টেক্সচার্ড ক্যানভাসের সংগ্রহশালা।",
+    galTabAll: "সব অ্যালবাম",
+    galTabCalligraphy: "ক্যালিগ্রাফি",
+    galTabCanvas: "ক্যানভাস ও ইজেল",
+    galTabBookmarks: "বুকমার্ক ও উপহার",
+    galTabCustom: "কাস্টম সেট",
+    galClickToEnlarge: "জুম করে দেখতে ক্লিক করুন",
+    galInquireThisPiece: "এই আর্টওয়ার্কটি সম্পর্কে জানতে চান?",
+
+    // Brand Story
+    storyHeading: "আধুনিক গৃহে প্রশান্তি ছড়াতে তৈরি আমাদের শিল্পকর্ম",
+    storyP1: "কোলাহলময় দৈনন্দিন জীবনে ঘরে একটু আধ্যাত্মিক প্রশান্তি ও মানসিক স্বস্তি ফিরিয়ে দিতেই 'তিয়ানা'স সুকূন'-এর যাত্রা শুরু। আরবি 'সুকূন' শব্দের অর্থ হলো গভীর মানসিক শান্তি, প্রশান্তি ও আত্মিক নির্ভরতা।",
+    storyP2: "আমরা বিশ্বাস করি, পবিত্র ইসলামিক আয়াত শুধু দেয়ালের সাজসজ্জা নয়—এটি মহান রবের রহমত, উষ্ণতা ও করুণার জীবন্ত এক স্মারক। গভীর এমারেল্ড গ্রিন এবং খাঁটি সোনালী লিফের সমন্বয়ে প্রতিটি চিত্রকর্ম দিনের আলো ও রাতের ল্যাম্পশেডে মনমুগ্ধকর দ্যুতি ছড়ায়।",
+    storyLocationTitle: "স্টুডিওর অবস্থান",
+    storyLocationCity: "ঢাকা, বাংলাদেশ",
+    storyLocationDesc: "নিরাপদ ও অক্ষত কুরিয়ার প্যাকেজিংয়ে সারাদেশে ডেলিভারি দেওয়া হয়।",
+    pillar1Title: "হাতে আঁকা খাঁটি হরফ",
+    pillar1Desc: "থুলুথ, দিওয়ানি ও নাসখ লিপির প্রতিটি সোনালী রেখা ক্যালিগ্রাফি কলমে পরম যত্নে অঙ্কিত, কোনো ডিজিটাল প্রিন্ট নয়।",
+    pillar2Title: "২৪K গোল্ড লিফ গিল্ডিং",
+    pillar2Desc: "আমদানিকৃত খাঁটি গোল্ড ফয়েল ও ইউভি প্রোটেক্টিভ কোটিং ব্যবহার করা হয়, যা বছরের পর বছর নতুনের মতো উজ্জ্বল থাকে।",
+    pillar3Title: "আর্কাইভাল লিনেন ক্যানভাস",
+    pillar3Desc: "৩৮০ জিএসএম প্রিমিয়াম লিনেন ক্যানভাস ও সিজনড পাইন উড ফ্রেমে তৈরি, যা দীর্ঘস্থায়ী ও টেকসই।",
+    pillar4Title: "নিরাপদ প্যাকেজিং গ্যারান্টি",
+    pillar4Desc: "মাল্টি-লেয়ার বাবল র‍্যাপ, হার্ড কর্নার গার্ড ও কাঠের বক্স দিয়ে ট্রানজিটে অক্ষত রাখার শতভাগ নিশ্চয়তা।",
+
+    // Testimonials
+    revHeading: "সারাদেশের গ্রাহকদের শুভকামনা ও ভালোবাসা",
+    revDesc: "সুকূনের শিল্পকর্ম যাদের ঘরে প্রশান্তি ছড়িয়েছে, তাদের কিছু মূল্যবান মতামত ও অনুভূতি।",
+    revVerified: "যাচাইকৃত ক্রেতা",
+
+    // FAQ
+    faqHeading: "সচরাচর জিজ্ঞাসিত প্রশ্নাবলী",
+    faqDesc: "অর্ডার, ডেলিভারি, ফ্রেম এবং আর্টওয়ার্কের যত্ন সংক্রান্ত প্রয়োজনীয় সকল তথ্য।",
+
+    // Cart & Checkout
+    cartTitle: "আপনার শপিং ব্যাগ",
+    cartEmptyTitle: "আপনার ব্যাগ খালি",
+    cartEmptyDesc: "আমাদের কালেকশন ঘুরে দেখুন এবং আপনার পছন্দের পবিত্র ক্যালিগ্রাফি নির্বাচন করুন।",
+    cartBrowseBtn: "আর্টওয়ার্ক দেখুন",
+    cartSubtotal: "সাবটোটাল",
+    cartDelivery: "ডেলিভারি",
+    cartDeliveryDhaka: "ঢাকা সিটি (৳৮০ / ৪ হাজার টাকার উপরে ফ্রি)",
+    cartDeliveryOutside: "ঢাকার বাইরে (৳১৫০)",
+    cartTotal: "সর্বমোট বিল",
+    cartCheckoutBtn: "চেকআউট করুন",
+    cartOrderSuccess: "ধন্যবাদ! আপনার অর্ডার সফলভাবে গ্রহণ করা হয়েছে",
+    cartOrderSuccessDesc: "আপনার অর্ডার রেকর্ড করা হয়েছে। পরবর্তী ২ কর্মঘণ্টার মধ্যে আমাদের স্টুডিও থেকে ফোন বা হোয়াটসঅ্যাপে নিশ্চিত করা হবে।",
+    cartCheckoutTitle: "ক্যাশ অন ডেলিভারি চেকআউট",
+    cartFullName: "আপনার পুরো নাম *",
+    cartPhone: "ফোন নম্বর (০১XXXXXXXXX) *",
+    cartAddress: "সম্পূর্ণ ঠিকানা (বাসা, রোড, এলাকা, জেলা) *",
+    cartZone: "ডেলিভারি এলাকা",
+    cartZoneInside: "ঢাকা সিটির ভেতরে (৳৮০)",
+    cartZoneOutside: "ঢাকা সিটির বাইরে (৳১৫০)",
+    cartNotes: "বিশেষ কোনো বার্তা বা নির্দেশনা (ঐচ্ছিক)",
+    cartPlaceOrderBtn: "অর্ডার কনফার্ম করুন (ক্যাশ অন ডেলিভারি)",
+    cartPlacingOrder: "অর্ডার কনফার্ম করা হচ্ছে...",
+
+    // Quick View Modal
+    modalDimensions: "ক্যানভাস সাইজ",
+    modalMedium: "মাধ্যম ও প্রযুক্তি",
+    modalFinish: "সুরক্ষা কোটিং",
+    modalFrameIncluded: "ফ্লোটিং লাক্সারি ফ্রেম অন্তর্ভুক্ত",
+    modalFreeShipping: "এই আইটেমে ঢাকায় ফ্রি ডেলিভারি",
+    modalAddToCart: "শপিং ব্যাগে যোগ করুন",
+    modalOrderWhatsApp: "হোয়াটসঅ্যাপে অর্ডার করুন",
+
+    // Footer
+    footDesc: "\"যেখানে রং মেলে অনুভূতির সাথে, আর প্রতিটি রেখা বলে যায় প্রশান্তির গল্প।\" খাঁটি আরবি ক্যালিগ্রাফি ও টেক্সচার্ড ক্যানভাস আর্ট, হাতে তৈরি ঢাকায়।",
+    footExplore: "ন্যাভিগেশন",
+    footCategories: "ক্যাটাগরি",
+    footStudio: "স্টুডিও ও যোগাযোগ",
+    footHours: "শনিবার - বৃহস্পতিবার: সকাল ১০টা - রাত ১০টা",
+    footAdmin: "অ্যাডমিন প্যানেল",
+    footCopyright: "তিয়ানা'স সুকূন। সর্বস্বত্ব সংরক্ষিত। পরম যত্নে ঢাকায় তৈরি।",
+    footBadge1: "১০০% খাঁটি হাতে তৈরি ক্যালিগ্রাফি",
+    footBadge2: "নিরাপদ ক্যাশ অন ডেলিভারি",
+    footBadge3: "অক্ষত পৌঁছানোর শতভাগ গ্যারান্টি",
+  },
+};

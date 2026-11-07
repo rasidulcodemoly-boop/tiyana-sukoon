@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 export const GalleryLightbox: React.FC = () => {
-  const { artworks, addToCart, setSelectedArtworkForModal } = useStore();
+  const { artworks, addToCart, setSelectedArtworkForModal, language, t } = useStore();
   const [activeTab, setActiveTab] = useState<string>("all");
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
     null
@@ -58,22 +58,21 @@ export const GalleryLightbox: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Tiyana&apos;s Sukoon Visual Archives
+              {t("galHeading")}
             </h2>
             <p className="text-[#9cb5a6] text-sm max-w-xl">
-              Photographed directly in our Dhaka studio. Explore all {artworks.length} finished
-              canvases, desert sand texture artworks, Ayat al-Kursi, Surah Al-Falaq, and bespoke keepsakes.
+              {t("galDesc")}
             </p>
           </div>
 
           {/* Filter Pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none">
             {[
-              { id: "all", label: `All Archives (${artworks.length})` },
-              { id: "calligraphy", label: "Calligraphy" },
-              { id: "canvas", label: "Canvases & Easels" },
-              { id: "bookmarks", label: "Bookmarks & Gifts" },
-              { id: "custom-orders", label: "Custom Sets" },
+              { id: "all", label: `${t("galTabAll")} (${artworks.length})` },
+              { id: "calligraphy", label: t("galTabCalligraphy") },
+              { id: "canvas", label: t("galTabCanvas") },
+              { id: "bookmarks", label: t("galTabBookmarks") },
+              { id: "custom-orders", label: t("galTabCustom") },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -117,7 +116,7 @@ export const GalleryLightbox: React.FC = () => {
                   </span>
                 </div>
                 <p className="text-xs font-bold text-white line-clamp-1">
-                  {art.title}
+                  {language === "bn" && art.titleBangla ? art.titleBangla : art.title}
                 </p>
                 {art.titleBangla && (
                   <p className="text-[11px] text-[#8fa89a] line-clamp-1 font-serif">

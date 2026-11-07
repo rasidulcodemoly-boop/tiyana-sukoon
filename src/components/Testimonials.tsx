@@ -3,19 +3,21 @@
 import React from "react";
 import { Star, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { initialReviews } from "../data/initialData";
+import { useStore } from "../context/StoreContext";
 
 export const Testimonials: React.FC = () => {
+  const { t } = useStore();
+
   return (
     <section id="reviews" className="py-20 bg-[#06110a] relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3 mb-14">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Loved in Homes Across Bangladesh
+            {t("revHeading")}
           </h2>
           <p className="text-[#9cb5a6] text-sm">
-            Read verified reviews from art lovers, interior designers, and gift seekers
-            who welcomed Tiyana&apos;s Sukoon into their sacred spaces.
+            {t("revDesc")}
           </p>
         </div>
 
@@ -49,7 +51,7 @@ export const Testimonials: React.FC = () => {
                   {rev.verified && (
                     <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-medium">
                       <CheckCircle2 className="w-3 h-3" />
-                      <span>Verified Buyer</span>
+                      <span>{t("revVerified")}</span>
                     </span>
                   )}
                 </div>

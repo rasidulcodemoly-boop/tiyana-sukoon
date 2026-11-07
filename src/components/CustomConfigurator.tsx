@@ -84,7 +84,7 @@ const ART_STYLES = [
 ];
 
 export const CustomConfigurator: React.FC = () => {
-  const { createInquiry, showToast, settings } = useStore();
+  const { createInquiry, showToast, settings, language, t } = useStore();
 
   const [selectedStyle, setSelectedStyle] = useState(ART_STYLES[0].name);
   const [selectedSize, setSelectedSize] = useState<SizeOption>(SIZE_OPTIONS[1]);
@@ -145,11 +145,10 @@ ${customerNotes ? `- Notes: ${customerNotes}` : ""}`;
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-14">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Design Your Custom Islamic Canvas
+            {t("confHeading")}
           </h2>
           <p className="text-[#9cb5a6] text-sm">
-            Select your preferred verse, canvas dimensions, and framing finish.
-            Get an instant estimate and commission our master calligrapher directly.
+            {t("confDesc")}
           </p>
         </div>
 
@@ -203,7 +202,7 @@ ${customerNotes ? `- Notes: ${customerNotes}` : ""}`;
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g., Ayatul Kursi, or 'Farhan & Sadia - 12.11.2024'"
+                  placeholder={t("confCustomTextPlaceholder")}
                   value={customText}
                   onChange={(e) => setCustomText(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl bg-[#08170f] border border-white/10 text-white placeholder-[#687f71] text-xs focus:outline-none focus:border-[#d4af37]"
@@ -380,7 +379,7 @@ ${customerNotes ? `- Notes: ${customerNotes}` : ""}`;
                 <form onSubmit={handleSubmit} className="space-y-3">
                   <div>
                     <label className="block text-xs text-[#9cb5a6] mb-1">
-                      Your Full Name *
+                      {t("confNamePlaceholder")}
                     </label>
                     <input
                       type="text"
@@ -393,7 +392,7 @@ ${customerNotes ? `- Notes: ${customerNotes}` : ""}`;
                   </div>
                   <div>
                     <label className="block text-xs text-[#9cb5a6] mb-1">
-                      Phone Number (for WhatsApp/Confirmation) *
+                      {t("confPhonePlaceholder")}
                     </label>
                     <input
                       type="tel"
@@ -406,11 +405,11 @@ ${customerNotes ? `- Notes: ${customerNotes}` : ""}`;
                   </div>
                   <div>
                     <label className="block text-xs text-[#9cb5a6] mb-1">
-                      Special Requests / Notes (Optional)
+                      {t("confNotesPlaceholder")}
                     </label>
                     <textarea
                       rows={2}
-                      placeholder="e.g., Anniversary gift needed before 15th, please add couple names in gold..."
+                      placeholder={t("confNotesPlaceholder")}
                       value={customerNotes}
                       onChange={(e) => setCustomerNotes(e.target.value)}
                       className="w-full px-3 py-2 rounded-lg bg-[#08170f] border border-white/10 text-white text-xs placeholder-[#687f71] focus:outline-none focus:border-[#d4af37]"
@@ -425,17 +424,17 @@ ${customerNotes ? `- Notes: ${customerNotes}` : ""}`;
                       className="w-full btn-3d-gold py-3 text-xs tracking-wider uppercase font-bold"
                     >
                       <Send className="w-3.5 h-3.5 text-[#0f1811]" />
-                      <span>{isSubmitting ? "Submitting..." : "Submit Custom Commission"}</span>
+                      <span>{isSubmitting ? t("confBtnSubmitting") : t("confBtnSubmit")}</span>
                     </button>
 
                     <a
                       href={getWhatsAppLink()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full btn-3d-emerald py-2.5 text-xs text-center justify-center"
+                      className="w-full btn-3d-emerald py-2.5 text-xs text-center justify-center flex items-center gap-2"
                     >
                       <MessageCircle className="w-4 h-4" />
-                      <span>Instant WhatsApp Discussion</span>
+                      <span>{t("confBtnWhatsApp")}</span>
                     </a>
                   </div>
                 </form>

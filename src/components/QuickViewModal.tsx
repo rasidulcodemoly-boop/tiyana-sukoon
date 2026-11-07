@@ -26,6 +26,8 @@ export const QuickViewModal: React.FC = () => {
     setSelectedArtworkForModal,
     addToCart,
     settings,
+    language,
+    t,
   } = useStore();
 
   const [selectedFrame, setSelectedFrame] = useState(FRAME_OPTIONS[0]);
@@ -96,11 +98,16 @@ Dimensions: ${item.dimensions}`;
                   Arabic Fine Art &bull; {item.dimensions}
                 </span>
                 <h3 className="text-xl font-bold text-white leading-snug">
-                  {item.title}
+                  {language === "bn" && item.titleBangla ? item.titleBangla : item.title}
                 </h3>
-                {item.titleBangla && (
+                {language === "en" && item.titleBangla && (
                   <p className="text-xs text-[#8fa89a] font-serif mt-0.5">
                     {item.titleBangla}
+                  </p>
+                )}
+                {language === "bn" && (
+                  <p className="text-xs text-[#8fa89a] font-mono mt-0.5">
+                    {item.title}
                   </p>
                 )}
               </div>
@@ -189,12 +196,12 @@ Dimensions: ${item.dimensions}`;
                 {added ? (
                   <>
                     <Check className="w-4 h-4 text-[#0f1811]" />
-                    <span>Added to Cart!</span>
+                    <span>{t("colAdded")}</span>
                   </>
                 ) : (
                   <>
                     <ShoppingBag className="w-4 h-4 text-[#0f1811]" />
-                    <span>Add to Collection</span>
+                    <span>{t("modalAddToCart")}</span>
                   </>
                 )}
               </button>

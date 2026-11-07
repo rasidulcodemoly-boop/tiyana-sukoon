@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 export const Navbar: React.FC = () => {
-  const { cartCount, setIsCartOpen, settings } = useStore();
+  const { cartCount, setIsCartOpen, settings, language, setLanguage, t } = useStore();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -72,7 +72,7 @@ export const Navbar: React.FC = () => {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
               <p className="tracking-wide text-[#d6e5dc] truncate sm:whitespace-normal">
-                {settings.announcementText}
+                {language === "bn" ? t("announcement") : settings.announcementText}
               </p>
             </div>
             <a
@@ -82,7 +82,7 @@ export const Navbar: React.FC = () => {
               className="shrink-0 inline-flex items-center gap-1 text-[#f3db83] hover:text-white font-semibold text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30 transition-all hover:bg-[#d4af37]/25"
             >
               <MessageCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#34d399]" />
-              <span>WhatsApp</span>
+              <span>{t("whatsapp")}</span>
               <ExternalLink className="w-2.5 h-2.5 opacity-70" />
             </a>
           </div>
@@ -121,10 +121,10 @@ export const Navbar: React.FC = () => {
             {/* Brand Title and Tagline (Desktop Only - Strictly Hidden on Mobile & Tablet) */}
             <div className="hidden md:flex min-w-0 flex-col justify-center">
               <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-white group-hover:text-[#f4dc8a] transition-colors truncate">
-                Tiyana&apos;s Sukoon
+                {language === "bn" ? "তিয়ানা'স সুকূন" : "Tiyana's Sukoon"}
               </span>
               <p className="text-[10px] sm:text-[11px] text-[#8fa89a] font-normal tracking-wide truncate">
-                Art for your peace <span className="hidden xs:inline">• Dhaka</span>
+                {t("brandTagline")}
               </p>
             </div>
           </Link>
@@ -135,36 +135,68 @@ export const Navbar: React.FC = () => {
               href="#collections"
               className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all"
             >
-              Collections
+              {t("navCollections")}
             </a>
             <a
               href="#custom-commission"
               className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all"
             >
-              Custom Art
+              {t("navCustomArt")}
             </a>
             <a
               href="#gallery"
               className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all"
             >
-              Gallery
+              {t("navGallery")}
             </a>
             <a
               href="#philosophy"
               className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all"
             >
-              Philosophy
+              {t("navPhilosophy")}
             </a>
             <a
               href="#reviews"
               className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all"
             >
-              Reviews
+              {t("navReviews")}
             </a>
           </nav>
 
-          {/* Right Action Area: Cart, Commission CTA & Mobile Hamburger */}
+          {/* Right Action Area: Language Switcher, Cart & Mobile Hamburger */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Language Toggle Button (EN | বাং) */}
+            <div
+              className="flex items-center rounded-xl bg-[#091e13] border border-[#d4af37]/35 p-0.5 shadow-sm"
+              role="group"
+              aria-label="Language selection"
+            >
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={`px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold font-mono transition-all duration-200 ${
+                  language === "en"
+                    ? "bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] text-[#06110a] shadow-[0_2px_8px_rgba(212,175,55,0.3)] font-black"
+                    : "text-[#8fa89a] hover:text-white"
+                }`}
+                title="Switch to English (Default)"
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("bn")}
+                className={`px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold transition-all duration-200 ${
+                  language === "bn"
+                    ? "bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] text-[#06110a] shadow-[0_2px_8px_rgba(212,175,55,0.3)] font-black"
+                    : "text-[#8fa89a] hover:text-white"
+                }`}
+                title="বাংলায় পরিবর্তন করুন"
+              >
+                বাং
+              </button>
+            </div>
+
             {/* Cart Trigger Button (3D Dark Bevel) */}
             <button
               onClick={() => setIsCartOpen(true)}
@@ -203,6 +235,37 @@ export const Navbar: React.FC = () => {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-[#d4af37]/20 bg-[#06110a]/98 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] max-h-[calc(100vh-70px)] overflow-y-auto animate-fadeIn">
             <div className="px-4 py-5 space-y-4">
+              {/* Language Switcher in Mobile Drawer */}
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#0a1e13] border border-[#d4af37]/25">
+                <span className="text-xs text-[#9cb5a6] font-medium">
+                  {language === "en" ? "Language / ভাষা:" : "ভাষা / Language:"}
+                </span>
+                <div className="flex items-center rounded-lg bg-[#06120b] border border-[#d4af37]/35 p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setLanguage("en")}
+                    className={`px-3 py-1 rounded text-xs font-bold font-mono transition-all ${
+                      language === "en"
+                        ? "bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] text-[#06110a]"
+                        : "text-[#8fa89a]"
+                    }`}
+                  >
+                    English
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLanguage("bn")}
+                    className={`px-3 py-1 rounded text-xs font-bold transition-all ${
+                      language === "bn"
+                        ? "bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] text-[#06110a]"
+                        : "text-[#8fa89a]"
+                    }`}
+                  >
+                    বাংলা
+                  </button>
+                </div>
+              </div>
+
               {/* Navigation Links Grid */}
               <div className="space-y-1">
                 <a
@@ -212,7 +275,7 @@ export const Navbar: React.FC = () => {
                 >
                   <div className="flex items-center gap-3">
                     <Palette className="w-4 h-4 text-[#d4af37]" />
-                    <span>Artwork Collections</span>
+                    <span>{t("navCollections")}</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-[#6e8578]" />
                 </a>
@@ -224,7 +287,7 @@ export const Navbar: React.FC = () => {
                 >
                   <div className="flex items-center gap-3">
                     <Sparkles className="w-4 h-4 text-[#d4af37]" />
-                    <span>Custom Art</span>
+                    <span>{t("navCustomArt")}</span>
                   </div>
                   <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-[#d4af37]/20 text-[#fceb9e] border border-[#d4af37]/40">
                     Bespoke
@@ -238,7 +301,7 @@ export const Navbar: React.FC = () => {
                 >
                   <div className="flex items-center gap-3">
                     <ImageIcon className="w-4 h-4 text-[#d4af37]" />
-                    <span>Visual Archives & Gallery</span>
+                    <span>{t("navGallery")}</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-[#6e8578]" />
                 </a>
@@ -250,7 +313,7 @@ export const Navbar: React.FC = () => {
                 >
                   <div className="flex items-center gap-3">
                     <Heart className="w-4 h-4 text-[#d4af37]" />
-                    <span>The Sukoon Story & Craft</span>
+                    <span>{t("navPhilosophy")}</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-[#6e8578]" />
                 </a>
@@ -262,7 +325,7 @@ export const Navbar: React.FC = () => {
                 >
                   <div className="flex items-center gap-3">
                     <Star className="w-4 h-4 text-[#d4af37] fill-[#d4af37]" />
-                    <span>Client Reviews & Rating</span>
+                    <span>{t("navReviews")}</span>
                   </div>
                   <span className="text-xs text-[#fceb9e] font-bold">5.0 ★</span>
                 </a>
@@ -279,7 +342,7 @@ export const Navbar: React.FC = () => {
                   className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0d3320] to-[#12422a] border border-[#25d366]/40 text-[#a7f3d0] font-semibold text-xs flex items-center justify-center gap-2 shadow-lg hover:border-[#25d366] transition-all"
                 >
                   <MessageCircle className="w-4 h-4 text-[#25d366]" />
-                  <span>Order via WhatsApp Chat</span>
+                  <span>{t("navOrderWhatsApp")}</span>
                 </a>
 
                 {/* Direct Phone Call */}
@@ -288,13 +351,13 @@ export const Navbar: React.FC = () => {
                   className="w-full btn-3d-dark py-2 text-xs text-center justify-center flex items-center gap-2 text-[#c4d7cc]"
                 >
                   <PhoneCall className="w-3.5 h-3.5 text-[#34d399]" />
-                  <span>Call Studio: {settings.phone1}</span>
+                  <span>{t("callStudio")}: {settings.phone1}</span>
                 </a>
               </div>
 
               {/* Studio Guarantee Badge */}
               <div className="pt-2 text-center text-[10px] text-[#8fa89a]">
-                <p>✨ 100% Hand-painted in Dhaka Studio • Nationwide Delivery</p>
+                <p>{t("navGuarantee")}</p>
               </div>
             </div>
           </div>

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 export const Footer: React.FC = () => {
-  const { settings } = useStore();
+  const { settings, language, t } = useStore();
 
   return (
     <footer className="bg-[#050e08] border-t border-white/10 pt-16 pb-12 relative text-xs">
@@ -38,18 +38,16 @@ export const Footer: React.FC = () => {
               </div>
               <div>
                 <span className="font-bold text-base text-white tracking-tight">
-                  Tiyana&apos;s Sukoon
+                  {language === "bn" ? "তিয়ানা'স সুকূন" : "Tiyana's Sukoon"}
                 </span>
                 <p className="text-[11px] text-[#8fa89a]">
-                  Art for your peace &bull; Dhaka
+                  {t("brandTagline")}
                 </p>
               </div>
             </Link>
 
             <p className="text-[#9cb5a6] leading-relaxed max-w-sm">
-              &quot;Where colors meet emotions, and every stroke tells a story.&quot;{" "}
-              Bespoke Arabic calligraphy, textured modern canvases, and Islamic keepsakes
-              handcrafted with devotion in Dhaka, Bangladesh.
+              {t("footDesc")}
             </p>
 
             <div className="flex items-center gap-3 pt-1">
@@ -80,32 +78,32 @@ export const Footer: React.FC = () => {
           {/* Quick Navigation */}
           <div className="space-y-3">
             <h4 className="font-bold text-white uppercase tracking-wider text-xs font-mono">
-              Explore
+              {t("footExplore")}
             </h4>
             <ul className="space-y-2 text-[#9cb5a6]">
               <li>
                 <a href="#collections" className="hover:text-[#f4dc8a] transition-colors">
-                  Featured Artworks
+                  {t("navCollections")}
                 </a>
               </li>
               <li>
                 <a href="#custom-commission" className="hover:text-[#f4dc8a] transition-colors">
-                  Custom Commission Builder
+                  {t("navCustomArt")}
                 </a>
               </li>
               <li>
                 <a href="#gallery" className="hover:text-[#f4dc8a] transition-colors">
-                  Studio Photo Archives
+                  {t("navGallery")}
                 </a>
               </li>
               <li>
                 <a href="#philosophy" className="hover:text-[#f4dc8a] transition-colors">
-                  The Sukoon Philosophy
+                  {t("navPhilosophy")}
                 </a>
               </li>
               <li>
                 <a href="#reviews" className="hover:text-[#f4dc8a] transition-colors">
-                  Customer Reviews
+                  {t("navReviews")}
                 </a>
               </li>
             </ul>
@@ -114,7 +112,7 @@ export const Footer: React.FC = () => {
           {/* Islamic Art Types */}
           <div className="space-y-3">
             <h4 className="font-bold text-white uppercase tracking-wider text-xs font-mono">
-              Art Categories
+              {t("footCategories")}
             </h4>
             <ul className="space-y-2 text-[#9cb5a6]">
               <li>Ayat al-Kursi Gilded Canvas</li>
@@ -129,7 +127,7 @@ export const Footer: React.FC = () => {
           {/* Studio Contact */}
           <div className="space-y-3">
             <h4 className="font-bold text-white uppercase tracking-wider text-xs font-mono">
-              Studio &amp; Inquiries
+              {t("footStudio")}
             </h4>
             <div className="space-y-2.5 text-[#9cb5a6]">
               <div className="flex items-start gap-2">
@@ -144,7 +142,7 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[#d4af37] shrink-0" />
-                <span>Sat - Thu: 10:00 AM - 10:00 PM</span>
+                <span>{t("footHours")}</span>
               </div>
               <div className="pt-2">
                 <Link
@@ -152,7 +150,7 @@ export const Footer: React.FC = () => {
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0e271a] border border-[#d4af37]/30 text-[#f4dc8a] hover:bg-[#d4af37]/20 transition-all font-medium"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Admin Management Panel</span>
+                  <span>{t("footAdmin")}</span>
                 </Link>
               </div>
             </div>
@@ -162,15 +160,14 @@ export const Footer: React.FC = () => {
         {/* Bottom copyright row */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[#758a7e]">
           <p>
-            &copy; {new Date().getFullYear()} Tiyana&apos;s Sukoon. All Rights Reserved.
-            Handcrafted with devotion in Dhaka.
+            &copy; {new Date().getFullYear()} {t("footCopyright")}
           </p>
           <div className="flex items-center gap-4 text-[11px]">
-            <span>100% Authentic Hand-Lettering</span>
+            <span>{t("footBadge1")}</span>
             <span>&bull;</span>
-            <span>Secure Cash on Delivery</span>
+            <span>{t("footBadge2")}</span>
             <span>&bull;</span>
-            <span>Breakage-Safe Guarantee</span>
+            <span>{t("footBadge3")}</span>
           </div>
         </div>
       </div>

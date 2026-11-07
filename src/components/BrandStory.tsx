@@ -14,28 +14,28 @@ import {
 import { useStore } from "../context/StoreContext";
 
 export const BrandStory: React.FC = () => {
-  const { settings } = useStore();
+  const { settings, language, t } = useStore();
 
   const PILLARS = [
     {
       icon: Feather,
-      title: "Sacred Hand Lettering",
-      desc: "Every curve of Thuluth, Diwani, and Naskh script is crafted by hand using traditional calligraphy pens, not printed or automated.",
+      title: t("pillar1Title"),
+      desc: t("pillar1Desc"),
     },
     {
       icon: Sparkles,
-      title: "24K Gold Leaf Gilding",
-      desc: "Genuine imitation 24K gold foil meticulously laid with gilding size, sealed with UV protection so the gold never tarnishes.",
+      title: t("pillar2Title"),
+      desc: t("pillar2Desc"),
     },
     {
       icon: Layers,
-      title: "Archival Linen Canvases",
-      desc: "Heavyweight 380gsm primed linen canvases wrapped tightly around kiln-dried pine wood stretcher bars for lifetime longevity.",
+      title: t("pillar3Title"),
+      desc: t("pillar3Desc"),
     },
     {
       icon: Shield,
-      title: "Reinforced Safe Shipping",
-      desc: "Each framed canvas is packed in triple-wall corrugated carton, foam edge bumpers, and wooden corner guards for damage-free transit.",
+      title: t("pillar4Title"),
+      desc: t("pillar4Desc"),
     },
   ];
 
@@ -71,11 +71,11 @@ export const BrandStory: React.FC = () => {
               {/* Floating Mini Overlay Card */}
               <div className="absolute -bottom-6 -right-6 hidden sm:block p-4 rounded-xl linear-card border border-[#d4af37]/40 shadow-2xl max-w-[210px] bg-[#0b2115]/90 backdrop-blur-md">
                 <span className="text-[10px] font-mono text-[#d4af37] uppercase">
-                  Studio Location
+                  {t("storyLocationTitle")}
                 </span>
-                <p className="text-xs font-bold text-white mt-0.5">Dhaka, Bangladesh</p>
+                <p className="text-xs font-bold text-white mt-0.5">{t("storyLocationCity")}</p>
                 <p className="text-[10px] text-[#8fa89a] mt-1">
-                  Private commissions available nationwide via courier.
+                  {t("storyLocationDesc")}
                 </p>
               </div>
             </div>
@@ -84,23 +84,15 @@ export const BrandStory: React.FC = () => {
           {/* Right Column: Story Copy & Pillars */}
           <div className="lg:col-span-7 space-y-6">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-              Art Designed to Bring Serenity to Modern Homes
+              {t("storyHeading")}
             </h2>
 
             <div className="space-y-4 text-sm text-[#9cb5a6] leading-relaxed">
               <p>
-                In an increasingly noisy and chaotic world,{" "}
-                <span className="text-white font-semibold">Tiyana&apos;s Sukoon</span> was
-                founded with a simple yet profound vision: to bring{" "}
-                <span className="text-[#f4dc8a] italic">Sukoon</span> (tranquility,
-                spiritual calm, peace of soul) into your daily living spaces.
+                {t("storyP1")}
               </p>
               <p>
-                We believe sacred Islamic verses and Arabic calligraphy shouldn&apos;t just
-                be words on a wall; they should be an intimate reminder of divine grace,
-                warmth, and stillness. By pairing deep obsidian emerald greens with
-                luminous gold leaf, each painting reacts dynamically to morning sunlight
-                and warm evening lamps.
+                {t("storyP2")}
               </p>
             </div>
 

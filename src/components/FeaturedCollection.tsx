@@ -12,18 +12,18 @@ import {
 } from "lucide-react";
 
 export const FeaturedCollection: React.FC = () => {
-  const { artworks, addToCart, setSelectedArtworkForModal } = useStore();
+  const { artworks, addToCart, setSelectedArtworkForModal, language, t } = useStore();
   const [activeCategory, setActiveCategory] = useState<ArtworkCategory>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [justAddedId, setJustAddedId] = useState<string | null>(null);
 
   const categories: { label: string; value: ArtworkCategory }[] = [
-    { label: "All Artworks", value: "all" },
-    { label: "Arabic Calligraphy", value: "calligraphy" },
-    { label: "Canvas Paintings", value: "canvas" },
-    { label: "Mini Easels", value: "mini-easels" },
-    { label: "Artisan Bookmarks", value: "bookmarks" },
-    { label: "Custom Gifts & Hampers", value: "custom-orders" },
+    { label: t("colCatAll"), value: "all" },
+    { label: t("colCatCalligraphy"), value: "calligraphy" },
+    { label: t("colCatCanvas"), value: "canvas" },
+    { label: t("colCatMiniEasels"), value: "mini-easels" },
+    { label: t("colCatBookmarks"), value: "bookmarks" },
+    { label: t("colCatCustom"), value: "custom-orders" },
   ];
 
   const filteredArtworks = artworks.filter((item) => {
@@ -59,11 +59,10 @@ export const FeaturedCollection: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Featured Artwork & Calligraphy
+              {t("colHeading")}
             </h2>
             <p className="text-[#9cb5a6] text-sm max-w-xl">
-              Each piece is individually handcrafted in our Dhaka studio using 
-              traditional Arabic calligraphy techniques, genuine gold foil, and archival grade canvas.
+              {t("colDesc")}
             </p>
           </div>
 
@@ -72,7 +71,7 @@ export const FeaturedCollection: React.FC = () => {
             <Search className="w-4 h-4 text-[#8fa89a] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search verses, sizes, gifts..."
+              placeholder={t("colSearchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-[#0b1f14] border border-white/10 text-white placeholder-[#6b8275] focus:outline-none focus:border-[#d4af37] transition-all"
@@ -164,12 +163,17 @@ export const FeaturedCollection: React.FC = () => {
                     </div>
 
                     <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-[#f4dc8a] transition-colors line-clamp-1">
-                      {item.title}
+                      {language === "bn" && item.titleBangla ? item.titleBangla : item.title}
                     </h3>
 
-                    {item.titleBangla && (
+                    {language === "en" && item.titleBangla && (
                       <p className="text-[10px] sm:text-xs text-[#8fa89a] line-clamp-1 font-serif">
                         {item.titleBangla}
+                      </p>
+                    )}
+                    {language === "bn" && (
+                      <p className="text-[10px] sm:text-xs text-[#8fa89a] line-clamp-1 font-mono">
+                        {item.title}
                       </p>
                     )}
 
@@ -209,12 +213,12 @@ export const FeaturedCollection: React.FC = () => {
                     {justAddedId === item.id ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-[#0f1811]" />
-                        <span>Added!</span>
+                        <span>{t("colAdded")}</span>
                       </>
                     ) : (
                       <>
                         <ShoppingBag className="w-3.5 h-3.5 text-[#0f1811]" />
-                        <span>Add to Cart</span>
+                        <span>{t("colAddToCart")}</span>
                       </>
                     )}
                   </button>

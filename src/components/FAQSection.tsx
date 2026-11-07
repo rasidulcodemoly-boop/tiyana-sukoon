@@ -2,13 +2,14 @@
 
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { useStore } from "../context/StoreContext";
 
 interface FAQItem {
   q: string;
   a: string;
 }
 
-const FAQS: FAQItem[] = [
+const FAQS_EN: FAQItem[] = [
   {
     q: "How long does custom calligraphy take to complete?",
     a: "Standard ready-in-studio pieces ship within 24–48 hours. Custom calligraphy commissions (such as personalized names or specific Quranic surahs) typically take 5 to 8 business days for layout sketching, hand-painting, gold foil application, and precision framing.",
@@ -35,8 +36,37 @@ const FAQS: FAQItem[] = [
   },
 ];
 
+const FAQS_BN: FAQItem[] = [
+  {
+    q: "কাস্টম ক্যালিগ্রাফি তৈরি হতে কতদিন সময় লাগে?",
+    a: "স্টুডিওতে রেডি থাকা আর্টওয়ার্কগুলো সাধারণত ২৪–৪৮ ঘণ্টার মধ্যে ডেলিভারি দেওয়া হয়। আর কাস্টম সাইজ বা নামের ক্যালিগ্রাফির ক্ষেত্রে স্কেচিং, রঙ, ২৪K গোল্ড ফয়েল ও ফ্রেম করতে ৫ থেকে ৮ কর্মদিবস সময় লাগে।",
+  },
+  {
+    q: "গোল্ড কি খাঁটি এবং সময়ের সাথে রং নষ্ট হবে কি?",
+    a: "আমরা প্রিমিয়াম ২৪K ইমিটেশন গোল্ড লিফ ও জার্মানির তৈরি মেটালিক কালার ব্যবহার করি। পেইন্টিং শেষে আর্টওয়ার্কের উপর ইউভি-প্রোটেক্টিভ গ্লস বার্নিশ কোটিং দেওয়া হয়, ফলে এটি রোদ, ধুলাবালি বা বাতাসে নষ্ট হয় না।",
+  },
+  {
+    q: "ঢাকার বাইরে ডেলিভারির জন্য কেমন প্যাকেজিং করা হয়?",
+    a: "ফ্রেম করা ক্যানভাস সুরক্ষিত রাখতে বাবল র‍্যাপ, হার্ড ফোম কর্নার প্রোটেক্টর এবং শক্ত ডাবল-ওয়াল কার্টন বক্সে প্যাক করা হয়। বড় প্যানোরামিক ক্যানভাসের জন্য কাঠের ফ্রেম ক্রেইট ব্যবহার করা হয়।",
+  },
+  {
+    q: "পেমেন্ট মাধ্যম কী কী আছে?",
+    a: "রেডি আর্টওয়ার্কের ক্ষেত্রে ঢাকা সিটির ভেতর ক্যাশ অন ডেলিভারি (COD) প্রযোজ্য। কাস্টম অর্ডার ও ঢাকার বাইরের জন্য বিকাশ, নগদ বা ব্যাংক ট্রান্সফারের সুবিধা রয়েছে।",
+  },
+  {
+    q: "ক্যানভাস পেইন্টিং কীভাবে যত্ন নেব বা পরিষ্কার করব?",
+    a: "কখনোই ভেজা কাপড় বা রাসায়নিক লিকুইড ব্যবহার করবেন না। নরম শুকনো মাইক্রোফাইবার কাপড় বা ফেদার ডাস্টার দিয়ে হালকা করে মুছে নিলেই চলবে।",
+  },
+  {
+    q: "পছন্দের আরবি ফন্ট (যেমন থুলুথ, দিওয়ানি, কুফিক) নির্বাচন করা যাবে কি?",
+    a: "হ্যাঁ! আমাদের দক্ষ ক্যালিগ্রাফার থুলুথ, দিওয়ানি, জালি দিওয়ানি এবং জ্যামিতিক কুফিক স্ক্রিপ্টে পারদর্শী। আপনার পছন্দের ফন্ট জানাতে পারেন।",
+  },
+];
+
 export const FAQSection: React.FC = () => {
+  const { language, t } = useStore();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const activeFaqs = language === "bn" ? FAQS_BN : FAQS_EN;
 
   const toggle = (idx: number) => {
     setOpenIndex((prev) => (prev === idx ? null : idx));
@@ -48,16 +78,16 @@ export const FAQSection: React.FC = () => {
         {/* Header */}
         <div className="text-center space-y-3 mb-12">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Frequently Asked Questions
+            {t("faqHeading")}
           </h2>
           <p className="text-[#9cb5a6] text-sm">
-            Everything you need to know about commissions, framing, delivery safety, and artwork preservation.
+            {t("faqDesc")}
           </p>
         </div>
 
         {/* Accordion list */}
         <div className="space-y-3">
-          {FAQS.map((faq, idx) => {
+          {activeFaqs.map((faq, idx) => {
             const isOpen = openIndex === idx;
             return (
               <div

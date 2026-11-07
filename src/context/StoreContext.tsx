@@ -25,8 +25,15 @@ import {
   dbToInquiry,
   inquiryToDb,
 } from "../lib/supabase";
+import { translations, Language } from "../lib/translations";
 
 interface StoreContextType {
+  // Language & Localization
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  toggleLanguage: () => void;
+  t: (key: keyof typeof translations.en) => string;
+
   artworks: Artwork[];
   orders: Order[];
   inquiries: CustomInquiry[];
@@ -80,12 +87,14 @@ const STORAGE_KEYS = {
   INQUIRIES: "tiyana_inquiries_v1",
   SETTINGS: "tiyana_settings_v1",
   CART: "tiyana_cart_v1",
+  LANGUAGE: "tiyana_language_v1",
 };
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isHydrated, setIsHydrated] = useState(false);
+  const [language, setLanguageState] = useState<Language>("en");
   const [artworks, setArtworks] = useState<Artwork[]>(initialArtworks);
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [inquiries, setInquiries] = useState<CustomInquiry[]>(initialInquiries);
@@ -233,6 +242,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const savedCart = localStorage.getItem(STORAGE_KEYS.CART);
       if (savedCart) setCart(JSON.parse(savedCart));
+
+      const savedLanguage = localStorage.getItem(STORAGE_KEYS.LANGUAGE) as Language | null;
+      if (savedLanguage === "en" || savedLanguage === "bn") {
+        setLanguageState(savedLanguage);
+      }
     } catch (e) {
       console.error("Failed to load state from localStorage:", e);
     }
@@ -559,9 +573,41 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const setLanguage = useCallback((lang: Language) => {
+    setLanguageState(lang);
+    try {
+      localStorage.setItem(STORAGE_KEYS.LANGUAGE, lang);
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  const toggleLanguage = useCallback(() => {
+    setLanguageState((prev) => {
+      const nextLang: Language = prev === "en" ? "bn" : "en";
+      try {
+        localStorage.setItem(STORAGE_KEYS.LANGUAGE, nextLang);
+      } catch (e) {
+        console.error(e);
+      }
+      return nextLang;
+    });
+  }, []);
+
+  const t = useCallback(
+    (key: keyof typeof translations.en): string => {
+      return translations[language]?.[key] || translations.en[key] || "";
+    },
+    [language]
+  );
+
   return (
     <StoreContext.Provider
       value={{
+        language,
+        setLanguage,
+        toggleLanguage,
+        t,
         artworks,
         orders,
         inquiries,

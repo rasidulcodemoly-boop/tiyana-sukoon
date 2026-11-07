@@ -6,7 +6,7 @@ import { useStore } from "../context/StoreContext";
 import { ArrowRight, ZoomIn } from "lucide-react";
 
 export const HeroSection: React.FC = () => {
-  const { setSelectedArtworkForModal, artworks } = useStore();
+  const { setSelectedArtworkForModal, artworks, language, t } = useStore();
 
   // Desktop Carousel: Top 10 artworks duplicated for infinite marquee
   const carouselArtworks = artworks.length > 0 ? artworks.slice(0, 8) : [];
@@ -87,14 +87,14 @@ export const HeroSection: React.FC = () => {
           <div className="lg:col-span-7 space-y-4 text-center lg:text-left">
             {/* Eyebrow Text (Clean - No Icon, No Outline) */}
             <p className="text-xs sm:text-sm font-semibold text-[#d4af37] tracking-wider uppercase">
-              হস্তনির্মিত ইসলামিক ক্যালিগ্রাফি স্টুডিও
+              {t("heroEyebrow")}
             </p>
 
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
-              Art for your peace. <br />
+              {t("heroHeadline1")} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#fceb9e] via-[#d4af37] to-[#e6bc42] drop-shadow-[0_2px_12px_rgba(212,175,55,0.25)]">
-                Peace for your soul.
+                {t("heroHeadline2")}
               </span>
             </h1>
           </div>
@@ -103,7 +103,7 @@ export const HeroSection: React.FC = () => {
           <div className="lg:col-span-5 space-y-5 text-center lg:text-left lg:pb-1">
             {/* Sub-headline Text */}
             <p className="text-base sm:text-lg text-[#9cb5a6] font-normal leading-relaxed max-w-xl mx-auto lg:mx-0">
-              যেখানে ক্যালিগ্রাফির প্রতিটি সোনালী আঁচড়ে জেগে ওঠে প্রশান্তি। খাঁটি ইসলামিক ক্যালিগ্রাফি ও প্রিমিয়াম টেক্সচার্ড ক্যানভাস আর্ট।
+              {t("heroSubheadline")}
             </p>
 
             {/* Exactly 2 Buttons */}
@@ -112,7 +112,7 @@ export const HeroSection: React.FC = () => {
                 href="#collections"
                 className="btn-3d-gold px-6 py-3.5 text-xs sm:text-sm tracking-wide font-bold flex items-center gap-2"
               >
-                <span>কালেকশন দেখুন</span>
+                <span>{t("heroBtnCollections")}</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
 
@@ -120,7 +120,7 @@ export const HeroSection: React.FC = () => {
                 href="#custom-commission"
                 className="btn-3d-dark px-6 py-3.5 text-xs sm:text-sm tracking-wide text-[#e5ede7] border border-white/10 hover:border-[#d4af37]/40 flex items-center gap-2"
               >
-                <span>কাস্টম আর্ট অর্ডার</span>
+                <span>{t("heroBtnCustom")}</span>
               </a>
             </div>
           </div>
@@ -177,7 +177,7 @@ export const HeroSection: React.FC = () => {
                 {/* Bottom Title & Price */}
                 <div className="absolute bottom-0 inset-x-0 p-2.5 z-10 space-y-0.5 pointer-events-none">
                   <h3 className="text-[11px] font-bold text-white truncate">
-                    {art.title}
+                    {language === "bn" && art.titleBangla ? art.titleBangla : art.title}
                   </h3>
                   <div className="flex items-center justify-between text-[10px]">
                     <span className="text-[#8fa89a] font-mono text-[9px]">
@@ -257,7 +257,7 @@ export const HeroSection: React.FC = () => {
               {/* Bottom Caption Overlay */}
               <div className="absolute bottom-0 inset-x-0 p-3.5 z-10 space-y-1">
                 <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-1 group-hover:text-[#f4dc8a] transition-colors">
-                  {art.title}
+                  {language === "bn" && art.titleBangla ? art.titleBangla : art.title}
                 </h3>
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-[#8fa89a] font-mono">{art.dimensions}</span>

@@ -29,6 +29,8 @@ export const CartDrawer: React.FC = () => {
     cartSubtotal,
     createOrder,
     settings,
+    language,
+    t,
   } = useStore();
 
   const [deliveryZone, setDeliveryZone] = useState<"inside_dhaka" | "outside_dhaka">(
@@ -158,9 +160,9 @@ Please confirm my order. Thank you!`;
                 <ShoppingBag className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-base">Your Cart</h3>
+                <h3 className="font-bold text-white text-base">{t("cartTitle")}</h3>
                 <p className="text-[11px] text-[#8fa89a]">
-                  {cart.length} item{cart.length === 1 ? "" : "s"} selected
+                  {cart.length} {language === "bn" ? "টি আর্টওয়ার্ক নির্বাচিত" : `item${cart.length === 1 ? "" : "s"} selected`}
                 </p>
               </div>
             </div>
@@ -286,7 +288,7 @@ Please confirm my order. Thank you!`;
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <h4 className="font-semibold text-xs text-white truncate">
-                          {item.artwork.title}
+                          {language === "bn" && item.artwork.titleBangla ? item.artwork.titleBangla : item.artwork.title}
                         </h4>
                         <p className="text-[10px] text-[#8fa89a] truncate">
                           {item.selectedFrame || item.artwork.dimensions}
@@ -493,7 +495,9 @@ Please confirm my order. Thank you!`;
                       disabled={isPlacingOrder}
                       className="w-full btn-3d-gold py-3 text-xs tracking-wider uppercase font-bold"
                     >
-                      {isPlacingOrder ? "Processing..." : `Confirm Order • ৳${grandTotal.toLocaleString()} BDT`}
+                      {isPlacingOrder
+                        ? t("cartPlacingOrder")
+                        : `${t("cartPlaceOrderBtn")} • ৳${grandTotal.toLocaleString()} BDT`}
                     </button>
                   </div>
                 </form>
@@ -505,15 +509,15 @@ Please confirm my order. Thank you!`;
           {!completedOrder && cart.length > 0 && (
             <div className="p-4 bg-[#0a1e13] border-t border-white/10 space-y-2 text-xs">
               <div className="flex justify-between text-[#8fa89a]">
-                <span>Artworks Subtotal</span>
+                <span>{t("cartSubtotal")}</span>
                 <span>৳{cartSubtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-[#8fa89a]">
-                <span>Delivery Charge</span>
-                <span>{deliveryFee === 0 ? "FREE" : `৳${deliveryFee}`}</span>
+                <span>{t("cartDelivery")}</span>
+                <span>{deliveryFee === 0 ? (language === "bn" ? "ফ্রি" : "FREE") : `৳${deliveryFee}`}</span>
               </div>
               <div className="flex justify-between font-bold text-sm text-white pt-1 border-t border-white/5">
-                <span>Grand Total</span>
+                <span>{t("cartTotal")}</span>
                 <span className="text-[#fceb9e]">
                   ৳{grandTotal.toLocaleString()} BDT
                 </span>

@@ -83,8 +83,13 @@ export const HeroSection: React.FC = () => {
       {/* Top Container: Left (Eyebrow + Headline) and Right (Sub-headline + 2 Buttons) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-end">
-          {/* Left Side: Headline */}
+          {/* Left Side: Eyebrow + Headline */}
           <div className="lg:col-span-7 space-y-4 text-center lg:text-left">
+            {/* Eyebrow Text (Clean - No Icon, No Outline) */}
+            <p className="text-xs sm:text-sm font-semibold text-[#d4af37] tracking-wider uppercase">
+              হস্তনির্মিত ইসলামিক ক্যালিগ্রাফি স্টুডিও
+            </p>
+
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
               Art for your peace. <br />

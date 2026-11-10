@@ -41,6 +41,7 @@ import {
   Upload,
   Check,
   Copy,
+  Save,
   Database,
   Cloud,
   RefreshCw,
@@ -281,6 +282,25 @@ const AdminDashboardInner: React.FC = () => {
   } | null>(null);
   const [isSeeding, setIsSeeding] = useState(false);
   const [sqlCopied, setSqlCopied] = useState(false);
+
+  // Store Configuration form state
+  const [settingsForm, setSettingsForm] = useState(settings);
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
+  const [settingsSavedSuccess, setSettingsSavedSuccess] = useState(false);
+
+  useEffect(() => {
+    setSettingsForm(settings);
+  }, [settings]);
+
+  const handleSaveStoreSettings = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setIsSavingSettings(true);
+    updateSettings(settingsForm);
+    setIsSavingSettings(false);
+    setSettingsSavedSuccess(true);
+    showToast("Store settings saved successfully to Supabase!", "success");
+    setTimeout(() => setSettingsSavedSuccess(false), 3500);
+  };
 
   // Load configured Supabase credentials
   useEffect(() => {
@@ -1621,58 +1641,83 @@ If you have any questions or would like preview photos of your canvas, reply to 
 
           {/* TAB 6: SETTINGS & CONFIGURATION */}
           {activeTab === "settings" && (
-            <div className="max-w-2xl space-y-6 animate-fadeIn">
-              <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">
-                  Store &amp; Studio Configuration
-                </h2>
-                <p className="text-xs text-[#8fa89a]">
-                  Modify announcement banner, studio phone contacts, and delivery fees.
-                </p>
+            <div className="max-w-2xl space-y-6 animate-fadeIn pb-12">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-white tracking-tight">
+                    Store &amp; Studio Configuration
+                  </h2>
+                  <p className="text-xs text-[#8fa89a]">
+                    Modify announcement banner, studio phone contacts, delivery fees, and emergency PIN.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSaveStoreSettings}
+                  disabled={isSavingSettings}
+                  className="btn-3d-gold px-5 py-2.5 text-xs font-bold flex items-center gap-2 self-start sm:self-auto shadow-lg"
+                >
+                  {settingsSavedSuccess ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-950" />
+                      <span>Saved to Supabase!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 text-[#0f1811]" />
+                      <span>Save Changes</span>
+                    </>
+                  )}
+                </button>
               </div>
 
-              <div className="linear-card p-6 rounded-2xl border border-white/10 space-y-4">
-                <div className="space-y-1">
+              <div className="linear-card p-6 rounded-2xl border border-white/10 space-y-5">
+                {/* 1. Announcement Banner */}
+                <div className="space-y-2">
                   <label className="block text-xs font-semibold text-[#c4d7cc]">
                     Top Announcement Bar Text
                   </label>
                   <input
                     type="text"
-                    value={settings.announcementText}
+                    value={settingsForm.announcementText}
                     onChange={(e) =>
-                      updateSettings({ announcementText: e.target.value })
+                      setSettingsForm((prev) => ({ ...prev, announcementText: e.target.value }))
                     }
-                    className="w-full px-3 py-2 rounded-lg bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
+                    placeholder="e.g. Ramadan & Eid 2026 Calligraphy Slots Open..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
                   />
+                  <div className="flex items-center gap-3 pt-1">
+                    <input
+                      type="checkbox"
+                      id="annActive"
+                      checked={settingsForm.isAnnouncementActive}
+                      onChange={(e) =>
+                        setSettingsForm((prev) => ({ ...prev, isAnnouncementActive: e.target.checked }))
+                      }
+                      className="rounded bg-[#07160f] border-white/20 text-[#d4af37] w-4 h-4"
+                    />
+                    <label htmlFor="annActive" className="text-xs text-white cursor-pointer select-none">
+                      Show Announcement Banner on Storefront
+                    </label>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="annActive"
-                    checked={settings.isAnnouncementActive}
-                    onChange={(e) =>
-                      updateSettings({ isAnnouncementActive: e.target.checked })
-                    }
-                    className="rounded bg-[#07160f] border-white/20 text-[#d4af37]"
-                  />
-                  <label htmlFor="annActive" className="text-xs text-white">
-                    Show Announcement Banner on Storefront
-                  </label>
-                </div>
+                <div className="h-px bg-white/5 my-2" />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                {/* 2. Contact Numbers & Social */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-[#c4d7cc] mb-1">
                       Primary Phone (WhatsApp)
                     </label>
                     <input
                       type="text"
-                      value={settings.phone1}
+                      value={settingsForm.phone1}
                       onChange={(e) =>
-                        updateSettings({ phone1: e.target.value })
+                        setSettingsForm((prev) => ({ ...prev, phone1: e.target.value, whatsapp: e.target.value }))
                       }
-                      className="w-full px-3 py-2 rounded-lg bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
                     />
                   </div>
                   <div>
@@ -1681,11 +1726,11 @@ If you have any questions or would like preview photos of your canvas, reply to 
                     </label>
                     <input
                       type="text"
-                      value={settings.phone2}
+                      value={settingsForm.phone2}
                       onChange={(e) =>
-                        updateSettings({ phone2: e.target.value })
+                        setSettingsForm((prev) => ({ ...prev, phone2: e.target.value }))
                       }
-                      className="w-full px-3 py-2 rounded-lg bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
                     />
                   </div>
                 </div>
@@ -1693,17 +1738,52 @@ If you have any questions or would like preview photos of your canvas, reply to 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-[#c4d7cc] mb-1">
+                      Facebook Page URL
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.facebookUrl || ""}
+                      onChange={(e) =>
+                        setSettingsForm((prev) => ({ ...prev, facebookUrl: e.target.value }))
+                      }
+                      placeholder="https://facebook.com/..."
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#c4d7cc] mb-1">
+                      Studio Physical Address
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.studioAddress || ""}
+                      onChange={(e) =>
+                        setSettingsForm((prev) => ({ ...prev, studioAddress: e.target.value }))
+                      }
+                      placeholder="e.g. Dhanmondi, Dhaka, Bangladesh"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
+                    />
+                  </div>
+                </div>
+
+                <div className="h-px bg-white/5 my-2" />
+
+                {/* 3. Delivery Fees */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#c4d7cc] mb-1">
                       Inside Dhaka Delivery Charge (৳)
                     </label>
                     <input
                       type="number"
-                      value={settings.insideDhakaDeliveryFee}
+                      value={settingsForm.insideDhakaDeliveryFee}
                       onChange={(e) =>
-                        updateSettings({
+                        setSettingsForm((prev) => ({
+                          ...prev,
                           insideDhakaDeliveryFee: Number(e.target.value),
-                        })
+                        }))
                       }
-                      className="w-full px-3 py-2 rounded-lg bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
                     />
                   </div>
                   <div>
@@ -1712,13 +1792,14 @@ If you have any questions or would like preview photos of your canvas, reply to 
                     </label>
                     <input
                       type="number"
-                      value={settings.outsideDhakaDeliveryFee}
+                      value={settingsForm.outsideDhakaDeliveryFee}
                       onChange={(e) =>
-                        updateSettings({
+                        setSettingsForm((prev) => ({
+                          ...prev,
                           outsideDhakaDeliveryFee: Number(e.target.value),
-                        })
+                        }))
                       }
-                      className="w-full px-3 py-2 rounded-lg bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
                     />
                   </div>
                 </div>
@@ -1729,28 +1810,68 @@ If you have any questions or would like preview photos of your canvas, reply to 
                   </label>
                   <input
                     type="number"
-                    value={settings.freeDeliveryThreshold}
+                    value={settingsForm.freeDeliveryThreshold}
                     onChange={(e) =>
-                      updateSettings({
+                      setSettingsForm((prev) => ({
+                        ...prev,
                         freeDeliveryThreshold: Number(e.target.value),
-                      })
+                      }))
                     }
-                    className="w-full px-3 py-2 rounded-lg bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
                   />
+                  <p className="text-[11px] text-[#8fa89a] mt-1">
+                    Orders with subtotal above this amount get free delivery automatically.
+                  </p>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-[#c4d7cc] mb-1">
-                    Master Administrative PIN
-                  </label>
+                <div className="h-px bg-white/5 my-2" />
+
+                {/* 4. Emergency Backup Master PIN */}
+                <div className="p-4 rounded-xl bg-[#05130b] border border-[#d4af37]/20 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Key className="w-4 h-4 text-[#d4af37]" />
+                    <label className="block text-xs font-bold text-[#f4dc8a]">
+                      Emergency Master Backup PIN (জরুরী ব্যাকআপ পিন)
+                    </label>
+                  </div>
                   <input
                     type="text"
-                    value={settings.adminPin}
+                    value={settingsForm.adminPin}
                     onChange={(e) =>
-                      updateSettings({ adminPin: e.target.value })
+                      setSettingsForm((prev) => ({ ...prev, adminPin: e.target.value }))
                     }
-                    className="w-full px-3 py-2 rounded-lg bg-[#07160f] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#d4af37]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-[#d4af37]"
                   />
+                  <div className="text-[11px] text-[#8fa89a] space-y-1 pt-1 leading-relaxed">
+                    <p>
+                      💡 <span className="text-white font-medium">পাসওয়ার্ড বনাম ব্যাকআপ পিন:</span> আপনি স্বাভাবিকভাবে লগইন করার সময় আপনার জিমেইল (<code className="text-[#f4dc8a]">{adminEmail}</code>) এবং জিমেইলের পাসওয়ার্ড ব্যবহার করছেন।
+                    </p>
+                    <p>
+                      এই মাস্টার পিনটি একটি <strong>ইমার্জেন্সি মাস্টার কি (Emergency Key)</strong>। কখনো যদি ক্লাউড ডাটাবেস ডাউন থাকে বা পাসওয়ার্ড ভুলে যান, তখন জরুরি অবস্থায় এই পিনটি পাসওয়ার্ডের ঘরে দিলেই অ্যাডমিন আনলক হয়ে যাবে। আপনি চাইলে এটি পরিবর্তন করতে পারেন।
+                    </p>
+                  </div>
+                </div>
+
+                {/* Bottom Save Button */}
+                <div className="pt-3">
+                  <button
+                    type="button"
+                    onClick={handleSaveStoreSettings}
+                    disabled={isSavingSettings}
+                    className="w-full btn-3d-gold py-3 text-sm font-bold flex items-center justify-center gap-2 shadow-xl"
+                  >
+                    {settingsSavedSuccess ? (
+                      <>
+                        <CheckCircle2 className="w-5 h-5 text-emerald-950" />
+                        <span>Settings Saved to Supabase &amp; Live Site!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-5 h-5 text-[#0f1811]" />
+                        <span>Save Store Configuration</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             </div>

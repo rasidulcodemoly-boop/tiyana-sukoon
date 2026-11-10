@@ -30,6 +30,7 @@ import {
   Eye,
   MessageCircle,
   PhoneCall,
+  MapPin,
   Printer,
   X,
   AlertTriangle,
@@ -1735,35 +1736,42 @@ If you have any questions or would like preview photos of your canvas, reply to 
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-[#c4d7cc] mb-1">
-                      Facebook Page URL
+                {/* Facebook Page URL */}
+                <div>
+                  <label className="block text-xs font-semibold text-[#c4d7cc] mb-1">
+                    Facebook Page URL (ফেসবুক পেজ লিঙ্ক)
+                  </label>
+                  <input
+                    type="text"
+                    value={settingsForm.facebookUrl || ""}
+                    onChange={(e) =>
+                      setSettingsForm((prev) => ({ ...prev, facebookUrl: e.target.value }))
+                    }
+                    placeholder="https://www.facebook.com/your-page-id"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
+                  />
+                </div>
+
+                {/* Studio Physical Address - Prominent Card */}
+                <div className="p-4 rounded-xl bg-[#05130b] border border-[#d4af37]/30 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-[#d4af37]" />
+                    <label className="block text-xs font-bold text-[#f4dc8a]">
+                      স্টুডিওর ঠিকানা (Studio Physical Address / পিকআপ পয়েন্ট)
                     </label>
-                    <input
-                      type="text"
-                      value={settingsForm.facebookUrl || ""}
-                      onChange={(e) =>
-                        setSettingsForm((prev) => ({ ...prev, facebookUrl: e.target.value }))
-                      }
-                      placeholder="https://facebook.com/..."
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
-                    />
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-[#c4d7cc] mb-1">
-                      Studio Physical Address
-                    </label>
-                    <input
-                      type="text"
-                      value={settingsForm.studioAddress || ""}
-                      onChange={(e) =>
-                        setSettingsForm((prev) => ({ ...prev, studioAddress: e.target.value }))
-                      }
-                      placeholder="e.g. Dhanmondi, Dhaka, Bangladesh"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs focus:outline-none focus:border-[#d4af37]"
-                    />
-                  </div>
+                  <textarea
+                    rows={2}
+                    value={settingsForm.studioAddress || ""}
+                    onChange={(e) =>
+                      setSettingsForm((prev) => ({ ...prev, studioAddress: e.target.value }))
+                    }
+                    placeholder="যেমন: বাড়ি #১২, রোড #৪, ব্লক #বি, ধানমন্ডি / উত্তরা, ঢাকা - ১২০৫"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#07160f] border border-white/10 text-white text-xs leading-relaxed focus:outline-none focus:border-[#d4af37] resize-y"
+                  />
+                  <p className="text-[11px] text-[#8fa89a] leading-relaxed">
+                    💡 এখানে আপনার স্টুডিও বা শোরুমের আসল ঠিকানাটি লিখুন। এটি ওয়েবসাইটের ফুটার (Footer) এবং কন্টাক্ট ইনফোতে কাস্টমারদের দেখানো হবে।
+                  </p>
                 </div>
 
                 <div className="h-px bg-white/5 my-2" />

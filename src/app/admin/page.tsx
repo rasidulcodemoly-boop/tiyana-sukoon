@@ -295,10 +295,10 @@ const AdminDashboardInner: React.FC = () => {
   const handleSaveStoreSettings = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setIsSavingSettings(true);
-    updateSettings(settingsForm);
+    updateSettings(settingsForm, true);
     setIsSavingSettings(false);
     setSettingsSavedSuccess(true);
-    showToast("Store settings saved successfully to Supabase!", "success");
+    showToast("স্টোর সেটিংস সফলভাবে ক্লাউড ডাটাবেস ও লাইভ সাইটে সেভ হয়েছে! ✓", "success");
     setTimeout(() => setSettingsSavedSuccess(false), 3500);
   };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { CheckCircle2, AlertCircle, Info, X } from "lucide-react";
 import {
   Artwork,
   Order,
@@ -43,7 +44,7 @@ interface StoreContextType {
   setIsCartOpen: (open: boolean) => void;
   selectedArtworkForModal: Artwork | null;
   setSelectedArtworkForModal: (artwork: Artwork | null) => void;
-  toast: { message: string; type: "success" | "info" | "error" } | null;
+  toast: { id?: number; message: string; type: "success" | "info" | "error" } | null;
   showToast: (message: string, type?: "success" | "info" | "error") => void;
 
   // Supabase Cloud State
@@ -79,7 +80,7 @@ interface StoreContextType {
   deleteArtwork: (id: string) => void;
 
   // Settings
-  updateSettings: (newSettings: Partial<SiteSettings>) => void;
+  updateSettings: (newSettings: Partial<SiteSettings>, silent?: boolean) => void;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -107,6 +108,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedArtworkForModal, setSelectedArtworkForModal] =
     useState<Artwork | null>(null);
   const [toast, setToast] = useState<{
+    id?: number;
     message: string;
     type: "success" | "info" | "error";
   } | null>(null);
@@ -116,10 +118,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const showToast = useCallback(
     (message: string, type: "success" | "info" | "error" = "success") => {
-      setToast({ message, type });
+      const id = Date.now();
+      setToast({ id, message, type });
       setTimeout(() => {
-        setToast((prev) => (prev?.message === message ? null : prev));
-      }, 4000);
+        setToast((prev) => (prev?.id === id ? null : prev));
+      }, 4500);
     },
     []
   );
@@ -636,10 +639,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   // Settings update with Supabase sync
-  const updateSettings = (newSettings: Partial<SiteSettings>) => {
+  const updateSettings = (newSettings: Partial<SiteSettings>, silent?: boolean) => {
     const updated = { ...settings, ...newSettings };
     setSettings(updated);
-    showToast("Site settings saved successfully.");
+    if (!silent) {
+      showToast("স্টোর সেটিংস সফলভাবে সেভ হয়েছে! (Settings Saved)", "success");
+    }
 
     const client = getSupabase();
     if (client) {
@@ -730,17 +735,45 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
       {/* Toast Notification Container */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-[#0d2218]/95 backdrop-blur-md border border-[#d4af37]/40 text-[#f4f8f5] px-5 py-3.5 rounded-xl shadow-2xl animate-bounce-short">
-          <div
-            className={`w-2.5 h-2.5 rounded-full ${
-              toast.type === "success"
-                ? "bg-emerald-400 shadow-[0_0_8px_#34d399]"
+        <div className="fixed top-6 right-6 z-[99999] flex items-center gap-3.5 bg-[#091b11]/95 backdrop-blur-xl border border-emerald-500/40 text-white px-5 py-3.5 rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.6),0_0_20px_rgba(16,185,129,0.25)] animate-fadeIn transition-all duration-300 max-w-md pointer-events-auto">
+          <div className="flex-shrink-0">
+            {toast.type === "success" && (
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+            )}
+            {toast.type === "error" && (
+              <div className="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+            )}
+            {toast.type === "info" && (
+              <div className="w-8 h-8 rounded-xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#f4dc8a]">
+                <Info className="w-5 h-5" />
+              </div>
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0 pr-1">
+            <p className="text-[11px] font-bold text-white tracking-wide uppercase">
+              {toast.type === "success"
+                ? "সফল হয়েছে ✓ (Success)"
                 : toast.type === "error"
-                ? "bg-rose-400 shadow-[0_0_8px_#fb7185]"
-                : "bg-amber-400 shadow-[0_0_8px_#fbbf24]"
-            }`}
-          />
-          <p className="text-sm font-medium">{toast.message}</p>
+                ? "সমস্যা হয়েছে (Error)"
+                : "নোটিফিকেশন (Notification)"}
+            </p>
+            <p className="text-xs text-[#c4d7cc] mt-0.5 leading-snug font-medium break-words">
+              {toast.message}
+            </p>
+          </div>
+
+          <button
+            onClick={() => setToast(null)}
+            className="p-1 rounded-lg text-[#8fa89a] hover:text-white hover:bg-white/10 transition-colors"
+            title="Dismiss notification"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
     </StoreContext.Provider>

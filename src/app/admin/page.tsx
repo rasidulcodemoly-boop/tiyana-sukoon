@@ -221,7 +221,10 @@ const AdminDashboardInner: React.FC = () => {
     updateOrderStatus,
     updateOrderNotes,
     deleteOrder,
+    clearAllOrders,
     updateInquiryStatus,
+    deleteInquiry,
+    clearAllInquiries,
     addArtwork,
     updateArtwork,
     deleteArtwork,
@@ -881,7 +884,14 @@ If you have any questions or would like preview photos of your canvas, reply to 
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
-                      {orders.slice(0, 5).map((ord) => (
+                      {orders.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="py-8 text-center text-[#8fa89a]">
+                            No studio orders yet. Orders placed by customers will appear here.
+                          </td>
+                        </tr>
+                      ) : (
+                        orders.slice(0, 5).map((ord) => (
                         <tr key={ord.id} className="hover:bg-white/5">
                           <td className="py-3 font-mono font-bold text-[#f4dc8a]">
                             {ord.orderNumber}
@@ -933,7 +943,7 @@ If you have any questions or would like preview photos of your canvas, reply to 
                             </button>
                           </td>
                         </tr>
-                      ))}
+                      )))}
                     </tbody>
                   </table>
                 </div>
@@ -1267,6 +1277,21 @@ If you have any questions or would like preview photos of your canvas, reply to 
                       className="pl-9 pr-3 py-1.5 rounded-xl bg-[#091d12] border border-white/10 text-xs text-white placeholder-[#6b8275] focus:outline-none focus:border-[#d4af37]"
                     />
                   </div>
+
+                  {orders.length > 0 && (
+                    <button
+                      onClick={() => {
+                        if (confirm("Are you sure you want to clear all orders? This will delete all demo/existing orders.")) {
+                          clearAllOrders();
+                        }
+                      }}
+                      className="px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-xs font-semibold flex items-center gap-1.5 transition-all"
+                      title="Clear all orders"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Clear All</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -1449,17 +1474,43 @@ If you have any questions or would like preview photos of your canvas, reply to 
           {/* TAB 5: CUSTOM INQUIRIES */}
           {activeTab === "inquiries" && (
             <div className="space-y-6 animate-fadeIn">
-              <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">
-                  Custom Commission Requests
-                </h2>
-                <p className="text-xs text-[#8fa89a]">
-                  Leads and custom art specifications submitted from the website estimator.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-white tracking-tight">
+                    Custom Commission Requests
+                  </h2>
+                  <p className="text-xs text-[#8fa89a]">
+                    Leads and custom art specifications submitted from the website estimator.
+                  </p>
+                </div>
+
+                {inquiries.length > 0 && (
+                  <button
+                    onClick={() => {
+                      if (confirm("Are you sure you want to clear all inquiries? This will delete all demo/existing inquiries.")) {
+                        clearAllInquiries();
+                      }
+                    }}
+                    className="px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-xs font-semibold flex items-center gap-1.5 transition-all self-start sm:self-auto"
+                    title="Clear all inquiries"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Clear All</span>
+                  </button>
+                )}
               </div>
 
               <div className="space-y-4">
-                {inquiries.map((inq) => (
+                {inquiries.length === 0 ? (
+                  <div className="linear-card p-12 text-center rounded-2xl border border-white/10 text-[#8fa89a]">
+                    <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                    <p className="text-sm font-semibold">No custom inquiries yet</p>
+                    <p className="text-xs text-[#6b8275] mt-1">
+                      New inquiries submitted via the Custom Art Configurator will appear here.
+                    </p>
+                  </div>
+                ) : (
+                  inquiries.map((inq) => (
                   <div
                     key={inq.id}
                     className="linear-card p-5 rounded-2xl border border-white/10 space-y-3"
@@ -1515,6 +1566,18 @@ If you have any questions or would like preview photos of your canvas, reply to 
                           <MessageCircle className="w-3.5 h-3.5" />
                           <span>WhatsApp</span>
                         </a>
+
+                        <button
+                          onClick={() => {
+                            if (confirm(`Delete inquiry from ${inq.customerName}?`)) {
+                              deleteInquiry(inq.id);
+                            }
+                          }}
+                          className="p-2 rounded-lg bg-[#0b1f14] text-rose-400 hover:text-rose-300 hover:bg-rose-500/20 border border-white/5 transition-all"
+                          title="Delete inquiry"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
 
@@ -1551,7 +1614,7 @@ If you have any questions or would like preview photos of your canvas, reply to 
                       )}
                     </div>
                   </div>
-                ))}
+                )))}
               </div>
             </div>
           )}

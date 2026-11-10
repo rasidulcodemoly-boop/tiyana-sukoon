@@ -65,10 +65,13 @@ interface StoreContextType {
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   updateOrderNotes: (orderId: string, notes: string) => void;
   deleteOrder: (orderId: string) => void;
+  clearAllOrders: () => void;
 
   // Inquiries
   createInquiry: (inquiryData: Omit<CustomInquiry, "id" | "createdAt" | "status">) => CustomInquiry;
   updateInquiryStatus: (inquiryId: string, status: CustomInquiry["status"]) => void;
+  deleteInquiry: (inquiryId: string) => void;
+  clearAllInquiries: () => void;
 
   // Artworks CRUD
   addArtwork: (artwork: Omit<Artwork, "id">) => void;
@@ -155,7 +158,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (!ordError && ordData && ordData.length > 0) {
+      if (!ordError && ordData) {
         setOrders(ordData.map(dbToOrder));
       }
 
@@ -165,7 +168,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (!inqError && inqData && inqData.length > 0) {
+      if (!inqError && inqData) {
         setInquiries(inqData.map(dbToInquiry));
       }
 
@@ -441,6 +444,38 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const clearAllOrders = () => {
+    const orderIds = orders.map((o) => o.id);
+    setOrders([]);
+    try {
+      localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify([]));
+    } catch (e) {
+      console.error(e);
+    }
+    showToast("All orders cleared successfully", "info");
+
+    const client = getSupabase();
+    if (client) {
+      if (orderIds.length > 0) {
+        client
+          .from("orders")
+          .delete()
+          .in("id", orderIds)
+          .then(({ error }) => {
+            if (error) console.error("Supabase clear orders error:", error);
+          });
+      } else {
+        client
+          .from("orders")
+          .delete()
+          .neq("id", "")
+          .then(({ error }) => {
+            if (error) console.error("Supabase clear orders error:", error);
+          });
+      }
+    }
+  };
+
   // Create Inquiry with Supabase sync
   const createInquiry = (
     inquiryData: Omit<CustomInquiry, "id" | "createdAt" | "status">
@@ -487,6 +522,54 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
         .then(({ error }) => {
           if (error) console.error("Supabase inquiry update error:", error);
         });
+    }
+  };
+
+  const deleteInquiry = (inquiryId: string) => {
+    setInquiries((prev) => prev.filter((inq) => inq.id !== inquiryId));
+    showToast("Inquiry deleted", "info");
+
+    const client = getSupabase();
+    if (client) {
+      client
+        .from("inquiries")
+        .delete()
+        .eq("id", inquiryId)
+        .then(({ error }) => {
+          if (error) console.error("Supabase inquiry delete error:", error);
+        });
+    }
+  };
+
+  const clearAllInquiries = () => {
+    const inquiryIds = inquiries.map((i) => i.id);
+    setInquiries([]);
+    try {
+      localStorage.setItem(STORAGE_KEYS.INQUIRIES, JSON.stringify([]));
+    } catch (e) {
+      console.error(e);
+    }
+    showToast("All inquiries cleared", "info");
+
+    const client = getSupabase();
+    if (client) {
+      if (inquiryIds.length > 0) {
+        client
+          .from("inquiries")
+          .delete()
+          .in("id", inquiryIds)
+          .then(({ error }) => {
+            if (error) console.error("Supabase clear inquiries error:", error);
+          });
+      } else {
+        client
+          .from("inquiries")
+          .delete()
+          .neq("id", "")
+          .then(({ error }) => {
+            if (error) console.error("Supabase clear inquiries error:", error);
+          });
+      }
     }
   };
 
@@ -633,8 +716,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
         updateOrderStatus,
         updateOrderNotes,
         deleteOrder,
+        clearAllOrders,
         createInquiry,
         updateInquiryStatus,
+        deleteInquiry,
+        clearAllInquiries,
         addArtwork,
         updateArtwork,
         deleteArtwork,

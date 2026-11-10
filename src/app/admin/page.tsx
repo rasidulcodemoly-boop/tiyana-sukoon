@@ -271,6 +271,42 @@ const AdminDashboardInner: React.FC = () => {
   const [editingArtwork, setEditingArtwork] = useState<Artwork | null>(null);
   const [isAddingArtwork, setIsAddingArtwork] = useState(false);
 
+  // Custom Confirmation Dialog State
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    itemName?: string;
+    confirmLabel?: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  const requestConfirm = ({
+    title,
+    message,
+    itemName,
+    confirmLabel = "মুছে ফেলুন (Delete)",
+    onConfirm,
+  }: {
+    title: string;
+    message: string;
+    itemName?: string;
+    confirmLabel?: string;
+    onConfirm: () => void;
+  }) => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      itemName,
+      confirmLabel,
+      onConfirm: () => {
+        onConfirm();
+        setConfirmModal(null);
+      },
+    });
+  };
+
   // Supabase management states
   const [supabaseUrlInput, setSupabaseUrlInput] = useState("");
   const [supabaseKeyInput, setSupabaseKeyInput] = useState("");
@@ -1123,9 +1159,13 @@ If you have any questions or would like preview photos of your canvas, reply to 
                         </button>
                         <button
                           onClick={() => {
-                            if (confirm(`Delete artwork "${art.title}"?`)) {
-                              deleteArtwork(art.id);
-                            }
+                            requestConfirm({
+                              title: "আর্টওয়ার্ক মুছে ফেলুন (Delete Artwork)",
+                              message: "আপনি কি নিশ্চিত এই আর্টওয়ার্কটি ক্যাটালগ ও ক্লাউড ডাটাবেস থেকে স্থায়ীভাবে মুছে ফেলতে চান?",
+                              itemName: art.title,
+                              confirmLabel: "হ্যাঁ, মুছে ফেলুন",
+                              onConfirm: () => deleteArtwork(art.id),
+                            });
                           }}
                           className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
                           title="Delete Artwork"
@@ -1302,9 +1342,12 @@ If you have any questions or would like preview photos of your canvas, reply to 
                   {orders.length > 0 && (
                     <button
                       onClick={() => {
-                        if (confirm("Are you sure you want to clear all orders? This will delete all demo/existing orders.")) {
-                          clearAllOrders();
-                        }
+                        requestConfirm({
+                          title: "সব অর্ডার মুছে ফেলুন (Clear All Orders)",
+                          message: "আপনি কি নিশ্চিত সমস্ত ডেমো ও বর্তমান অর্ডার মুছে ফেলতে চান? এটি ড্যাশবোর্ড এবং ক্লাউড ডাটাবেস থেকেও সম্পূর্ণ মুছে যাবে।",
+                          confirmLabel: "সবগুলো মুছুন (Clear All)",
+                          onConfirm: () => clearAllOrders(),
+                        });
                       }}
                       className="px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-xs font-semibold flex items-center gap-1.5 transition-all"
                       title="Clear all orders"
@@ -1471,9 +1514,13 @@ If you have any questions or would like preview photos of your canvas, reply to 
                                 </button>
                                 <button
                                   onClick={() => {
-                                    if (confirm(`Delete order #${ord.orderNumber}?`)) {
-                                      deleteOrder(ord.id);
-                                    }
+                                    requestConfirm({
+                                      title: "অর্ডার মুছে ফেলুন (Delete Order)",
+                                      message: `আপনি কি নিশ্চিত অর্ডার #${ord.orderNumber} মুছে ফেলতে চান?`,
+                                      itemName: `${ord.customerName} (৳${ord.totalAmount.toLocaleString()})`,
+                                      confirmLabel: "মুছে ফেলুন",
+                                      onConfirm: () => deleteOrder(ord.id),
+                                    });
                                   }}
                                   className="p-1.5 rounded-lg bg-[#091d12] text-rose-400 hover:text-rose-300"
                                   title="Delete order"
@@ -1508,9 +1555,12 @@ If you have any questions or would like preview photos of your canvas, reply to 
                 {inquiries.length > 0 && (
                   <button
                     onClick={() => {
-                      if (confirm("Are you sure you want to clear all inquiries? This will delete all demo/existing inquiries.")) {
-                        clearAllInquiries();
-                      }
+                      requestConfirm({
+                        title: "সব ইনকোয়ারি মুছে ফেলুন (Clear All Inquiries)",
+                        message: "আপনি কি নিশ্চিত সমস্ত কাস্টম কমিশন রিকোয়েস্ট ও ইনকোয়ারি মুছে ফেলতে চান?",
+                        confirmLabel: "সবগুলো মুছুন (Clear All)",
+                        onConfirm: () => clearAllInquiries(),
+                      });
                     }}
                     className="px-3 py-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-xs font-semibold flex items-center gap-1.5 transition-all self-start sm:self-auto"
                     title="Clear all inquiries"
@@ -1590,9 +1640,13 @@ If you have any questions or would like preview photos of your canvas, reply to 
 
                         <button
                           onClick={() => {
-                            if (confirm(`Delete inquiry from ${inq.customerName}?`)) {
-                              deleteInquiry(inq.id);
-                            }
+                            requestConfirm({
+                              title: "ইনকোয়ারি মুছে ফেলুন (Delete Inquiry)",
+                              message: `আপনি কি নিশ্চিত ${inq.customerName}-এর কাস্টম আর্ট রিকোয়েস্টটি মুছে ফেলতে চান?`,
+                              itemName: `${inq.customerName} - ${inq.artType}`,
+                              confirmLabel: "মুছে ফেলুন",
+                              onConfirm: () => deleteInquiry(inq.id),
+                            });
                           }}
                           className="p-2 rounded-lg bg-[#0b1f14] text-rose-400 hover:text-rose-300 hover:bg-rose-500/20 border border-white/5 transition-all"
                           title="Delete inquiry"
@@ -2770,6 +2824,64 @@ If you have any questions or would like preview photos of your canvas, reply to 
                   Save Changes
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CUSTOM LUXURY CONFIRMATION DIALOG */}
+      {confirmModal && confirmModal.isOpen && (
+        <div
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn pointer-events-auto"
+          onClick={() => setConfirmModal(null)}
+        >
+          <div
+            className="w-full max-w-md linear-card p-6 sm:p-7 rounded-3xl border border-rose-500/30 shadow-[0_20px_50px_rgba(0,0,0,0.85),0_0_35px_rgba(244,63,94,0.18)] space-y-5 animate-scaleUp"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header with Glowing Warning Icon */}
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0 shadow-[0_0_15px_rgba(244,63,94,0.2)]">
+                <Trash2 className="w-6 h-6 animate-pulse" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-white tracking-tight">
+                  {confirmModal.title}
+                </h3>
+                <p className="text-xs text-[#8fa89a] leading-relaxed">
+                  {confirmModal.message}
+                </p>
+              </div>
+            </div>
+
+            {/* Target Item Name Box (if provided) */}
+            {confirmModal.itemName && (
+              <div className="p-3.5 rounded-2xl bg-[#06140b] border border-white/10 flex items-center gap-2.5">
+                <div className="w-2 h-2 rounded-full bg-rose-400 shrink-0 shadow-[0_0_8px_#fb7185]" />
+                <p className="text-xs font-mono font-semibold text-[#fceb9e] truncate">
+                  &quot;{confirmModal.itemName}&quot;
+                </p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setConfirmModal(null)}
+                className="btn-3d-dark px-4 py-2.5 text-xs font-semibold rounded-xl"
+              >
+                বাতিল করুন (Cancel)
+              </button>
+
+              <button
+                type="button"
+                onClick={confirmModal.onConfirm}
+                className="px-5 py-2.5 rounded-xl border border-rose-500/40 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs shadow-lg shadow-rose-950/60 flex items-center gap-2 transition-all active:scale-95"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>{confirmModal.confirmLabel || "হ্যাঁ, মুছে ফেলুন"}</span>
+              </button>
             </div>
           </div>
         </div>

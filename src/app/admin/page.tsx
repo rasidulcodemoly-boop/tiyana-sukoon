@@ -54,6 +54,15 @@ import {
   Lock,
   EyeOff,
   LogOut,
+  LayoutGrid,
+  List,
+  ChevronUp,
+  ChevronDown,
+  ArrowUp,
+  ArrowDown,
+  CheckSquare,
+  Square,
+  Hash,
 } from "lucide-react";
 import {
   getSupabaseConfig,
@@ -230,6 +239,8 @@ const AdminDashboardInner: React.FC = () => {
     addArtwork,
     updateArtwork,
     deleteArtwork,
+    deleteArtworks,
+    reorderArtworks,
     updateSettings,
     showToast,
     isSupabaseActive,
@@ -305,6 +316,78 @@ const AdminDashboardInner: React.FC = () => {
         setConfirmModal(null);
       },
     });
+  };
+
+  // Artwork Catalog View & Bulk selection states
+  const [artworkViewMode, setArtworkViewMode] = useState<"grid" | "table">("grid");
+  const [selectedArtworkIds, setSelectedArtworkIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const savedView = localStorage.getItem("tiyana_art_view");
+      if (savedView === "grid" || savedView === "table") {
+        setArtworkViewMode(savedView);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  const changeArtworkViewMode = (mode: "grid" | "table") => {
+    setArtworkViewMode(mode);
+    try {
+      localStorage.setItem("tiyana_art_view", mode);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const toggleSelectArtwork = (id: string) => {
+    setSelectedArtworkIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const selectAllFilteredArtworks = (items: Artwork[]) => {
+    const allFilteredSelected = items.length > 0 && items.every((a) => selectedArtworkIds.includes(a.id));
+    if (allFilteredSelected) {
+      const filteredIds = new Set(items.map((a) => a.id));
+      setSelectedArtworkIds((prev) => prev.filter((id) => !filteredIds.has(id)));
+    } else {
+      const combined = new Set([...selectedArtworkIds, ...items.map((a) => a.id)]);
+      setSelectedArtworkIds(Array.from(combined));
+    }
+  };
+
+  const handleBulkDeleteArtworks = () => {
+    if (selectedArtworkIds.length === 0) return;
+    requestConfirm({
+      title: "সিলেক্ট করা আর্টওয়ার্ক মুছে ফেলুন (Delete Selected Artworks)",
+      message: `আপনি কি নিশ্চিত সিলেক্ট করা ${selectedArtworkIds.length}টি আর্টওয়ার্ক ক্যাটালগ ও ক্লাউড ডাটাবেস থেকে স্থায়ীভাবে মুছে ফেলতে চান?`,
+      itemName: `${selectedArtworkIds.length}টি আইটেম সিলেক্টেড`,
+      confirmLabel: `সবগুলো মুছুন (${selectedArtworkIds.length})`,
+      onConfirm: () => {
+        deleteArtworks(selectedArtworkIds);
+        setSelectedArtworkIds([]);
+      },
+    });
+  };
+
+  const handleMoveArtwork = (fromIdx: number, toIdx: number) => {
+    if (toIdx < 0 || toIdx >= artworks.length) return;
+    const nextList = [...artworks];
+    const [moved] = nextList.splice(fromIdx, 1);
+    nextList.splice(toIdx, 0, moved);
+    reorderArtworks(nextList);
+  };
+
+  const handleSetArtworkSerial = (artId: string, targetSerial: number) => {
+    if (isNaN(targetSerial) || targetSerial < 1) return;
+    const currentIdx = artworks.findIndex((a) => a.id === artId);
+    if (currentIdx === -1) return;
+    const targetIdx = Math.max(0, Math.min(artworks.length - 1, targetSerial - 1));
+    if (currentIdx === targetIdx) return;
+    handleMoveArtwork(currentIdx, targetIdx);
   };
 
   // Supabase management states
@@ -1008,7 +1091,7 @@ If you have any questions or would like preview photos of your canvas, reply to 
             </div>
           )}
 
-          {/* TAB 2: ARTWORK CATALOG CRUD (WITH FULL IMAGE EDITING) */}
+          {/* TAB 2: ARTWORK CATALOG CRUD (WITH FULL IMAGE EDITING, TABLE/GRID VIEW, REORDERING & BULK ACTIONS) */}
           {activeTab === "artworks" && (
             <div className="space-y-6 animate-fadeIn">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1017,11 +1100,11 @@ If you have any questions or would like preview photos of your canvas, reply to 
                     Artwork &amp; Product Catalog ({artworks.length} items)
                   </h2>
                   <p className="text-xs text-[#8fa89a]">
-                    Click &quot;Edit Artwork &amp; Image&quot; on any card to swap image, modify Bengali description, dimensions, finish, or pricing.
+                    Manage artworks, reorder serial numbers, switch between grid/table view, or bulk delete.
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center flex-wrap gap-2.5">
                   <div className="relative">
                     <Search className="w-4 h-4 text-[#8fa89a] absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
@@ -1033,150 +1116,537 @@ If you have any questions or would like preview photos of your canvas, reply to 
                     />
                   </div>
 
+                  {/* View Mode Switcher */}
+                  <div className="flex items-center bg-[#07160f] p-1 rounded-xl border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => changeArtworkViewMode("grid")}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                        artworkViewMode === "grid"
+                          ? "bg-[#d4af37] text-[#06110a] shadow-sm"
+                          : "text-[#8fa89a] hover:text-white"
+                      }`}
+                      title="গ্রিড ভিউ (Grid View)"
+                    >
+                      <LayoutGrid className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Grid</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => changeArtworkViewMode("table")}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                        artworkViewMode === "table"
+                          ? "bg-[#d4af37] text-[#06110a] shadow-sm"
+                          : "text-[#8fa89a] hover:text-white"
+                      }`}
+                      title="টেবিল / লিস্ট ভিউ (Table / List View)"
+                    >
+                      <List className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Table</span>
+                    </button>
+                  </div>
+
                   <button
                     onClick={() => setIsAddingArtwork(true)}
-                    className="btn-3d-gold px-4 py-2 text-xs flex items-center gap-1.5 font-bold whitespace-nowrap"
+                    className="btn-3d-gold px-3.5 py-1.5 text-xs flex items-center gap-1.5 font-bold whitespace-nowrap"
                   >
                     <Plus className="w-4 h-4 text-[#0f1811]" />
-                    <span>Add New Artwork</span>
+                    <span>Add New</span>
                   </button>
                 </div>
               </div>
 
-              {/* Category Filter Pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none">
-                {[
-                  { id: "all", label: "All Items" },
-                  { id: "calligraphy", label: "Arabic Calligraphy" },
-                  { id: "canvas", label: "Canvas Paintings" },
-                  { id: "mini-easels", label: "Mini Easels" },
-                  { id: "bookmarks", label: "Bookmarks" },
-                  { id: "custom-orders", label: "Custom Orders" },
-                ].map((c) => (
+              {/* Category Filter Pills & Selection Info */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                  {[
+                    { id: "all", label: "All Items" },
+                    { id: "calligraphy", label: "Arabic Calligraphy" },
+                    { id: "canvas", label: "Canvas Paintings" },
+                    { id: "mini-easels", label: "Mini Easels" },
+                    { id: "bookmarks", label: "Bookmarks" },
+                    { id: "custom-orders", label: "Custom Orders" },
+                  ].map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => setArtworkCategoryFilter(c.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                        artworkCategoryFilter === c.id
+                          ? "bg-[#d4af37] text-[#06110a]"
+                          : "bg-[#091d12] text-[#8fa89a] hover:text-white"
+                      }`}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
                   <button
-                    key={c.id}
-                    onClick={() => setArtworkCategoryFilter(c.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
-                      artworkCategoryFilter === c.id
-                        ? "bg-[#d4af37] text-[#06110a]"
-                        : "bg-[#091d12] text-[#8fa89a] hover:text-white"
-                    }`}
+                    type="button"
+                    onClick={() => selectAllFilteredArtworks(filteredArtworks)}
+                    className="text-xs text-[#d4af37] hover:underline flex items-center gap-1.5 bg-[#091d12] px-2.5 py-1.5 rounded-lg border border-white/10"
                   >
-                    {c.label}
+                    {filteredArtworks.length > 0 &&
+                    filteredArtworks.every((a) => selectedArtworkIds.includes(a.id)) ? (
+                      <>
+                        <CheckSquare className="w-3.5 h-3.5" />
+                        <span>Deselect All</span>
+                      </>
+                    ) : (
+                      <>
+                        <Square className="w-3.5 h-3.5" />
+                        <span>Select All ({filteredArtworks.length})</span>
+                      </>
+                    )}
                   </button>
-                ))}
+                </div>
               </div>
 
-              {/* Artwork Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredArtworks.map((art) => (
-                  <div
-                    key={art.id}
-                    className="linear-card rounded-2xl overflow-hidden flex flex-col justify-between border border-white/10 group"
-                  >
-                    <div>
-                      {/* Image Preview with quick replace */}
-                      <div className="relative aspect-[16/10] w-full bg-[#08170f] overflow-hidden">
-                        <Image
-                          src={art.image}
-                          alt={art.title}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute top-2 left-2 flex items-center gap-1">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#06110a]/90 text-[#f4dc8a] border border-[#d4af37]/30">
-                            {art.category}
-                          </span>
-                          {art.badge && (
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/80 text-white">
-                              {art.badge}
-                            </span>
-                          )}
-                        </div>
-
-                        <button
-                          onClick={() => setEditingArtwork(art)}
-                          className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-[#06110a]/85 text-[#f4dc8a] border border-white/10 hover:border-[#d4af37] flex items-center gap-1 text-[11px] font-medium backdrop-blur-sm"
-                        >
-                          <Edit3 className="w-3 h-3" />
-                          <span>Edit Image</span>
-                        </button>
-                      </div>
-
-                      <div className="p-4 space-y-2">
-                        <div className="flex items-center justify-between text-[11px] text-[#8fa89a]">
-                          <span>{art.dimensions}</span>
-                          <span
-                            className={
-                              art.inStock ? "text-emerald-400" : "text-rose-400"
-                            }
-                          >
-                            ● {art.inStock ? "In Stock" : "Out of Stock"}
-                          </span>
-                        </div>
-
-                        <h4 className="font-bold text-sm text-white line-clamp-1">
-                          {art.title}
-                        </h4>
-
-                        {art.titleBangla && (
-                          <p className="text-xs text-[#8fa89a] line-clamp-1 font-serif">
-                            {art.titleBangla}
-                          </p>
-                        )}
-
-                        <p className="text-xs text-[#9cb5a6] line-clamp-2">
-                          {art.description}
-                        </p>
-
-                        {art.spiritualMessage && (
-                          <p className="text-[10px] text-[#fceb9e] bg-[#07160f] p-1.5 rounded border border-white/5 line-clamp-1">
-                            {art.spiritualMessage}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="p-4 pt-2 border-t border-white/5 space-y-3">
-                      <div className="flex items-baseline justify-between">
-                        <span className="text-lg font-bold text-[#fceb9e]">
-                          ৳{art.price.toLocaleString()}
-                        </span>
-                        {art.originalPrice && (
-                          <span className="text-xs text-[#8fa89a] line-through">
-                            ৳{art.originalPrice.toLocaleString()}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setEditingArtwork(art)}
-                          className="flex-1 btn-3d-dark py-2 text-xs flex items-center justify-center gap-1.5 font-semibold text-[#f4dc8a]"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                          <span>Edit Artwork &amp; Image</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            requestConfirm({
-                              title: "আর্টওয়ার্ক মুছে ফেলুন (Delete Artwork)",
-                              message: "আপনি কি নিশ্চিত এই আর্টওয়ার্কটি ক্যাটালগ ও ক্লাউড ডাটাবেস থেকে স্থায়ীভাবে মুছে ফেলতে চান?",
-                              itemName: art.title,
-                              confirmLabel: "হ্যাঁ, মুছে ফেলুন",
-                              onConfirm: () => deleteArtwork(art.id),
-                            });
-                          }}
-                          className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
-                          title="Delete Artwork"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
+              {/* Bulk Action Bar */}
+              {selectedArtworkIds.length > 0 && (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-rose-950/50 via-[#0d2218] to-[#091d12] border border-rose-500/30 text-white animate-fadeIn shadow-xl">
+                  <div className="flex items-center gap-3">
+                    <span className="w-7 h-7 rounded-xl bg-rose-500/20 border border-rose-500/30 text-rose-300 font-bold text-xs flex items-center justify-center">
+                      {selectedArtworkIds.length}
+                    </span>
+                    <span className="text-xs font-semibold text-rose-100">
+                      {selectedArtworkIds.length}টি আর্টওয়ার্ক সিলেক্ট করা হয়েছে
+                    </span>
                   </div>
-                ))}
-              </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedArtworkIds([])}
+                      className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-[#c4d7cc] text-xs font-medium transition-all"
+                    >
+                      Cancel Selection
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleBulkDeleteArtworks}
+                      className="px-4 py-1.5 rounded-xl border border-rose-500/40 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-rose-950/50 transition-all"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete Selected ({selectedArtworkIds.length})</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* TABLE / LIST VIEW */}
+              {artworkViewMode === "table" ? (
+                <div className="linear-card rounded-2xl overflow-hidden border border-white/10">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-[#091b11] border-b border-white/10 text-[#8fa89a]">
+                        <tr>
+                          <th className="p-3 w-10 text-center">
+                            <input
+                              type="checkbox"
+                              checked={
+                                filteredArtworks.length > 0 &&
+                                filteredArtworks.every((a) =>
+                                  selectedArtworkIds.includes(a.id)
+                                )
+                              }
+                              onChange={() => selectAllFilteredArtworks(filteredArtworks)}
+                              className="rounded bg-[#07160f] border-white/20 text-[#d4af37] w-4 h-4 cursor-pointer"
+                              title="Select All Filtered"
+                            />
+                          </th>
+                          <th className="p-3 font-mono text-center w-28">সিরিয়াল #</th>
+                          <th className="p-3 w-16">ছবি</th>
+                          <th className="p-3 min-w-[200px]">ক্যালিগ্রাফি / টাইটেল</th>
+                          <th className="p-3">ক্যাটাগরি</th>
+                          <th className="p-3">মূল্য (৳)</th>
+                          <th className="p-3">স্টক স্ট্যাটাস</th>
+                          <th className="p-3 text-right">অ্যাকশন</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {filteredArtworks.length === 0 ? (
+                          <tr>
+                            <td colSpan={8} className="p-8 text-center text-[#8fa89a]">
+                              No artworks matching your criteria.
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredArtworks.map((art) => {
+                            const globalIdx = artworks.findIndex((a) => a.id === art.id);
+                            const serialNo = globalIdx + 1;
+                            const isSelected = selectedArtworkIds.includes(art.id);
+
+                            return (
+                              <tr
+                                key={art.id}
+                                className={`transition-colors ${
+                                  isSelected
+                                    ? "bg-rose-500/10 hover:bg-rose-500/15"
+                                    : "hover:bg-white/5"
+                                }`}
+                              >
+                                {/* Checkbox */}
+                                <td className="p-3 text-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => toggleSelectArtwork(art.id)}
+                                    className="rounded bg-[#07160f] border-white/20 text-[#d4af37] w-4 h-4 cursor-pointer"
+                                  />
+                                </td>
+
+                                {/* Serial Reordering Stepper & Direct Input */}
+                                <td className="p-3 text-center">
+                                  <div className="flex items-center justify-center gap-1">
+                                    <div className="flex flex-col gap-0.5">
+                                      <button
+                                        type="button"
+                                        disabled={globalIdx === 0}
+                                        onClick={() => handleMoveArtwork(globalIdx, globalIdx - 1)}
+                                        className="p-0.5 rounded hover:bg-white/10 text-[#8fa89a] hover:text-[#d4af37] disabled:opacity-20 disabled:hover:text-[#8fa89a]"
+                                        title="Move Up (১ ধাপ উপরে)"
+                                      >
+                                        <ChevronUp className="w-3.5 h-3.5" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        disabled={globalIdx === artworks.length - 1}
+                                        onClick={() => handleMoveArtwork(globalIdx, globalIdx + 1)}
+                                        className="p-0.5 rounded hover:bg-white/10 text-[#8fa89a] hover:text-[#d4af37] disabled:opacity-20 disabled:hover:text-[#8fa89a]"
+                                        title="Move Down (১ ধাপ নিচে)"
+                                      >
+                                        <ChevronDown className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+
+                                    <input
+                                      type="number"
+                                      min={1}
+                                      max={artworks.length}
+                                      defaultValue={serialNo}
+                                      key={serialNo}
+                                      onBlur={(e) => {
+                                        const val = parseInt(e.target.value, 10);
+                                        if (!isNaN(val) && val !== serialNo) {
+                                          handleSetArtworkSerial(art.id, val);
+                                        }
+                                      }}
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                          const val = parseInt((e.target as HTMLInputElement).value, 10);
+                                          if (!isNaN(val) && val !== serialNo) {
+                                            handleSetArtworkSerial(art.id, val);
+                                          }
+                                        }
+                                      }}
+                                      className="w-11 px-1.5 py-1 text-center font-mono font-bold text-xs bg-[#07160f] border border-white/15 rounded-lg text-[#f4dc8a] focus:outline-none focus:border-[#d4af37]"
+                                      title="যেকোনো সিরিয়াল নম্বর লিখে Enter চাপুন"
+                                    />
+                                  </div>
+                                </td>
+
+                                {/* Thumbnail */}
+                                <td className="p-3">
+                                  <div
+                                    onClick={() => setEditingArtwork(art)}
+                                    className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#07160f] border border-white/10 cursor-pointer group"
+                                    title="Click to edit image"
+                                  >
+                                    <Image
+                                      src={art.image}
+                                      alt={art.title}
+                                      fill
+                                      className="object-cover group-hover:scale-110 transition-transform"
+                                    />
+                                  </div>
+                                </td>
+
+                                {/* Title & Bangla Title */}
+                                <td className="p-3">
+                                  <div className="space-y-0.5">
+                                    <p className="font-bold text-white text-xs line-clamp-1">
+                                      {art.title}
+                                    </p>
+                                    {art.titleBangla && (
+                                      <p className="text-[11px] text-[#8fa89a] line-clamp-1 font-serif">
+                                        {art.titleBangla}
+                                      </p>
+                                    )}
+                                    <p className="text-[10px] text-[#6b8275]">{art.dimensions}</p>
+                                  </div>
+                                </td>
+
+                                {/* Category & Badge */}
+                                <td className="p-3 whitespace-nowrap">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#06110a] text-[#f4dc8a] border border-[#d4af37]/30">
+                                    {art.category}
+                                  </span>
+                                  {art.badge && (
+                                    <span className="ml-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                      {art.badge}
+                                    </span>
+                                  )}
+                                </td>
+
+                                {/* Price */}
+                                <td className="p-3 whitespace-nowrap">
+                                  <p className="font-bold text-sm text-[#fceb9e]">
+                                    ৳{art.price.toLocaleString()}
+                                  </p>
+                                  {art.originalPrice && (
+                                    <p className="text-[10px] text-[#8fa89a] line-through">
+                                      ৳{art.originalPrice.toLocaleString()}
+                                    </p>
+                                  )}
+                                </td>
+
+                                {/* In Stock toggle */}
+                                <td className="p-3 whitespace-nowrap">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      updateArtwork(art.id, { inStock: !art.inStock })
+                                    }
+                                    className={`px-2 py-1 rounded-md text-[10px] font-bold transition-all ${
+                                      art.inStock
+                                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30"
+                                        : "bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-rose-500/30"
+                                    }`}
+                                    title="Click to toggle stock"
+                                  >
+                                    ● {art.inStock ? "In Stock" : "Out of Stock"}
+                                  </button>
+                                </td>
+
+                                {/* Actions */}
+                                <td className="p-3 text-right whitespace-nowrap space-x-1.5">
+                                  <button
+                                    onClick={() => setEditingArtwork(art)}
+                                    className="p-1.5 rounded-lg bg-[#07160f] text-[#f4dc8a] hover:bg-[#d4af37]/20 border border-white/10"
+                                    title="Edit Artwork & Image"
+                                  >
+                                    <Edit3 className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      requestConfirm({
+                                        title: "আর্টওয়ার্ক মুছে ফেলুন (Delete Artwork)",
+                                        message: "আপনি কি নিশ্চিত এই আর্টওয়ার্কটি ক্যাটালগ ও ক্লাউড ডাটাবেস থেকে স্থায়ীভাবে মুছে ফেলতে চান?",
+                                        itemName: art.title,
+                                        confirmLabel: "হ্যাঁ, মুছে ফেলুন",
+                                        onConfirm: () => deleteArtwork(art.id),
+                                      });
+                                    }}
+                                    className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20"
+                                    title="Delete Artwork"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                /* GRID VIEW WITH CHECKBOX & SERIAL STEPPER */
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredArtworks.map((art) => {
+                    const globalIdx = artworks.findIndex((a) => a.id === art.id);
+                    const serialNo = globalIdx + 1;
+                    const isSelected = selectedArtworkIds.includes(art.id);
+
+                    return (
+                      <div
+                        key={art.id}
+                        className={`linear-card rounded-2xl overflow-hidden flex flex-col justify-between border transition-all group ${
+                          isSelected
+                            ? "border-rose-500/60 ring-2 ring-rose-500/30 shadow-[0_0_25px_rgba(244,63,94,0.2)]"
+                            : "border-white/10 hover:border-white/20"
+                        }`}
+                      >
+                        <div>
+                          {/* Image Preview with quick replace, selection checkbox & serial controls */}
+                          <div className="relative aspect-[16/10] w-full bg-[#08170f] overflow-hidden">
+                            <Image
+                              src={art.image}
+                              alt={art.title}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+
+                            {/* Top Left: Checkbox & Category */}
+                            <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10">
+                              <label
+                                onClick={(e) => e.stopPropagation()}
+                                className="p-1 rounded-lg bg-[#06110a]/90 backdrop-blur-sm border border-white/20 hover:border-[#d4af37] cursor-pointer flex items-center justify-center transition-all shadow-md"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => toggleSelectArtwork(art.id)}
+                                  className="rounded bg-[#07160f] border-white/20 text-[#d4af37] w-4 h-4 cursor-pointer"
+                                />
+                              </label>
+
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#06110a]/90 text-[#f4dc8a] border border-[#d4af37]/30 backdrop-blur-sm">
+                                {art.category}
+                              </span>
+                              {art.badge && (
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/80 text-white backdrop-blur-sm">
+                                  {art.badge}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Top Right: Serial Stepper & Direct Serial Input */}
+                            <div
+                              onClick={(e) => e.stopPropagation()}
+                              className="absolute top-2 right-2 flex items-center gap-1 p-1 rounded-xl bg-[#06110a]/90 backdrop-blur-sm border border-white/15 z-10 shadow-md"
+                            >
+                              <div className="flex flex-col">
+                                <button
+                                  type="button"
+                                  disabled={globalIdx === 0}
+                                  onClick={() => handleMoveArtwork(globalIdx, globalIdx - 1)}
+                                  className="text-[#8fa89a] hover:text-[#d4af37] disabled:opacity-20 leading-none"
+                                  title="Move Up (১ ধাপ উপরে)"
+                                >
+                                  <ChevronUp className="w-3 h-3" />
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={globalIdx === artworks.length - 1}
+                                  onClick={() => handleMoveArtwork(globalIdx, globalIdx + 1)}
+                                  className="text-[#8fa89a] hover:text-[#d4af37] disabled:opacity-20 leading-none"
+                                  title="Move Down (১ ধাপ নিচে)"
+                                >
+                                  <ChevronDown className="w-3 h-3" />
+                                </button>
+                              </div>
+
+                              <input
+                                type="number"
+                                min={1}
+                                max={artworks.length}
+                                defaultValue={serialNo}
+                                key={serialNo}
+                                onBlur={(e) => {
+                                  const val = parseInt(e.target.value, 10);
+                                  if (!isNaN(val) && val !== serialNo) {
+                                    handleSetArtworkSerial(art.id, val);
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    const val = parseInt((e.target as HTMLInputElement).value, 10);
+                                    if (!isNaN(val) && val !== serialNo) {
+                                      handleSetArtworkSerial(art.id, val);
+                                    }
+                                  }
+                                }}
+                                className="w-10 px-1 py-0.5 text-center font-mono font-bold text-[11px] bg-[#07160f] border border-white/10 rounded text-[#f4dc8a] focus:outline-none focus:border-[#d4af37]"
+                                title="সিরিয়াল নম্বর লিখে Enter চাপুন"
+                              />
+                            </div>
+
+                            <button
+                              onClick={() => setEditingArtwork(art)}
+                              className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-[#06110a]/85 text-[#f4dc8a] border border-white/10 hover:border-[#d4af37] flex items-center gap-1 text-[11px] font-medium backdrop-blur-sm"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                              <span>Edit Image</span>
+                            </button>
+                          </div>
+
+                          <div className="p-4 space-y-2">
+                            <div className="flex items-center justify-between text-[11px] text-[#8fa89a]">
+                              <span>{art.dimensions}</span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateArtwork(art.id, { inStock: !art.inStock })
+                                }
+                                className={`text-[11px] font-semibold transition-colors ${
+                                  art.inStock
+                                    ? "text-emerald-400 hover:text-emerald-300"
+                                    : "text-rose-400 hover:text-rose-300"
+                                }`}
+                                title="Click to toggle stock status"
+                              >
+                                ● {art.inStock ? "In Stock" : "Out of Stock"}
+                              </button>
+                            </div>
+
+                            <h4 className="font-bold text-sm text-white line-clamp-1">
+                              {art.title}
+                            </h4>
+
+                            {art.titleBangla && (
+                              <p className="text-xs text-[#8fa89a] line-clamp-1 font-serif">
+                                {art.titleBangla}
+                              </p>
+                            )}
+
+                            <p className="text-xs text-[#9cb5a6] line-clamp-2">
+                              {art.description}
+                            </p>
+
+                            {art.spiritualMessage && (
+                              <p className="text-[10px] text-[#fceb9e] bg-[#07160f] p-1.5 rounded border border-white/5 line-clamp-1">
+                                {art.spiritualMessage}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="p-4 pt-2 border-t border-white/5 space-y-3">
+                          <div className="flex items-baseline justify-between">
+                            <span className="text-lg font-bold text-[#fceb9e]">
+                              ৳{art.price.toLocaleString()}
+                            </span>
+                            {art.originalPrice && (
+                              <span className="text-xs text-[#8fa89a] line-through">
+                                ৳{art.originalPrice.toLocaleString()}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setEditingArtwork(art)}
+                              className="flex-1 btn-3d-dark py-2 text-xs flex items-center justify-center gap-1.5 font-semibold text-[#f4dc8a]"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>Edit Artwork &amp; Image</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                requestConfirm({
+                                  title: "আর্টওয়ার্ক মুছে ফেলুন (Delete Artwork)",
+                                  message: "আপনি কি নিশ্চিত এই আর্টওয়ার্কটি ক্যাটালগ ও ক্লাউড ডাটাবেস থেকে স্থায়ীভাবে মুছে ফেলতে চান?",
+                                  itemName: art.title,
+                                  confirmLabel: "হ্যাঁ, মুছে ফেলুন",
+                                  onConfirm: () => deleteArtwork(art.id),
+                                });
+                              }}
+                              className="p-2 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
+                              title="Delete Artwork"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 

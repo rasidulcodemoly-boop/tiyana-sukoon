@@ -99,6 +99,8 @@ export interface SiteSettings {
   outsideDhakaDeliveryFee: number;
   freeDeliveryThreshold: number;
   adminPin: string;
+  // Custom ordering
+  artworkOrderIds?: string[];
   // Editable site images
   siteLogo: string;
   heroImage: string;

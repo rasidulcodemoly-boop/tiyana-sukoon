@@ -78,6 +78,8 @@ interface StoreContextType {
   addArtwork: (artwork: Omit<Artwork, "id">) => void;
   updateArtwork: (id: string, updated: Partial<Artwork>) => void;
   deleteArtwork: (id: string) => void;
+  deleteArtworks: (ids: string[]) => void;
+  reorderArtworks: (newOrder: Artwork[]) => void;
 
   // Settings
   updateSettings: (newSettings: Partial<SiteSettings>, silent?: boolean) => void;
@@ -150,8 +152,30 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
+      // 4. Fetch Site Settings (Fetch first to get artworkOrderIds)
+      const { data: settData, error: settError } = await client
+        .from("site_settings")
+        .select("settings")
+        .eq("id", "current")
+        .maybeSingle();
+
+      let activeSettings = settings;
+      if (!settError && settData?.settings) {
+        activeSettings = { ...settings, ...settData.settings };
+        setSettings(activeSettings);
+      }
+
       if (artData && artData.length > 0) {
-        const mappedArtworks = artData.map(dbToArtwork);
+        let mappedArtworks = artData.map(dbToArtwork);
+        const orderIds = activeSettings.artworkOrderIds;
+        if (orderIds && Array.isArray(orderIds) && orderIds.length > 0) {
+          const map = new Map(orderIds.map((id, idx) => [id, idx]));
+          mappedArtworks.sort((a, b) => {
+            const posA = map.has(a.id) ? map.get(a.id)! : 9999;
+            const posB = map.has(b.id) ? map.get(b.id)! : 9999;
+            return posA - posB;
+          });
+        }
         setArtworks(mappedArtworks);
       }
 
@@ -173,17 +197,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (!inqError && inqData) {
         setInquiries(inqData.map(dbToInquiry));
-      }
-
-      // 4. Fetch Site Settings
-      const { data: settData, error: settError } = await client
-        .from("site_settings")
-        .select("settings")
-        .eq("id", "current")
-        .maybeSingle();
-
-      if (!settError && settData?.settings) {
-        setSettings((prev) => ({ ...prev, ...settData.settings }));
       }
 
       setSupabaseStatus("connected");
@@ -638,6 +651,35 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const deleteArtworks = (ids: string[]) => {
+    if (!ids || ids.length === 0) return;
+    setArtworks((prev) => prev.filter((art) => !ids.includes(art.id)));
+    showToast(`সফলভাবে ${ids.length}টি আর্টওয়ার্ক মুছে ফেলা হয়েছে! ✓`, "success");
+
+    const client = getSupabase();
+    if (client) {
+      client
+        .from("artworks")
+        .delete()
+        .in("id", ids)
+        .then(({ error }) => {
+          if (error) console.error("Failed to delete artworks in Supabase:", error);
+        });
+    }
+  };
+
+  const reorderArtworks = (newOrder: Artwork[]) => {
+    setArtworks(newOrder);
+    try {
+      localStorage.setItem(STORAGE_KEYS.ARTWORKS, JSON.stringify(newOrder));
+    } catch (e) {
+      console.error(e);
+    }
+    const orderIds = newOrder.map((a) => a.id);
+    updateSettings({ artworkOrderIds: orderIds }, true);
+    showToast("আর্টওয়ার্ক ক্রম/সিরিয়াল সফলভাবে সাজানো হয়েছে! ✓", "success");
+  };
+
   // Settings update with Supabase sync
   const updateSettings = (newSettings: Partial<SiteSettings>, silent?: boolean) => {
     const updated = { ...settings, ...newSettings };
@@ -729,6 +771,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
         addArtwork,
         updateArtwork,
         deleteArtwork,
+        deleteArtworks,
+        reorderArtworks,
         updateSettings,
       }}
     >

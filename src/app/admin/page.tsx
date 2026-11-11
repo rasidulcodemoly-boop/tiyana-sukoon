@@ -398,6 +398,7 @@ const AdminDashboardInner: React.FC = () => {
   const [mediaSearchQuery, setMediaSearchQuery] = useState("");
   const [mediaFilter, setMediaFilter] = useState<"all" | "in-carousel" | "available">("all");
   const [isAddSlideModalOpen, setIsAddSlideModalOpen] = useState(false);
+  const [activeCoreImageModal, setActiveCoreImageModal] = useState<"logo" | "hero" | "story" | null>(null);
   const [newSlideData, setNewSlideData] = useState<{
     title: string;
     titleBangla: string;
@@ -2195,106 +2196,222 @@ If you have any questions or would like preview photos of your canvas, reply to 
                 </div>
 
                 {/* 2. CORE SITE BRAND IMAGES */}
-                <div id="core-images-section" className="space-y-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-                      <ImageIcon className="w-5 h-5 text-emerald-400" />
-                      Core Storefront Theme Images (ব্র্যান্ড কোর ইমেজেস)
-                    </h3>
-                    <p className="text-xs text-[#8fa89a]">
-                      ওয়েবসাইটের ব্র্যান্ড লোগো, হোমপেজ হিরোর ৩ডি আর্ট ফ্রেম এবং স্টোরি সেকশনের ফিচার্ড ছবি পরিবর্তন করুন।
-                    </p>
+                <div id="core-images-section" className="space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
+                    <div>
+                      <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                        <ImageIcon className="w-5 h-5 text-emerald-400" />
+                        Core Storefront Theme Assets (ব্র্যান্ড কোর থিম ইমেজেস)
+                      </h3>
+                      <p className="text-xs text-[#8fa89a]">
+                        ওয়েবসাইটের ৩টি মূল ভিজ্যুয়াল উপাদান: ব্র্যান্ড লোগো, হোমপেজ হিরোর ৩ডি ভাসমান ফ্রেম এবং ফিলোসফি স্টোরি ব্যানার।
+                      </p>
+                    </div>
+                    <span className="text-xs font-mono text-[#f4dc8a] bg-[#0d2218] px-3.5 py-1 rounded-full border border-[#d4af37]/30 self-start sm:self-center">
+                      3 Core Assets Active
+                    </span>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* 1. Brand Logo */}
-                    <div className="linear-card p-5 rounded-3xl border border-white/10 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between">
-                      <div className="space-y-3">
+                    {/* 1. Brand Logo Card */}
+                    <div className="linear-card rounded-3xl border border-white/10 hover:border-[#d4af37]/40 transition-all p-5 flex flex-col justify-between space-y-4 shadow-xl group">
+                      <div className="space-y-3.5">
                         <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
-                          <h4 className="font-bold text-sm text-white flex items-center gap-1.5">
-                            <ShieldCheck className="w-4 h-4 text-[#d4af37]" />
-                            Brand Identity Logo
-                          </h4>
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37]">
+                              <ShieldCheck className="w-4 h-4" />
+                            </div>
+                            <h4 className="font-bold text-sm text-white">
+                              Brand Identity Logo
+                            </h4>
+                          </div>
                           <span className="text-[10px] text-[#f4dc8a] font-mono px-2 py-0.5 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30">
                             Navbar &amp; Footer
                           </span>
                         </div>
 
-                        <ImageSourceControl
-                          label="Site Brand Logo"
-                          currentValue={settings.siteLogo}
-                          onChange={(newUrl) => updateSettings({ siteLogo: newUrl })}
-                          presets={GALLERY_IMAGE_PRESETS.slice(0, 5)}
-                        />
+                        {/* Visual Live Preview Frame */}
+                        <div
+                          onClick={() => setActiveCoreImageModal("logo")}
+                          className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-[#040d07] border border-white/15 flex items-center justify-center p-4 cursor-pointer group-hover:border-[#d4af37]/60 transition-all shadow-inner"
+                        >
+                          <div className="relative w-28 h-28 max-w-full max-h-full">
+                            <Image
+                              src={settings.siteLogo || "/brand/logo.jpg"}
+                              alt="Brand Logo"
+                              fill
+                              className="object-contain drop-shadow-[0_4px_15px_rgba(0,0,0,0.8)] group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+
+                          {/* Hover Overlay */}
+                          <div className="absolute inset-0 bg-[#06110a]/80 backdrop-blur-xs opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1.5 transition-opacity duration-200">
+                            <div className="w-9 h-9 rounded-xl bg-[#d4af37] text-[#07160f] flex items-center justify-center shadow-lg">
+                              <Edit3 className="w-4 h-4" />
+                            </div>
+                            <span className="text-xs font-bold text-white">লোগো পরিবর্তন করুন</span>
+                            <span className="text-[10px] text-[#f4dc8a]">Click to Replace</span>
+                          </div>
+                        </div>
+
+                        {/* Path Info Pill */}
+                        <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-[#06110a] border border-white/5 text-[11px]">
+                          <span className="text-[#8fa89a] truncate max-w-[200px] font-mono">
+                            {settings.siteLogo || "/brand/logo.jpg"}
+                          </span>
+                          <span className="text-emerald-400 text-[10px] font-mono font-bold shrink-0">
+                            ● Live
+                          </span>
+                        </div>
                       </div>
 
-                      <div className="pt-2">
+                      {/* Action Buttons */}
+                      <div className="pt-2 flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setActiveCoreImageModal("logo")}
+                          className="btn-3d-gold py-2 px-3 text-xs font-bold flex-1 flex items-center justify-center gap-1.5 shadow-md"
+                        >
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Change Logo</span>
+                        </button>
                         <button
                           type="button"
                           onClick={() => {
                             updateSettings({ siteLogo: "/brand/logo.jpg" });
                             showToast("লোগো ডিফল্ট ফেসবুক লোগোতে রিসেট করা হয়েছে!");
                           }}
-                          className="btn-3d-dark py-2 px-3 text-xs w-full text-center"
+                          className="btn-3d-dark py-2 px-3 text-xs text-[#8fa89a] hover:text-white"
+                          title="Reset to default FB logo"
                         >
-                          Reset to Original FB Logo
+                          Reset
                         </button>
                       </div>
                     </div>
 
-                    {/* 2. Hero 3D Frame Image */}
-                    <div className="linear-card p-5 rounded-3xl border border-white/10 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between">
-                      <div className="space-y-3">
+                    {/* 2. Hero 3D Highlight Canvas Card */}
+                    <div className="linear-card rounded-3xl border border-white/10 hover:border-[#d4af37]/40 transition-all p-5 flex flex-col justify-between space-y-4 shadow-xl group">
+                      <div className="space-y-3.5">
                         <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
-                          <h4 className="font-bold text-sm text-white flex items-center gap-1.5">
-                            <Sparkles className="w-4 h-4 text-emerald-400" />
-                            Hero 3D Highlight Canvas
-                          </h4>
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                              <Sparkles className="w-4 h-4" />
+                            </div>
+                            <h4 className="font-bold text-sm text-white">
+                              Hero 3D Highlight Canvas
+                            </h4>
+                          </div>
                           <span className="text-[10px] text-emerald-400 font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30">
-                            Homepage Top
+                            Homepage Top 3D
                           </span>
                         </div>
 
-                        <ImageSourceControl
-                          label="Hero 3D Frame Image"
-                          currentValue={settings.heroImage}
-                          onChange={(newUrl) => updateSettings({ heroImage: newUrl })}
-                          presets={GALLERY_IMAGE_PRESETS}
-                        />
+                        {/* Visual Live Preview Frame */}
+                        <div
+                          onClick={() => setActiveCoreImageModal("hero")}
+                          className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-[#040d07] border border-white/15 flex items-center justify-center cursor-pointer group-hover:border-[#d4af37]/60 transition-all shadow-inner"
+                        >
+                          <Image
+                            src={settings.heroImage || "/artwork/artwork_4.jpg"}
+                            alt="Hero 3D Canvas"
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+
+                          {/* Hover Overlay */}
+                          <div className="absolute inset-0 bg-[#06110a]/80 backdrop-blur-xs opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1.5 transition-opacity duration-200">
+                            <div className="w-9 h-9 rounded-xl bg-[#d4af37] text-[#07160f] flex items-center justify-center shadow-lg">
+                              <Edit3 className="w-4 h-4" />
+                            </div>
+                            <span className="text-xs font-bold text-white">৩ডি ফ্রেম ইমেজ পরিবর্তন</span>
+                            <span className="text-[10px] text-[#f4dc8a]">Click to Replace</span>
+                          </div>
+                        </div>
+
+                        {/* Path Info Pill */}
+                        <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-[#06110a] border border-white/5 text-[11px]">
+                          <span className="text-[#8fa89a] truncate max-w-[200px] font-mono">
+                            {settings.heroImage || "/artwork/artwork_4.jpg"}
+                          </span>
+                          <span className="text-emerald-400 text-[10px] font-mono font-bold shrink-0">
+                            ● 3D Active
+                          </span>
+                        </div>
                       </div>
 
-                      <div className="pt-2">
-                        <p className="text-[10px] text-[#8fa89a] text-center">
-                          হোমপেজে ৩ডি ভাসমান ফ্রেমের প্রধান আর্টপিস
-                        </p>
+                      {/* Action Buttons */}
+                      <div className="pt-2 flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setActiveCoreImageModal("hero")}
+                          className="btn-3d-gold py-2 px-3 text-xs font-bold flex-1 flex items-center justify-center gap-1.5 shadow-md"
+                        >
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Change 3D Canvas</span>
+                        </button>
                       </div>
                     </div>
 
-                    {/* 3. Story Feature Banner */}
-                    <div className="linear-card p-5 rounded-3xl border border-white/10 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between">
-                      <div className="space-y-3">
+                    {/* 3. Story Feature Banner Card */}
+                    <div className="linear-card rounded-3xl border border-white/10 hover:border-[#d4af37]/40 transition-all p-5 flex flex-col justify-between space-y-4 shadow-xl group">
+                      <div className="space-y-3.5">
                         <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
-                          <h4 className="font-bold text-sm text-white flex items-center gap-1.5">
-                            <Palette className="w-4 h-4 text-[#f4dc8a]" />
-                            Brand Story Feature
-                          </h4>
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#f4dc8a]">
+                              <Palette className="w-4 h-4" />
+                            </div>
+                            <h4 className="font-bold text-sm text-white">
+                              Brand Story Feature
+                            </h4>
+                          </div>
                           <span className="text-[10px] text-[#f4dc8a] font-mono px-2 py-0.5 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30">
                             Philosophy Section
                           </span>
                         </div>
 
-                        <ImageSourceControl
-                          label="Philosophy Story Image"
-                          currentValue={settings.storyImage}
-                          onChange={(newUrl) => updateSettings({ storyImage: newUrl })}
-                          presets={GALLERY_IMAGE_PRESETS}
-                        />
+                        {/* Visual Live Preview Frame */}
+                        <div
+                          onClick={() => setActiveCoreImageModal("story")}
+                          className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-[#040d07] border border-white/15 flex items-center justify-center cursor-pointer group-hover:border-[#d4af37]/60 transition-all shadow-inner"
+                        >
+                          <Image
+                            src={settings.storyImage || "/artwork/artwork_1.jpg"}
+                            alt="Story Feature Banner"
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+
+                          {/* Hover Overlay */}
+                          <div className="absolute inset-0 bg-[#06110a]/80 backdrop-blur-xs opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1.5 transition-opacity duration-200">
+                            <div className="w-9 h-9 rounded-xl bg-[#d4af37] text-[#07160f] flex items-center justify-center shadow-lg">
+                              <Edit3 className="w-4 h-4" />
+                            </div>
+                            <span className="text-xs font-bold text-white">স্টোরি ব্যানার পরিবর্তন</span>
+                            <span className="text-[10px] text-[#f4dc8a]">Click to Replace</span>
+                          </div>
+                        </div>
+
+                        {/* Path Info Pill */}
+                        <div className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-[#06110a] border border-white/5 text-[11px]">
+                          <span className="text-[#8fa89a] truncate max-w-[200px] font-mono">
+                            {settings.storyImage || "/artwork/artwork_1.jpg"}
+                          </span>
+                          <span className="text-emerald-400 text-[10px] font-mono font-bold shrink-0">
+                            ● Story Active
+                          </span>
+                        </div>
                       </div>
 
-                      <div className="pt-2">
-                        <p className="text-[10px] text-[#8fa89a] text-center">
-                          আওয়ার ফিলোসফি (Story) সেকশনের প্রধান ভিজ্যুয়াল
-                        </p>
+                      {/* Action Buttons */}
+                      <div className="pt-2 flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setActiveCoreImageModal("story")}
+                          className="btn-3d-gold py-2 px-3 text-xs font-bold flex-1 flex items-center justify-center gap-1.5 shadow-md"
+                        >
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Change Story Image</span>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -4021,6 +4138,104 @@ If you have any questions or would like preview photos of your canvas, reply to 
                   Save Changes
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DEDICATED CORE THEME ASSET IMAGE SWITCHER MODAL */}
+      {activeCoreImageModal && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn pointer-events-auto"
+          onClick={() => setActiveCoreImageModal(null)}
+        >
+          <div
+            className="w-full max-w-2xl linear-card p-6 sm:p-7 rounded-3xl border border-[#d4af37]/40 shadow-[0_25px_60px_rgba(0,0,0,0.9),0_0_35px_rgba(212,175,55,0.25)] space-y-5 animate-scaleUp max-h-[92vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-inner">
+                  {activeCoreImageModal === "logo" && <ShieldCheck className="w-6 h-6" />}
+                  {activeCoreImageModal === "hero" && <Sparkles className="w-6 h-6" />}
+                  {activeCoreImageModal === "story" && <Palette className="w-6 h-6" />}
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-white">
+                    {activeCoreImageModal === "logo" && "Change Brand Identity Logo (লোগো পরিবর্তন)"}
+                    {activeCoreImageModal === "hero" && "Change Hero 3D Highlight Canvas (৩ডি ফ্রেম আর্টপিস পরিবর্তন)"}
+                    {activeCoreImageModal === "story" && "Change Philosophy Story Image (ব্র্যান্ড দর্শন ইমেজ পরিবর্তন)"}
+                  </h3>
+                  <p className="text-xs text-[#8fa89a]">
+                    {activeCoreImageModal === "logo" && "কম্পিউটার/মোবাইল থেকে নতুন লোগো আপলোড করুন অথবা স্টুডিও কালেকশন থেকে নির্বাচন করুন।"}
+                    {activeCoreImageModal === "hero" && "হোমপেজের টপে ৩ডি ভাসমান ফ্রেমের প্রধান আর্টপিস নির্বাচন করুন।"}
+                    {activeCoreImageModal === "story" && "আওয়ার ফিলোসফি (Story) সেকশনের প্রধান ভিজ্যুয়াল ছবি নির্বাচন করুন।"}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveCoreImageModal(null)}
+                className="p-1.5 rounded-xl bg-[#07160f] text-[#8fa89a] hover:text-white border border-white/10 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body: Generous, Full-Width ImageSourceControl */}
+            <div className="space-y-4">
+              {activeCoreImageModal === "logo" && (
+                <ImageSourceControl
+                  label="Select Brand Logo Source"
+                  currentValue={settings.siteLogo || "/brand/logo.jpg"}
+                  onChange={(newUrl) => {
+                    updateSettings({ siteLogo: newUrl });
+                    showToast("ব্র্যান্ড লোগো সফলভাবে পরিবর্তন করা হয়েছে! ✓", "success");
+                  }}
+                  presets={GALLERY_IMAGE_PRESETS.slice(0, 5)}
+                />
+              )}
+
+              {activeCoreImageModal === "hero" && (
+                <ImageSourceControl
+                  label="Select Hero 3D Highlight Canvas Source"
+                  currentValue={settings.heroImage || "/artwork/artwork_4.jpg"}
+                  onChange={(newUrl) => {
+                    updateSettings({ heroImage: newUrl });
+                    showToast("হিরো ৩ডি আর্টপিস সফলভাবে পরিবর্তন করা হয়েছে! ✓", "success");
+                  }}
+                  presets={GALLERY_IMAGE_PRESETS}
+                />
+              )}
+
+              {activeCoreImageModal === "story" && (
+                <ImageSourceControl
+                  label="Select Philosophy Story Image Source"
+                  currentValue={settings.storyImage || "/artwork/artwork_1.jpg"}
+                  onChange={(newUrl) => {
+                    updateSettings({ storyImage: newUrl });
+                    showToast("ব্র্যান্ড স্টোরি ব্যানার সফলভাবে পরিবর্তন করা হয়েছে! ✓", "success");
+                  }}
+                  presets={GALLERY_IMAGE_PRESETS}
+                />
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+              <span className="text-[11px] text-emerald-400 font-mono flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5" />
+                <span>পরিবর্তন স্বয়ংক্রিয়ভাবে লাইভ স্টোরে সেভ হয়</span>
+              </span>
+
+              <button
+                type="button"
+                onClick={() => setActiveCoreImageModal(null)}
+                className="btn-3d-gold px-6 py-2 text-xs font-bold"
+              >
+                সম্পন্ন (Done)
+              </button>
             </div>
           </div>
         </div>

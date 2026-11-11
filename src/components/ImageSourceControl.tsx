@@ -152,30 +152,30 @@ export const ImageSourceControl: React.FC<ImageSourceControlProps> = ({
         </div>
 
         {/* Mode Switcher Buttons */}
-        <div className="flex items-center gap-1 bg-[#050e08] p-1 rounded-lg border border-white/10 w-full">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-1.5 bg-[#050e08] p-1.5 rounded-2xl border border-white/10 w-full">
           <button
             type="button"
             onClick={() => setActiveMode("local")}
-            className={`flex-1 py-1.5 px-2 text-[10px] sm:text-[11px] rounded font-medium flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
+            className={`flex-1 py-2 px-3 text-xs rounded-xl font-semibold flex items-center justify-center gap-2 transition-all whitespace-nowrap ${
               activeMode === "local"
-                ? "bg-[#d4af37] text-[#06110a] font-bold shadow-sm"
-                : "text-[#8fa89a] hover:text-white"
+                ? "bg-[#d4af37] text-[#06110a] font-bold shadow-md"
+                : "text-[#8fa89a] hover:text-white hover:bg-white/5"
             }`}
           >
-            <Upload className="w-3 h-3 shrink-0" />
+            <Upload className="w-3.5 h-3.5 shrink-0" />
             <span>Upload File</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveMode("url")}
-            className={`flex-1 py-1.5 px-2 text-[10px] sm:text-[11px] rounded font-medium flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
+            className={`flex-1 py-2 px-3 text-xs rounded-xl font-semibold flex items-center justify-center gap-2 transition-all whitespace-nowrap ${
               activeMode === "url"
-                ? "bg-[#d4af37] text-[#06110a] font-bold shadow-sm"
-                : "text-[#8fa89a] hover:text-white"
+                ? "bg-[#d4af37] text-[#06110a] font-bold shadow-md"
+                : "text-[#8fa89a] hover:text-white hover:bg-white/5"
             }`}
           >
-            <LinkIcon className="w-3 h-3 shrink-0" />
+            <LinkIcon className="w-3.5 h-3.5 shrink-0" />
             <span>Image URL</span>
           </button>
 
@@ -183,13 +183,13 @@ export const ImageSourceControl: React.FC<ImageSourceControlProps> = ({
             <button
               type="button"
               onClick={() => setActiveMode("presets")}
-              className={`flex-1 py-1.5 px-2 text-[10px] sm:text-[11px] rounded font-medium flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
+              className={`flex-1 py-2 px-3 text-xs rounded-xl font-semibold flex items-center justify-center gap-2 transition-all whitespace-nowrap ${
                 activeMode === "presets"
-                  ? "bg-[#d4af37] text-[#06110a] font-bold shadow-sm"
-                  : "text-[#8fa89a] hover:text-white"
+                  ? "bg-[#d4af37] text-[#06110a] font-bold shadow-md"
+                  : "text-[#8fa89a] hover:text-white hover:bg-white/5"
               }`}
             >
-              <Grid className="w-3 h-3 shrink-0" />
+              <Grid className="w-3.5 h-3.5 shrink-0" />
               <span>Presets ({presets.length})</span>
             </button>
           )}

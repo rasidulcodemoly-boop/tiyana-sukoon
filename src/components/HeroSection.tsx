@@ -9,15 +9,16 @@ import { ArrowRight, ZoomIn } from "lucide-react";
 export const HeroSection: React.FC = () => {
   const { setSelectedArtworkForModal, artworks, settings, language, t } = useStore();
 
-  // Desktop & Mobile Carousel: Artworks selected from Admin Panel (or fallback)
+  // Desktop & Mobile Carousel: Artworks selected from Admin Panel
   const carouselArtworks = useMemo(() => {
     const selectedIds = settings.heroCarouselArtworkIds;
-    if (selectedIds && Array.isArray(selectedIds) && selectedIds.length > 0) {
-      const selected = selectedIds
+    // If the admin has configured the carousel (even if empty []):
+    if (selectedIds !== undefined && Array.isArray(selectedIds)) {
+      return selectedIds
         .map((id) => artworks.find((a) => a.id === id))
         .filter((a): a is Artwork => Boolean(a));
-      if (selected.length > 0) return selected;
     }
+    // Only if settings.heroCarouselArtworkIds has never been defined at all:
     return artworks.length > 0 ? artworks.slice(0, 8) : [];
   }, [artworks, settings.heroCarouselArtworkIds]);
 
@@ -138,149 +139,154 @@ export const HeroSection: React.FC = () => {
         </div>
       </div>
 
-      {/* MOBILE VIEW ONLY: 2 Images displayed side-by-side, changing 1-by-1 every 3 seconds */}
-      <div className="block md:hidden mt-8 px-4 w-full max-w-md mx-auto">
-        {/* 2-Card Slider Viewport */}
-        <div
-          className="relative overflow-hidden rounded-2xl p-1"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
-          <div
-            className="flex gap-3 will-change-transform"
-            style={{
-              transform: `translateX(calc(-${mobileIndex} * (50% + 6px)))`,
-              transition: isTransitioning
-                ? "transform 600ms cubic-bezier(0.25, 1, 0.5, 1)"
-                : "none",
-            }}
-            onTransitionEnd={handleTransitionEnd}
-          >
-            {mobileDisplayArtworks.map((art, idx) => (
-              <div
-                key={`mob-${art.id}-${idx}`}
-                onClick={() => setSelectedArtworkForModal(art)}
-                className="relative w-[calc(50%-6px)] shrink-0 aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer border border-[#d4af37]/35 bg-[#08180f] shadow-[0_10px_25px_rgba(0,0,0,0.7)] active:scale-[0.98] transition-all"
-                title="Click to view full piece"
-              >
-                {/* Artwork Image */}
-                <Image
-                  src={art.image}
-                  alt={art.title}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 250px"
-                  className="object-cover"
-                  priority={idx < 4}
-                />
-
-                {/* Subtle dark gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#06110a]/95 via-[#06110a]/25 to-transparent pointer-events-none" />
-
-                {/* Top Category Badge */}
-                <div className="absolute top-2 left-2 z-10 pointer-events-none">
-                  <span className="px-1.5 py-0.5 rounded text-[8px] uppercase font-mono font-bold bg-[#06110a]/85 text-[#f4dc8a] border border-[#d4af37]/30 backdrop-blur-xs">
-                    {art.category}
-                  </span>
-                </div>
-
-                {/* Bottom Title & Price */}
-                <div className="absolute bottom-0 inset-x-0 p-2.5 z-10 space-y-0.5 pointer-events-none">
-                  <h3 className="text-[11px] font-bold text-white truncate">
-                    {language === "bn" && art.titleBangla ? art.titleBangla : art.title}
-                  </h3>
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className="text-[#8fa89a] font-mono text-[9px]">
-                      {art.dimensions}
-                    </span>
-                    <span className="font-extrabold text-[#fceb9e] font-mono text-[11px]">
-                      ৳{art.price.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Carousel Indicators for Mobile */}
-        {carouselArtworks.length > 1 && (
-          <div className="flex justify-center items-center gap-1.5 mt-3.5">
-            {carouselArtworks.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  setIsTransitioning(true);
-                  setMobileIndex(i);
-                }}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  mobileIndex % carouselArtworks.length === i
-                    ? "w-6 bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] shadow-[0_0_8px_rgba(212,175,55,0.5)]"
-                    : "w-1.5 bg-white/20 hover:bg-white/40"
-                }`}
-                aria-label={`Go to slide ${i + 1}`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* DESKTOP VIEW ONLY: Animated Horizontal Infinite Continuous Marquee Loop */}
-      <div className="hidden md:block mt-12 sm:mt-16 pt-2 relative w-full overflow-hidden">
-        {/* Left & Right Smooth Edge Fade Masks */}
-        <div className="absolute left-0 inset-y-0 w-16 sm:w-32 bg-gradient-to-r from-[#06110a] via-[#06110a]/80 to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 inset-y-0 w-16 sm:w-32 bg-gradient-to-l from-[#06110a] via-[#06110a]/80 to-transparent z-10 pointer-events-none" />
-
-        {/* Continuous Horizontal Marquee Carousel */}
-        <div className="animate-marquee gap-4 sm:gap-6 py-2">
-          {displayArtworks.map((art, idx) => (
+      {/* CAROUSEL SECTION (ONLY RENDER IF SLIDES ARE CONFIGURED) */}
+      {carouselArtworks.length > 0 && (
+        <>
+          {/* MOBILE VIEW ONLY: 2 Images displayed side-by-side, changing 1-by-1 every 3 seconds */}
+          <div className="block md:hidden mt-8 px-4 w-full max-w-md mx-auto">
+            {/* 2-Card Slider Viewport */}
             <div
-              key={`desk-${art.id}-${idx}`}
-              onClick={() => setSelectedArtworkForModal(art)}
-              className="group relative w-[220px] sm:w-[270px] md:w-[310px] aspect-[4/5] shrink-0 rounded-2xl overflow-hidden cursor-pointer border border-white/10 bg-[#08180f] shadow-xl hover:border-[#d4af37]/60 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(212,175,55,0.2)]"
-              title="Click to view full piece"
+              className="relative overflow-hidden rounded-2xl p-1"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
             >
-              {/* Artwork Image */}
-              <Image
-                src={art.image}
-                alt={art.title}
-                fill
-                sizes="(max-width: 640px) 220px, 310px"
-                className="object-cover transition-transform duration-700 group-hover:scale-108"
-              />
+              <div
+                className="flex gap-3 will-change-transform"
+                style={{
+                  transform: `translateX(calc(-${mobileIndex} * (50% + 6px)))`,
+                  transition: isTransitioning
+                    ? "transform 600ms cubic-bezier(0.25, 1, 0.5, 1)"
+                    : "none",
+                }}
+                onTransitionEnd={handleTransitionEnd}
+              >
+                {mobileDisplayArtworks.map((art, idx) => (
+                  <div
+                    key={`mob-${art.id}-${idx}`}
+                    onClick={() => setSelectedArtworkForModal(art)}
+                    className="relative w-[calc(50%-6px)] shrink-0 aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer border border-[#d4af37]/35 bg-[#08180f] shadow-[0_10px_25px_rgba(0,0,0,0.7)] active:scale-[0.98] transition-all"
+                    title="Click to view full piece"
+                  >
+                    {/* Artwork Image */}
+                    <Image
+                      src={art.image}
+                      alt={art.title}
+                      fill
+                      sizes="(max-width: 768px) 50vw, 250px"
+                      className="object-cover"
+                      priority={idx < 4}
+                    />
 
-              {/* Gradient Scrim */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#06110a]/95 via-[#06110a]/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                    {/* Subtle dark gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#06110a]/95 via-[#06110a]/25 to-transparent pointer-events-none" />
 
-              {/* Top Category Badge */}
-              <div className="absolute top-3 left-3 z-10">
-                <span className="px-2 py-0.5 rounded-md text-[9px] uppercase font-mono font-bold tracking-wider bg-[#06110a]/80 text-[#f4dc8a] border border-[#d4af37]/30 backdrop-blur-md">
-                  {art.category}
-                </span>
-              </div>
+                    {/* Top Category Badge */}
+                    <div className="absolute top-2 left-2 z-10 pointer-events-none">
+                      <span className="px-1.5 py-0.5 rounded text-[8px] uppercase font-mono font-bold bg-[#06110a]/85 text-[#f4dc8a] border border-[#d4af37]/30 backdrop-blur-xs">
+                        {art.category}
+                      </span>
+                    </div>
 
-              {/* Hover Zoom Icon */}
-              <div className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-[#06110a]/70 text-[#f4dc8a] border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                <ZoomIn className="w-3.5 h-3.5" />
-              </div>
-
-              {/* Bottom Caption Overlay */}
-              <div className="absolute bottom-0 inset-x-0 p-3.5 z-10 space-y-1">
-                <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-1 group-hover:text-[#f4dc8a] transition-colors">
-                  {language === "bn" && art.titleBangla ? art.titleBangla : art.title}
-                </h3>
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-[#8fa89a] font-mono">{art.dimensions}</span>
-                  <span className="font-extrabold text-[#fceb9e] font-mono">
-                    ৳{art.price.toLocaleString()}
-                  </span>
-                </div>
+                    {/* Bottom Title & Price */}
+                    <div className="absolute bottom-0 inset-x-0 p-2.5 z-10 space-y-0.5 pointer-events-none">
+                      <h3 className="text-[11px] font-bold text-white truncate">
+                        {language === "bn" && art.titleBangla ? art.titleBangla : art.title}
+                      </h3>
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="text-[#8fa89a] font-mono text-[9px]">
+                          {art.dimensions}
+                        </span>
+                        <span className="font-extrabold text-[#fceb9e] font-mono text-[11px]">
+                          ৳{art.price.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+
+            {/* Carousel Indicators for Mobile */}
+            {carouselArtworks.length > 1 && (
+              <div className="flex justify-center items-center gap-1.5 mt-3.5">
+                {carouselArtworks.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setIsTransitioning(true);
+                      setMobileIndex(i);
+                    }}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      mobileIndex % carouselArtworks.length === i
+                        ? "w-6 bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] shadow-[0_0_8px_rgba(212,175,55,0.5)]"
+                        : "w-1.5 bg-white/20 hover:bg-white/40"
+                    }`}
+                    aria-label={`Go to slide ${i + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* DESKTOP VIEW ONLY: Animated Horizontal Infinite Continuous Marquee Loop */}
+          <div className="hidden md:block mt-12 sm:mt-16 pt-2 relative w-full overflow-hidden">
+            {/* Left & Right Smooth Edge Fade Masks */}
+            <div className="absolute left-0 inset-y-0 w-16 sm:w-32 bg-gradient-to-r from-[#06110a] via-[#06110a]/80 to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 inset-y-0 w-16 sm:w-32 bg-gradient-to-l from-[#06110a] via-[#06110a]/80 to-transparent z-10 pointer-events-none" />
+
+            {/* Continuous Horizontal Marquee Carousel */}
+            <div className="animate-marquee gap-4 sm:gap-6 py-2">
+              {displayArtworks.map((art, idx) => (
+                <div
+                  key={`desk-${art.id}-${idx}`}
+                  onClick={() => setSelectedArtworkForModal(art)}
+                  className="group relative w-[220px] sm:w-[270px] md:w-[310px] aspect-[4/5] shrink-0 rounded-2xl overflow-hidden cursor-pointer border border-white/10 bg-[#08180f] shadow-xl hover:border-[#d4af37]/60 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(212,175,55,0.2)]"
+                  title="Click to view full piece"
+                >
+                  {/* Artwork Image */}
+                  <Image
+                    src={art.image}
+                    alt={art.title}
+                    fill
+                    sizes="(max-width: 640px) 220px, 310px"
+                    className="object-cover transition-transform duration-700 group-hover:scale-108"
+                  />
+
+                  {/* Gradient Scrim */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#06110a]/95 via-[#06110a]/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+
+                  {/* Top Category Badge */}
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className="px-2 py-0.5 rounded-md text-[9px] uppercase font-mono font-bold tracking-wider bg-[#06110a]/80 text-[#f4dc8a] border border-[#d4af37]/30 backdrop-blur-md">
+                      {art.category}
+                    </span>
+                  </div>
+
+                  {/* Hover Zoom Icon */}
+                  <div className="absolute top-3 right-3 z-10 p-1.5 rounded-full bg-[#06110a]/70 text-[#f4dc8a] border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                    <ZoomIn className="w-3.5 h-3.5" />
+                  </div>
+
+                  {/* Bottom Caption Overlay */}
+                  <div className="absolute bottom-0 inset-x-0 p-3.5 z-10 space-y-1">
+                    <h3 className="text-xs sm:text-sm font-bold text-white line-clamp-1 group-hover:text-[#f4dc8a] transition-colors">
+                      {language === "bn" && art.titleBangla ? art.titleBangla : art.title}
+                    </h3>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#8fa89a] font-mono">{art.dimensions}</span>
+                      <span className="font-extrabold text-[#fceb9e] font-mono">
+                        ৳{art.price.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </section>
   );
 };

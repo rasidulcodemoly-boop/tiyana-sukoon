@@ -58,6 +58,8 @@ import {
   List,
   ChevronUp,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ArrowUp,
   ArrowDown,
   CheckSquare,
@@ -390,6 +392,105 @@ const AdminDashboardInner: React.FC = () => {
     const targetIdx = Math.max(0, Math.min(artworks.length - 1, targetSerial - 1));
     if (currentIdx === targetIdx) return;
     handleMoveArtwork(currentIdx, targetIdx);
+  };
+
+  // Media tab states & functions
+  const [mediaSearchQuery, setMediaSearchQuery] = useState("");
+  const [mediaFilter, setMediaFilter] = useState<"all" | "in-carousel" | "available">("all");
+  const [isAddSlideModalOpen, setIsAddSlideModalOpen] = useState(false);
+  const [newSlideData, setNewSlideData] = useState<{
+    title: string;
+    titleBangla: string;
+    image: string;
+    category: ArtworkCategory;
+    price: number;
+    dimensions: string;
+  }>({
+    title: "",
+    titleBangla: "",
+    image: "",
+    category: "calligraphy",
+    price: 4500,
+    dimensions: '20" x 28" inches',
+  });
+
+  const handleMoveHeroSlide = (currentIndex: number, newIndex: number) => {
+    const rawIds = settings.heroCarouselArtworkIds || artworks.slice(0, 8).map((a) => a.id);
+    const validArtIds = new Set(artworks.map((a) => a.id));
+    const heroIds = rawIds.filter((id) => validArtIds.has(id));
+    if (newIndex < 0 || newIndex >= heroIds.length) return;
+    const [movedId] = heroIds.splice(currentIndex, 1);
+    heroIds.splice(newIndex, 0, movedId);
+    setHeroCarouselArtworkIds(heroIds);
+    showToast(`স্লাইড ক্রমানুসারে সাজানো হয়েছে! (Slide #${currentIndex + 1} → #${newIndex + 1})`, "success");
+  };
+
+  const handleAddPresetToHeroCarousel = (preset: { id: number; path: string; label: string }) => {
+    // Check if an artwork with this image already exists
+    const existing = artworks.find((a) => a.image === preset.path);
+    if (existing) {
+      toggleHeroCarouselArtwork(existing.id);
+      return;
+    }
+
+    // Otherwise create a new Artwork from this preset and add to carousel!
+    const newArt = addArtwork({
+      title: preset.label,
+      titleBangla: preset.label,
+      category: "calligraphy",
+      price: 4500,
+      dimensions: '20" x 28" inches',
+      image: preset.path,
+      description: `Tiyana's Sukoon Authentic Studio Artwork - ${preset.label}`,
+      medium: "Mixed Media on Canvas with 24K Gold Leaf",
+      inStock: true,
+      isFeatured: true,
+    });
+
+    const rawIds = settings.heroCarouselArtworkIds || artworks.slice(0, 8).map((a) => a.id);
+    const validArtIds = new Set(artworks.map((a) => a.id));
+    const current = rawIds.filter((id) => validArtIds.has(id));
+    if (!current.includes(newArt.id)) {
+      setHeroCarouselArtworkIds([...current, newArt.id]);
+    }
+    showToast(`"${preset.label}" আর্টওয়ার্ক হিসেবে সেভ করে হিরো ক্যারোজেলে যুক্ত করা হয়েছে! ✓`, "success");
+  };
+
+  const handleCreateNewSlide = () => {
+    if (!newSlideData.image) {
+      showToast("দয়া করে স্লাইডের জন্য একটি ছবি নির্বাচন বা আপলোড করুন!", "error");
+      return;
+    }
+    const title = newSlideData.title.trim() || "Tiyana's Sukoon Studio Piece";
+    const newArt = addArtwork({
+      title,
+      titleBangla: newSlideData.titleBangla.trim() || undefined,
+      category: newSlideData.category,
+      price: Number(newSlideData.price) || 4500,
+      dimensions: newSlideData.dimensions.trim() || '20" x 28" inches',
+      image: newSlideData.image,
+      description: `Tiyana's Sukoon Studio Islamic Artwork: ${title}`,
+      medium: "Mixed Media on Canvas with Gold Leaf",
+      inStock: true,
+      isFeatured: true,
+    });
+
+    const rawIds = settings.heroCarouselArtworkIds || artworks.slice(0, 8).map((a) => a.id);
+    const validArtIds = new Set(artworks.map((a) => a.id));
+    const current = rawIds.filter((id) => validArtIds.has(id));
+    if (!current.includes(newArt.id)) {
+      setHeroCarouselArtworkIds([...current, newArt.id]);
+    }
+    setIsAddSlideModalOpen(false);
+    setNewSlideData({
+      title: "",
+      titleBangla: "",
+      image: "",
+      category: "calligraphy",
+      price: 4500,
+      dimensions: '20" x 28" inches',
+    });
+    showToast(`নতুন স্লাইড "${title}" সফলভাবে তৈরি ও হিরো ক্যারোজেলে যুক্ত হয়েছে! ✓`, "success");
   };
 
   // Supabase management states
@@ -1727,284 +1828,666 @@ If you have any questions or would like preview photos of your canvas, reply to 
           )}
 
           {/* TAB 3: SITE MEDIA & IMAGES MANAGER */}
-          {activeTab === "media" && (
-            <div className="space-y-8 animate-fadeIn">
-              <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">
-                  Website Images &amp; Media Control Center
-                </h2>
-                <p className="text-xs text-[#8fa89a]">
-                  Change every single image on the storefront: Brand logo, hero featured piece, philosophy story banner, and gallery archives.
-                </p>
-              </div>
+          {activeTab === "media" && (() => {
+            const heroIds = (
+              settings.heroCarouselArtworkIds ||
+              artworks.slice(0, 8).map((a) => a.id)
+            ).filter((id) => artworks.some((a) => a.id === id));
 
-              {/* HERO CAROUSEL SLIDES CONTROL */}
-              <div className="linear-card p-6 rounded-2xl border border-[#d4af37]/35 bg-gradient-to-br from-[#0c2417] via-[#091d12] to-[#07160f] space-y-5 shadow-xl">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-inner">
-                      <Sparkles className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-base text-white flex items-center gap-2">
-                        হিরো ক্যারোজেল স্লাইডার ম্যানেজমেন্ট (Hero Carousel Slides)
-                        <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#d4af37]/20 text-[#f4dc8a] border border-[#d4af37]/40">
-                          {
-                            (
-                              settings.heroCarouselArtworkIds ||
-                              artworks.slice(0, 8).map((a) => a.id)
-                            ).length
-                          }{" "}
-                          টি স্লাইডে সক্রিয়
+            const activeHeroArtworks = heroIds
+              .map((id) => artworks.find((a) => a.id === id))
+              .filter((a): a is Artwork => Boolean(a));
+
+            const unselectedArtworks = artworks.filter(
+              (art) => !heroIds.includes(art.id)
+            );
+
+            const filteredPresets = GALLERY_IMAGE_PRESETS.filter((preset) => {
+              const query = mediaSearchQuery.toLowerCase().trim();
+              const matchesSearch =
+                query === "" ||
+                preset.label.toLowerCase().includes(query) ||
+                preset.id.toString() === query;
+
+              if (!matchesSearch) return false;
+
+              const isPresetInHero = artworks.some(
+                (art) => art.image === preset.path && heroIds.includes(art.id)
+              );
+
+              if (mediaFilter === "in-carousel") return isPresetInHero;
+              if (mediaFilter === "available") return !isPresetInHero;
+              return true;
+            });
+
+            return (
+              <div className="space-y-10 animate-fadeIn pb-12">
+                {/* STUDIO MEDIA HEADER BANNER */}
+                <div className="linear-card p-6 rounded-3xl border border-[#d4af37]/30 bg-gradient-to-r from-[#0d2719] via-[#091e13] to-[#07160f] shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-96 h-96 bg-[#d4af37]/5 rounded-full blur-3xl pointer-events-none" />
+
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+                    <div className="space-y-2 max-w-2xl">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#d4af37]/20 text-[#f4dc8a] border border-[#d4af37]/40 flex items-center gap-1.5">
+                          <Sparkles className="w-3 h-3 text-[#d4af37]" />
+                          Studio Media Hub
                         </span>
-                      </h3>
-                      <p className="text-xs text-[#8fa89a]">
-                        হোমপেজের টপে ব্যানার স্লাইডারে যে ছবিগুলো অ্যানিমেশনে ঘুরবে, সেগুলো টিক দিয়ে যুক্ত বা বাদ দিন।
+                        <span className="text-[11px] text-emerald-400 font-mono flex items-center gap-1">
+                          <Cloud className="w-3 h-3" />
+                          Live Cloud Sync
+                        </span>
+                      </div>
+                      <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                        Website Images &amp; Media Control Center
+                      </h2>
+                      <p className="text-xs sm:text-sm text-[#9cb5a6] leading-relaxed">
+                        হোমপেজ হিরো স্লাইডার, ব্র্যান্ড লোগো, ৩ডি আর্ট ফ্রেম এবং ২১টি আসল ফেসবুক ফটো লাইব্রেরি এক জায়গা থেকে পরিচালনা করুন।
                       </p>
                     </div>
-                  </div>
 
-                  {/* Bulk Actions */}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const allIds = artworks.map((a) => a.id);
-                        setHeroCarouselArtworkIds(allIds);
-                        showToast(`সব ${allIds.length}টি আর্টওয়ার্ক হিরো স্লাইডারে যুক্ত করা হয়েছে!`);
-                      }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#122e20] text-[#f4dc8a] border border-white/15 hover:border-[#d4af37] transition-all"
-                    >
-                      সব সিলেক্ট করুন (Select All)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const top8Ids = artworks.slice(0, 8).map((a) => a.id);
-                        setHeroCarouselArtworkIds(top8Ids);
-                        showToast("হিরো স্লাইডার ডিফল্ট প্রথম ৮টি আর্টওয়ার্কে রিসেট করা হয়েছে!");
-                      }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#122e20] text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all"
-                    >
-                      ডিফল্ট ৮টি (Reset Top 8)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setHeroCarouselArtworkIds([]);
-                        showToast("হিরো স্লাইডার থেকে সব ছবি বাদ দেওয়া হয়েছে!");
-                      }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/25 hover:bg-rose-500/20 transition-all"
-                    >
-                      সব বাদ দিন (Clear All)
-                    </button>
+                    {/* Quick Section Anchor Pills */}
+                    <div className="flex flex-wrap lg:flex-col gap-2 shrink-0">
+                      <a
+                        href="#hero-carousel-section"
+                        className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#113121] text-[#f4dc8a] border border-[#d4af37]/30 hover:border-[#d4af37] flex items-center justify-between gap-3 transition-all"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" />
+                          হিরো ক্যারোজেল স্লাইডার
+                        </span>
+                        <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-[#06110a] text-white">
+                          {activeHeroArtworks.length}
+                        </span>
+                      </a>
+                      <a
+                        href="#core-images-section"
+                        className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#0d2418] text-[#c4d7cc] border border-white/10 hover:border-white/20 flex items-center justify-between gap-3 transition-all"
+                      >
+                        <span className="flex items-center gap-2">
+                          <ImageIcon className="w-3.5 h-3.5 text-emerald-400" />
+                          কোর ব্র্যান্ড ইমেজেস
+                        </span>
+                        <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-[#06110a] text-white">
+                          3
+                        </span>
+                      </a>
+                      <a
+                        href="#gallery-assets-section"
+                        className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#0d2418] text-[#c4d7cc] border border-white/10 hover:border-white/20 flex items-center justify-between gap-3 transition-all"
+                      >
+                        <span className="flex items-center gap-2">
+                          <LayoutGrid className="w-3.5 h-3.5 text-[#8fa89a]" />
+                          ফেসবুক ফটো কালেকশন
+                        </span>
+                        <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-[#06110a] text-white">
+                          21
+                        </span>
+                      </a>
+                    </div>
                   </div>
                 </div>
 
-                {/* Artworks Selection Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
-                  {artworks.map((art) => {
-                    const heroIds =
-                      settings.heroCarouselArtworkIds ||
-                      artworks.slice(0, 8).map((a) => a.id);
-                    const inHero = heroIds.includes(art.id);
-                    const heroSlideIndex = heroIds.indexOf(art.id);
+                {/* 1. HERO CAROUSEL SLIDES CONTROL */}
+                <div
+                  id="hero-carousel-section"
+                  className="linear-card p-6 sm:p-7 rounded-3xl border border-[#d4af37]/35 bg-gradient-to-br from-[#0c2417] via-[#091d12] to-[#07160f] space-y-6 shadow-2xl relative"
+                >
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-11 h-11 rounded-2xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-[0_0_20px_rgba(212,175,55,0.25)]">
+                        <Sparkles className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2.5">
+                          <h3 className="font-bold text-lg text-white">
+                            হিরো ক্যারোজেল স্লাইডার ম্যানেজমেন্ট (Hero Carousel Slides)
+                          </h3>
+                          <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#d4af37]/25 text-[#f4dc8a] border border-[#d4af37]/50 shadow-sm">
+                            {activeHeroArtworks.length} টি সক্রিয়
+                          </span>
+                        </div>
+                        <p className="text-xs text-[#8fa89a] mt-0.5">
+                          হোমপেজের টপে ব্যানার স্লাইডারে যে ছবিগুলো অ্যানিমেশনে ঘুরবে, এখানে সেগুলোর ক্রম সাজান এবং নতুন ছবি যুক্ত করুন।
+                        </p>
+                      </div>
+                    </div>
 
-                    return (
-                      <div
-                        key={art.id}
-                        onClick={() => toggleHeroCarouselArtwork(art.id)}
-                        className={`relative rounded-xl overflow-hidden border p-2 cursor-pointer transition-all duration-200 flex flex-col justify-between group select-none ${
-                          inHero
-                            ? "bg-[#102d1d] border-[#d4af37] shadow-[0_0_15px_rgba(212,175,55,0.25)] ring-1 ring-[#d4af37]/50"
-                            : "bg-[#07160f]/80 border-white/10 hover:border-white/30 opacity-70 hover:opacity-100"
-                        }`}
+                    {/* Action Bar */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => setIsAddSlideModalOpen(true)}
+                        className="btn-3d-gold px-4 py-2 text-xs font-bold flex items-center gap-1.5 shadow-lg"
                       >
-                        <div>
-                          {/* Image Thumbnail with badges */}
-                          <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-[#06110a] mb-2">
-                            <Image
-                              src={art.image}
-                              alt={art.title}
-                              fill
-                              className="object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                            {inHero ? (
+                        <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                        <span>+ নতুন স্লাইড ইমেজ যোগ করুন</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const allIds = artworks.map((a) => a.id);
+                          setHeroCarouselArtworkIds(allIds);
+                          showToast(`সব ${allIds.length}টি আর্টওয়ার্ক হিরো স্লাইডারে যুক্ত করা হয়েছে!`);
+                        }}
+                        className="px-3 py-2 rounded-xl text-xs font-semibold bg-[#122e20] text-[#f4dc8a] border border-white/15 hover:border-[#d4af37] transition-all"
+                      >
+                        সব সিলেক্ট (Select All)
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHeroCarouselArtworkIds([]);
+                          showToast("হিরো স্লাইডার থেকে সব ছবি বাদ দেওয়া হয়েছে!");
+                        }}
+                        className="px-3 py-2 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/25 hover:bg-rose-500/20 transition-all"
+                      >
+                        সব বাদ দিন (Clear All)
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* ACTIVE SLIDES DISPLAY WITH REORDERING & ADD CARD */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold text-[#c4d7cc] uppercase tracking-wider flex items-center gap-2">
+                        <span>বর্তমান সক্রিয় স্লাইডসমূহ (Active Slides in Order)</span>
+                        <span className="text-[10px] font-mono text-[#8fa89a] font-normal">
+                          (তীর চিহ্নে ক্লিক করে ক্রমানুসার পরিবর্তন করুন)
+                        </span>
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                      {activeHeroArtworks.map((art, idx) => (
+                        <div
+                          key={art.id}
+                          className="relative rounded-2xl overflow-hidden border border-[#d4af37]/60 bg-[#102d1d] p-2.5 flex flex-col justify-between shadow-[0_0_20px_rgba(212,175,55,0.18)] ring-1 ring-[#d4af37]/30 transition-all group"
+                        >
+                          <div>
+                            {/* Slide Thumbnail */}
+                            <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#06110a] mb-2.5 border border-white/10">
+                              <Image
+                                src={art.image}
+                                alt={art.title}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+
+                              {/* Sequence Badge */}
                               <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#d4af37] text-[#07160f] flex items-center gap-1 shadow-md">
                                 <Sparkles className="w-2.5 h-2.5 fill-current" />
-                                <span>#{heroSlideIndex + 1}</span>
+                                <span>Slide #{idx + 1}</span>
                               </div>
-                            ) : (
-                              <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-black/60 text-[#8fa89a] backdrop-blur-sm">
-                                Not in slide
-                              </div>
-                            )}
 
-                            {/* Checkbox / Toggle Icon */}
-                            <div
-                              className={`absolute top-1.5 right-1.5 w-5 h-5 rounded-md flex items-center justify-center transition-all ${
-                                inHero
-                                  ? "bg-[#d4af37] text-[#07160f]"
-                                  : "bg-[#06110a]/80 text-[#8fa89a] border border-white/20 group-hover:border-white/50"
-                              }`}
-                            >
-                              {inHero ? (
-                                <Check className="w-3.5 h-3.5 stroke-[3]" />
-                              ) : (
-                                <Plus className="w-3.5 h-3.5" />
-                              )}
+                              {/* Remove from Carousel Button */}
+                              <button
+                                type="button"
+                                onClick={() => toggleHeroCarouselArtwork(art.id)}
+                                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-md bg-black/75 hover:bg-rose-500 text-white flex items-center justify-center transition-all shadow-md"
+                                title="Remove from Hero Carousel"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
                             </div>
+
+                            <p className="font-bold text-white text-xs line-clamp-1 group-hover:text-[#f4dc8a] transition-colors">
+                              {art.title}
+                            </p>
+                            {art.titleBangla && (
+                              <p className="text-[10px] text-[#8fa89a] line-clamp-1 font-serif">
+                                {art.titleBangla}
+                              </p>
+                            )}
                           </div>
 
-                          <p className="font-bold text-white text-[11px] line-clamp-1 group-hover:text-[#f4dc8a] transition-colors">
-                            {art.title}
-                          </p>
-                          {art.titleBangla && (
-                            <p className="text-[10px] text-[#8fa89a] line-clamp-1 font-serif">
-                              {art.titleBangla}
-                            </p>
-                          )}
-                        </div>
+                          {/* Reordering Controls & Price */}
+                          <div className="pt-2 mt-2 border-t border-white/10 flex items-center justify-between">
+                            <span className="font-mono text-[#f4dc8a] font-bold text-[11px]">
+                              ৳{art.price.toLocaleString()}
+                            </span>
 
-                        <div className="pt-2 mt-1 border-t border-white/5 flex items-center justify-between text-[10px]">
-                          <span className="font-mono text-[#f4dc8a] font-bold">
-                            ৳{art.price.toLocaleString()}
-                          </span>
-                          <span
-                            className={`font-semibold ${
-                              inHero ? "text-emerald-400" : "text-[#6b8275]"
-                            }`}
-                          >
-                            {inHero ? "Active Slide" : "+ Click to Add"}
-                          </span>
+                            {/* Move Left / Right Buttons */}
+                            <div className="flex items-center gap-1 bg-[#07160f] p-0.5 rounded-lg border border-white/10">
+                              <button
+                                type="button"
+                                disabled={idx === 0}
+                                onClick={() => handleMoveHeroSlide(idx, idx - 1)}
+                                className="p-1 rounded text-[#8fa89a] hover:text-[#d4af37] disabled:opacity-20 hover:bg-white/5 transition-all"
+                                title="Move Earlier (বামে নিন)"
+                              >
+                                <ChevronLeft className="w-3.5 h-3.5" />
+                              </button>
+                              <span className="text-[9px] font-mono text-white/50 px-0.5">
+                                {idx + 1}
+                              </span>
+                              <button
+                                type="button"
+                                disabled={idx === activeHeroArtworks.length - 1}
+                                onClick={() => handleMoveHeroSlide(idx, idx + 1)}
+                                className="p-1 rounded text-[#8fa89a] hover:text-[#d4af37] disabled:opacity-20 hover:bg-white/5 transition-all"
+                                title="Move Later (ডানে নিন)"
+                              >
+                                <ChevronRight className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Interactive "+ Add Slide" Card */}
+                      <button
+                        type="button"
+                        onClick={() => setIsAddSlideModalOpen(true)}
+                        className="rounded-2xl border-2 border-dashed border-[#d4af37]/40 hover:border-[#d4af37] bg-[#0c2718]/40 hover:bg-[#0c2718]/80 p-4 flex flex-col items-center justify-center text-center space-y-2 transition-all group min-h-[170px] shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.2)]"
+                      >
+                        <div className="w-12 h-12 rounded-2xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] group-hover:scale-110 transition-transform">
+                          <Plus className="w-6 h-6 stroke-[2.5]" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-xs text-white group-hover:text-[#f4dc8a]">
+                            + নতুন স্লাইড যোগ করুন
+                          </p>
+                          <p className="text-[10px] text-[#8fa89a] mt-0.5">
+                            ছবি আপলোড, লিঙ্ক বা গ্যালারি থেকে
+                          </p>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* HELPFUL TIPS WHEN SLIDES ARE FEW */}
+                  {activeHeroArtworks.length < 4 && (
+                    <div className="p-4 rounded-2xl bg-gradient-to-r from-[#173b26] to-[#0e271a] border border-[#d4af37]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shrink-0 mt-0.5">
+                          <Sparkles className="w-4 h-4" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="text-xs font-bold text-white">
+                            💡 প্রো-টিপ: হিরো স্লাইডারে অন্তত ৪ থেকে ৮টি ইমেজ রাখুন
+                          </p>
+                          <p className="text-[11px] text-[#9cb5a6]">
+                            কমপক্ষে ৪টি ছবি থাকলে ডেস্কটপ মারকুই এবং মোবাইল ক্যারোজেল অ্যানিমেশন সবচেয়ে সুন্দর ও নিরবচ্ছিন্ন লুপে ঘোরে। নিচের ফেসবুক ফটো লাইব্রেরি থেকে ১-ক্লিকেই পছন্দের ছবি যোগ করতে পারেন।
+                          </p>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
 
-              {/* Section A: Global Core Images with Local File Upload */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* 1. Site Logo */}
-                <div className="linear-card p-5 rounded-2xl border border-white/10 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-sm text-white">Brand Logo</h3>
-                    <span className="text-[10px] text-[#f4dc8a] font-mono">Navbar &amp; Header</span>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const candidates = GALLERY_IMAGE_PRESETS.slice(0, 6);
+                          const newIds: string[] = [...heroIds];
+                          candidates.forEach((preset) => {
+                            if (newIds.length >= 6) return;
+                            let art = artworks.find((a) => a.image === preset.path);
+                            if (!art) {
+                              art = addArtwork({
+                                title: preset.label,
+                                titleBangla: preset.label,
+                                category: "calligraphy",
+                                price: 4500,
+                                dimensions: '20" x 28" inches',
+                                image: preset.path,
+                                description: `Tiyana's Sukoon Authentic Studio Artwork - ${preset.label}`,
+                                medium: "Mixed Media on Canvas with 24K Gold Leaf",
+                                inStock: true,
+                                isFeatured: true,
+                              });
+                            }
+                            if (!newIds.includes(art.id)) {
+                              newIds.push(art.id);
+                            }
+                          });
+                          setHeroCarouselArtworkIds(newIds);
+                          showToast("গ্যালারি থেকে ফটো অ্যাসেট হিরো স্লাইডারে সফলভাবে যুক্ত হয়েছে! ✓", "success");
+                        }}
+                        className="btn-3d-gold px-4 py-2 text-xs font-bold shrink-0 self-start sm:self-center"
+                      >
+                        + অটো ৪টি ছবি যুক্ত করুন
+                      </button>
+                    </div>
+                  )}
 
-                  <ImageSourceControl
-                    label="Brand Logo (Local File / URL)"
-                    currentValue={settings.siteLogo}
-                    onChange={(newUrl) => updateSettings({ siteLogo: newUrl })}
-                    presets={GALLERY_IMAGE_PRESETS.slice(0, 5)}
-                  />
-
-                  <div className="pt-1">
-                    <button
-                      onClick={() => updateSettings({ siteLogo: "/brand/logo.jpg" })}
-                      className="btn-3d-dark py-1.5 px-3 text-[11px] w-full"
-                    >
-                      Reset to Original FB Logo
-                    </button>
-                  </div>
-                </div>
-
-                {/* 2. Hero Featured Canvas */}
-                <div className="linear-card p-5 rounded-2xl border border-white/10 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-sm text-white">Hero 3D Frame Image</h3>
-                    <span className="text-[10px] text-emerald-400 font-mono">Homepage Top</span>
-                  </div>
-
-                  <ImageSourceControl
-                    label="Hero Canvas (Local File / URL / Presets)"
-                    currentValue={settings.heroImage}
-                    onChange={(newUrl) => updateSettings({ heroImage: newUrl })}
-                    presets={GALLERY_IMAGE_PRESETS}
-                  />
-                </div>
-
-                {/* 3. Philosophy Showcase Image */}
-                <div className="linear-card p-5 rounded-2xl border border-white/10 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-sm text-white">Brand Story Feature</h3>
-                    <span className="text-[10px] text-[#f4dc8a] font-mono">Philosophy Section</span>
-                  </div>
-
-                  <ImageSourceControl
-                    label="Story Section Image (Local File / URL)"
-                    currentValue={settings.storyImage}
-                    onChange={(newUrl) => updateSettings({ storyImage: newUrl })}
-                    presets={GALLERY_IMAGE_PRESETS}
-                  />
-                </div>
-              </div>
-
-              {/* Section B: All 21 Studio Gallery Photo Assets */}
-              <div className="linear-card p-6 rounded-2xl border border-white/10 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
-                  <div>
-                    <h3 className="font-bold text-white text-base">
-                      All 21 Authentic Facebook Photo Assets
-                    </h3>
-                    <p className="text-xs text-[#8fa89a]">
-                      Click &quot;Set as Hero&quot; or &quot;Set as Story&quot; to assign any image anywhere on the site with 1 click.
-                    </p>
-                  </div>
-                  <span className="text-xs font-mono text-[#f4dc8a] bg-[#0d2218] px-3 py-1 rounded-full border border-[#d4af37]/30">
-                    21 High-Res Files Loaded
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {GALLERY_IMAGE_PRESETS.map((preset) => (
-                    <div
-                      key={preset.id}
-                      className="p-2.5 rounded-xl bg-[#091d12] border border-white/5 space-y-2 group"
-                    >
-                      <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-[#06110a]">
-                        <Image
-                          src={preset.path}
-                          alt={preset.label}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-200"
-                        />
-                        <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#06110a]/90 text-white">
-                          #{preset.id}
+                  {/* UNSELECTED CATALOG ARTWORKS SECTION (IF ANY) */}
+                  {unselectedArtworks.length > 0 && (
+                    <div className="pt-4 border-t border-white/10 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-[#8fa89a] uppercase tracking-wider">
+                          ক্যাটালগের অন্যান্য আর্টওয়ার্ক (ক্যারোজেলে যুক্ত করতে ক্লিক করুন):
+                        </span>
+                        <span className="text-[11px] font-mono text-[#8fa89a]">
+                          {unselectedArtworks.length} টি বাকি আছে
                         </span>
                       </div>
 
-                      <p className="text-[10px] text-[#c4d7cc] font-medium truncate" title={preset.label}>
-                        {preset.label}
-                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                        {unselectedArtworks.map((art) => (
+                          <div
+                            key={art.id}
+                            onClick={() => toggleHeroCarouselArtwork(art.id)}
+                            className="p-2 rounded-xl bg-[#07160f]/80 border border-white/10 hover:border-[#d4af37]/60 cursor-pointer transition-all flex flex-col justify-between group opacity-75 hover:opacity-100 hover:scale-[1.02]"
+                          >
+                            <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-[#06110a] mb-1.5">
+                              <Image
+                                src={art.image}
+                                alt={art.title}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform"
+                              />
+                              <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-md bg-[#06110a]/80 border border-white/20 group-hover:border-[#d4af37] flex items-center justify-center text-[#8fa89a] group-hover:text-[#d4af37] transition-all">
+                                <Plus className="w-3.5 h-3.5" />
+                              </div>
+                            </div>
+                            <p className="text-[11px] font-semibold text-white line-clamp-1 group-hover:text-[#f4dc8a]">
+                              {art.title}
+                            </p>
+                            <p className="text-[10px] text-emerald-400 font-mono mt-0.5">
+                              + Click to Add
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-                      <div className="flex flex-col gap-1 pt-1">
+                {/* 2. CORE SITE BRAND IMAGES */}
+                <div id="core-images-section" className="space-y-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                      <ImageIcon className="w-5 h-5 text-emerald-400" />
+                      Core Storefront Theme Images (ব্র্যান্ড কোর ইমেজেস)
+                    </h3>
+                    <p className="text-xs text-[#8fa89a]">
+                      ওয়েবসাইটের ব্র্যান্ড লোগো, হোমপেজ হিরোর ৩ডি আর্ট ফ্রেম এবং স্টোরি সেকশনের ফিচার্ড ছবি পরিবর্তন করুন।
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* 1. Brand Logo */}
+                    <div className="linear-card p-5 rounded-3xl border border-white/10 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
+                          <h4 className="font-bold text-sm text-white flex items-center gap-1.5">
+                            <ShieldCheck className="w-4 h-4 text-[#d4af37]" />
+                            Brand Identity Logo
+                          </h4>
+                          <span className="text-[10px] text-[#f4dc8a] font-mono px-2 py-0.5 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30">
+                            Navbar &amp; Footer
+                          </span>
+                        </div>
+
+                        <ImageSourceControl
+                          label="Site Brand Logo"
+                          currentValue={settings.siteLogo}
+                          onChange={(newUrl) => updateSettings({ siteLogo: newUrl })}
+                          presets={GALLERY_IMAGE_PRESETS.slice(0, 5)}
+                        />
+                      </div>
+
+                      <div className="pt-2">
                         <button
+                          type="button"
                           onClick={() => {
-                            updateSettings({ heroImage: preset.path });
-                            showToast(`Set Photo #${preset.id} as Hero Canvas!`);
+                            updateSettings({ siteLogo: "/brand/logo.jpg" });
+                            showToast("লোগো ডিফল্ট ফেসবুক লোগোতে রিসেট করা হয়েছে!");
                           }}
-                          className="btn-3d-dark py-1 text-[10px] w-full text-center"
+                          className="btn-3d-dark py-2 px-3 text-xs w-full text-center"
                         >
-                          Set as Hero
-                        </button>
-                        <button
-                          onClick={() => {
-                            updateSettings({ storyImage: preset.path });
-                            showToast(`Set Photo #${preset.id} as Story Image!`);
-                          }}
-                          className="btn-3d-dark py-1 text-[10px] w-full text-center"
-                        >
-                          Set as Story
+                          Reset to Original FB Logo
                         </button>
                       </div>
                     </div>
-                  ))}
+
+                    {/* 2. Hero 3D Frame Image */}
+                    <div className="linear-card p-5 rounded-3xl border border-white/10 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
+                          <h4 className="font-bold text-sm text-white flex items-center gap-1.5">
+                            <Sparkles className="w-4 h-4 text-emerald-400" />
+                            Hero 3D Highlight Canvas
+                          </h4>
+                          <span className="text-[10px] text-emerald-400 font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30">
+                            Homepage Top
+                          </span>
+                        </div>
+
+                        <ImageSourceControl
+                          label="Hero 3D Frame Image"
+                          currentValue={settings.heroImage}
+                          onChange={(newUrl) => updateSettings({ heroImage: newUrl })}
+                          presets={GALLERY_IMAGE_PRESETS}
+                        />
+                      </div>
+
+                      <div className="pt-2">
+                        <p className="text-[10px] text-[#8fa89a] text-center">
+                          হোমপেজে ৩ডি ভাসমান ফ্রেমের প্রধান আর্টপিস
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 3. Story Feature Banner */}
+                    <div className="linear-card p-5 rounded-3xl border border-white/10 space-y-4 hover:border-white/20 transition-all flex flex-col justify-between">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
+                          <h4 className="font-bold text-sm text-white flex items-center gap-1.5">
+                            <Palette className="w-4 h-4 text-[#f4dc8a]" />
+                            Brand Story Feature
+                          </h4>
+                          <span className="text-[10px] text-[#f4dc8a] font-mono px-2 py-0.5 rounded-full bg-[#d4af37]/15 border border-[#d4af37]/30">
+                            Philosophy Section
+                          </span>
+                        </div>
+
+                        <ImageSourceControl
+                          label="Philosophy Story Image"
+                          currentValue={settings.storyImage}
+                          onChange={(newUrl) => updateSettings({ storyImage: newUrl })}
+                          presets={GALLERY_IMAGE_PRESETS}
+                        />
+                      </div>
+
+                      <div className="pt-2">
+                        <p className="text-[10px] text-[#8fa89a] text-center">
+                          আওয়ার ফিলোসফি (Story) সেকশনের প্রধান ভিজ্যুয়াল
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. ALL 21 AUTHENTIC FACEBOOK PHOTO ASSETS */}
+                <div
+                  id="gallery-assets-section"
+                  className="linear-card p-6 sm:p-7 rounded-3xl border border-white/10 space-y-6"
+                >
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
+                    <div>
+                      <h3 className="font-bold text-white text-lg flex items-center gap-2">
+                        <LayoutGrid className="w-5 h-5 text-[#d4af37]" />
+                        All 21 Authentic Facebook Photo Assets
+                      </h3>
+                      <p className="text-xs text-[#8fa89a]">
+                        ১-ক্লিকেই যেকোনো ছবি হিরো ক্যারোজেল, ৩ডি ফ্রেম বা স্টোরিতে যুক্ত করুন।
+                      </p>
+                    </div>
+
+                    {/* Search & Filter Controls */}
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <div className="relative">
+                        <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#8fa89a]" />
+                        <input
+                          type="text"
+                          placeholder="Search photos..."
+                          value={mediaSearchQuery}
+                          onChange={(e) => setMediaSearchQuery(e.target.value)}
+                          className="pl-9 pr-3 py-1.5 rounded-xl bg-[#07160f] border border-white/15 text-xs text-white focus:outline-none focus:border-[#d4af37] w-48"
+                        />
+                      </div>
+
+                      {/* Filter Pills */}
+                      <div className="flex items-center gap-1 bg-[#07160f] p-1 rounded-xl border border-white/10">
+                        <button
+                          type="button"
+                          onClick={() => setMediaFilter("all")}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+                            mediaFilter === "all"
+                              ? "bg-[#d4af37] text-[#07160f] font-bold"
+                              : "text-[#8fa89a] hover:text-white"
+                          }`}
+                        >
+                          All ({GALLERY_IMAGE_PRESETS.length})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setMediaFilter("in-carousel")}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+                            mediaFilter === "in-carousel"
+                              ? "bg-[#d4af37] text-[#07160f] font-bold"
+                              : "text-[#8fa89a] hover:text-white"
+                          }`}
+                        >
+                          In Carousel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setMediaFilter("available")}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+                            mediaFilter === "available"
+                              ? "bg-[#d4af37] text-[#07160f] font-bold"
+                              : "text-[#8fa89a] hover:text-white"
+                          }`}
+                        >
+                          Available
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Photo Assets Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-4">
+                    {filteredPresets.map((preset) => {
+                      const linkedArtwork = artworks.find((a) => a.image === preset.path);
+                      const isInCarousel = linkedArtwork ? heroIds.includes(linkedArtwork.id) : false;
+                      const carouselSlideNo =
+                        linkedArtwork && isInCarousel ? heroIds.indexOf(linkedArtwork.id) + 1 : null;
+                      const isHeroFrame = settings.heroImage === preset.path;
+                      const isStoryImage = settings.storyImage === preset.path;
+
+                      return (
+                        <div
+                          key={preset.id}
+                          className={`p-3 rounded-2xl border transition-all duration-200 space-y-2.5 flex flex-col justify-between group ${
+                            isInCarousel
+                              ? "bg-[#0f291a] border-[#d4af37]/60 shadow-[0_0_15px_rgba(212,175,55,0.15)] ring-1 ring-[#d4af37]/30"
+                              : "bg-[#091d12] border-white/10 hover:border-white/25"
+                          }`}
+                        >
+                          <div>
+                            {/* Photo Thumbnail */}
+                            <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-[#06110a] border border-white/5">
+                              <Image
+                                src={preset.path}
+                                alt={preset.label}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+
+                              {/* Number Badge */}
+                              <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-[#06110a]/90 text-white backdrop-blur-sm border border-white/10">
+                                #{preset.id.toString().padStart(2, "0")}
+                              </span>
+
+                              {/* Status Badges */}
+                              <div className="absolute top-1.5 right-1.5 flex flex-col gap-1 items-end pointer-events-none">
+                                {isInCarousel && (
+                                  <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-[#d4af37] text-[#07160f] flex items-center gap-1 shadow-md">
+                                    <Sparkles className="w-2.5 h-2.5 fill-current" />
+                                    Slide #{carouselSlideNo}
+                                  </span>
+                                )}
+                                {isHeroFrame && (
+                                  <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-emerald-500 text-white shadow-md">
+                                    Hero Frame
+                                  </span>
+                                )}
+                                {isStoryImage && (
+                                  <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-[#d4af37]/80 text-[#07160f] shadow-md">
+                                    Story Image
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <p
+                              className="text-xs font-bold text-white truncate mt-1 group-hover:text-[#f4dc8a] transition-colors"
+                              title={preset.label}
+                            >
+                              {preset.label}
+                            </p>
+                          </div>
+
+                          {/* 3 Action Buttons */}
+                          <div className="flex flex-col gap-1.5 pt-1">
+                            {/* 1. Add / Remove from Hero Carousel */}
+                            <button
+                              type="button"
+                              onClick={() => handleAddPresetToHeroCarousel(preset)}
+                              className={`py-1.5 px-2 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm ${
+                                isInCarousel
+                                  ? "bg-[#d4af37] text-[#07160f] hover:bg-[#e6bc42]"
+                                  : "bg-[#133221] text-[#f4dc8a] border border-[#d4af37]/40 hover:bg-[#d4af37]/20"
+                              }`}
+                            >
+                              <Sparkles className="w-3 h-3" />
+                              <span>{isInCarousel ? `In Carousel #${carouselSlideNo}` : "+ Add to Carousel"}</span>
+                            </button>
+
+                            {/* 2 & 3. Set as Hero / Set as Story */}
+                            <div className="grid grid-cols-2 gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  updateSettings({ heroImage: preset.path });
+                                  showToast(`Set Photo #${preset.id} as Hero Canvas!`);
+                                }}
+                                className={`py-1 rounded-lg text-[10px] font-medium transition-all ${
+                                  isHeroFrame
+                                    ? "bg-emerald-500/30 text-emerald-300 border border-emerald-500/50"
+                                    : "bg-[#06110a] text-[#8fa89a] border border-white/10 hover:text-white hover:border-white/20"
+                                }`}
+                              >
+                                {isHeroFrame ? "✓ Hero 3D" : "Set Hero 3D"}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  updateSettings({ storyImage: preset.path });
+                                  showToast(`Set Photo #${preset.id} as Story Image!`);
+                                }}
+                                className={`py-1 rounded-lg text-[10px] font-medium transition-all ${
+                                  isStoryImage
+                                    ? "bg-[#d4af37]/30 text-[#f4dc8a] border border-[#d4af37]/50"
+                                    : "bg-[#06110a] text-[#8fa89a] border border-white/10 hover:text-white hover:border-white/20"
+                                }`}
+                              >
+                                {isStoryImage ? "✓ Story" : "Set Story"}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* TAB 4: STUDIO ORDERS MANAGEMENT */}
           {activeTab === "orders" && (
@@ -3538,6 +4021,177 @@ If you have any questions or would like preview photos of your canvas, reply to 
                   Save Changes
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* QUICK ADD NEW HERO CAROUSEL SLIDE MODAL */}
+      {isAddSlideModalOpen && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn pointer-events-auto"
+          onClick={() => setIsAddSlideModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-xl linear-card p-6 sm:p-7 rounded-3xl border border-[#d4af37]/40 shadow-[0_20px_50px_rgba(0,0,0,0.85),0_0_35px_rgba(212,175,55,0.2)] space-y-5 animate-scaleUp max-h-[92vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37]">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-white">
+                    নতুন হিরো স্লাইড তৈরি ও যুক্ত করুন (Add Hero Slide)
+                  </h3>
+                  <p className="text-[11px] text-[#8fa89a]">
+                    ছবি আপলোড করুন অথবা গ্যালারি ও লিঙ্ক থেকে ছবি নির্বাচন করুন।
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAddSlideModalOpen(false)}
+                className="p-1.5 rounded-lg bg-[#07160f] text-[#8fa89a] hover:text-white border border-white/10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="space-y-4">
+              {/* Image Source Control */}
+              <ImageSourceControl
+                label="স্লাইডের ছবি (Image Source)"
+                currentValue={newSlideData.image}
+                onChange={(url) => {
+                  setNewSlideData((prev) => ({ ...prev, image: url }));
+                  // Auto-fill title if preset matches
+                  const matchedPreset = GALLERY_IMAGE_PRESETS.find((p) => p.path === url);
+                  if (matchedPreset && !newSlideData.title) {
+                    setNewSlideData((prev) => ({
+                      ...prev,
+                      title: matchedPreset.label,
+                      titleBangla: matchedPreset.label,
+                    }));
+                  }
+                }}
+                presets={GALLERY_IMAGE_PRESETS}
+              />
+
+              {/* Title Inputs */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#c4d7cc] mb-1">
+                    Title (ইংরেজি নাম) *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Ayat al-Kursi Gold Leaf"
+                    value={newSlideData.title}
+                    onChange={(e) =>
+                      setNewSlideData({ ...newSlideData, title: e.target.value })
+                    }
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-[#07160f] border border-white/15 text-white focus:outline-none focus:border-[#d4af37]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#c4d7cc] mb-1">
+                    বাংলা নাম (Bangla Title)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. আয়াতুল কুরসি গোল্ডেন ক্যানভাস"
+                    value={newSlideData.titleBangla}
+                    onChange={(e) =>
+                      setNewSlideData({ ...newSlideData, titleBangla: e.target.value })
+                    }
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-[#07160f] border border-white/15 text-white font-serif focus:outline-none focus:border-[#d4af37]"
+                  />
+                </div>
+              </div>
+
+              {/* Price, Category & Dimensions */}
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#c4d7cc] mb-1">
+                    মূল্য (৳ Price)
+                  </label>
+                  <input
+                    type="number"
+                    value={newSlideData.price}
+                    onChange={(e) =>
+                      setNewSlideData({
+                        ...newSlideData,
+                        price: Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-[#07160f] border border-white/15 text-white font-bold font-mono focus:outline-none focus:border-[#d4af37]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#c4d7cc] mb-1">
+                    ক্যাটাগরি
+                  </label>
+                  <select
+                    value={newSlideData.category}
+                    onChange={(e) =>
+                      setNewSlideData({
+                        ...newSlideData,
+                        category: e.target.value as ArtworkCategory,
+                      })
+                    }
+                    className="w-full px-2.5 py-2 text-xs rounded-xl bg-[#07160f] border border-white/15 text-white focus:outline-none focus:border-[#d4af37]"
+                  >
+                    <option value="calligraphy">Arabic Calligraphy</option>
+                    <option value="canvas">Canvas Paintings</option>
+                    <option value="mini-easels">Mini Easels &amp; Desk Canvas</option>
+                    <option value="bookmarks">Bookmarks &amp; Hampers</option>
+                    <option value="custom-orders">Custom Orders</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#c4d7cc] mb-1">
+                    সাইজ (Dimensions)
+                  </label>
+                  <input
+                    type="text"
+                    value={newSlideData.dimensions}
+                    onChange={(e) =>
+                      setNewSlideData({
+                        ...newSlideData,
+                        dimensions: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-[#07160f] border border-white/15 text-white focus:outline-none focus:border-[#d4af37]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="pt-3 border-t border-white/10 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setIsAddSlideModalOpen(false)}
+                className="btn-3d-dark px-4 py-2 text-xs"
+              >
+                বাতিল (Cancel)
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCreateNewSlide}
+                className="btn-3d-gold px-5 py-2 text-xs font-bold flex items-center gap-2 shadow-lg"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>সেভ করুন ও ক্যারোজেলে যোগ করুন</span>
+              </button>
             </div>
           </div>
         </div>

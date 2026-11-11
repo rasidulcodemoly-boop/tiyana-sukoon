@@ -75,7 +75,7 @@ interface StoreContextType {
   clearAllInquiries: () => void;
 
   // Artworks CRUD
-  addArtwork: (artwork: Omit<Artwork, "id">) => void;
+  addArtwork: (artwork: Omit<Artwork, "id">) => Artwork;
   updateArtwork: (id: string, updated: Partial<Artwork>) => void;
   deleteArtwork: (id: string) => void;
   deleteArtworks: (ids: string[]) => void;
@@ -592,7 +592,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   // Artwork CRUD with Supabase sync
-  const addArtwork = (artworkData: Omit<Artwork, "id">) => {
+  const addArtwork = (artworkData: Omit<Artwork, "id">): Artwork => {
     const newArt: Artwork = {
       ...artworkData,
       id: `art-${Date.now()}`,
@@ -609,6 +609,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
           if (error) console.error("Failed to add artwork to Supabase:", error);
         });
     }
+    return newArt;
   };
 
   const updateArtwork = (id: string, updated: Partial<Artwork>) => {
@@ -683,7 +684,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const toggleHeroCarouselArtwork = (artworkId: string) => {
-    const current = settings.heroCarouselArtworkIds || initialArtworks.slice(0, 8).map((a) => a.id);
+    const rawIds = settings.heroCarouselArtworkIds || artworks.slice(0, 8).map((a) => a.id);
+    const validArtIds = new Set(artworks.map((a) => a.id));
+    const current = rawIds.filter((id) => validArtIds.has(id));
     const exists = current.includes(artworkId);
     let updated: string[];
     if (exists) {

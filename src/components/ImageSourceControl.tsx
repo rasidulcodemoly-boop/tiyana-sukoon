@@ -144,41 +144,38 @@ export const ImageSourceControl: React.FC<ImageSourceControlProps> = ({
   return (
     <div className="bg-[#07160f] p-4 rounded-xl border border-white/10 space-y-3">
       {/* Header and Source Mode Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
-        <div>
+      <div className="space-y-2 border-b border-white/5 pb-2.5">
+        <div className="flex items-center justify-between">
           <label className="block text-[#f4dc8a] font-semibold text-xs">
-            {label} *
+            {label}
           </label>
-          <p className="text-[10px] text-[#8fa89a]">
-            Choose Local File, Direct URL, or Facebook Preset
-          </p>
         </div>
 
         {/* Mode Switcher Buttons */}
-        <div className="flex items-center gap-1 bg-[#050e08] p-1 rounded-lg border border-white/10">
+        <div className="flex items-center gap-1 bg-[#050e08] p-1 rounded-lg border border-white/10 w-full">
           <button
             type="button"
             onClick={() => setActiveMode("local")}
-            className={`px-2.5 py-1 text-[11px] rounded font-medium flex items-center gap-1.5 transition-all ${
+            className={`flex-1 py-1.5 px-2 text-[10px] sm:text-[11px] rounded font-medium flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
               activeMode === "local"
                 ? "bg-[#d4af37] text-[#06110a] font-bold shadow-sm"
                 : "text-[#8fa89a] hover:text-white"
             }`}
           >
-            <Upload className="w-3 h-3" />
-            <span>Local File Upload</span>
+            <Upload className="w-3 h-3 shrink-0" />
+            <span>Upload File</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveMode("url")}
-            className={`px-2.5 py-1 text-[11px] rounded font-medium flex items-center gap-1.5 transition-all ${
+            className={`flex-1 py-1.5 px-2 text-[10px] sm:text-[11px] rounded font-medium flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
               activeMode === "url"
                 ? "bg-[#d4af37] text-[#06110a] font-bold shadow-sm"
                 : "text-[#8fa89a] hover:text-white"
             }`}
           >
-            <LinkIcon className="w-3 h-3" />
+            <LinkIcon className="w-3 h-3 shrink-0" />
             <span>Image URL</span>
           </button>
 
@@ -186,13 +183,13 @@ export const ImageSourceControl: React.FC<ImageSourceControlProps> = ({
             <button
               type="button"
               onClick={() => setActiveMode("presets")}
-              className={`px-2.5 py-1 text-[11px] rounded font-medium flex items-center gap-1.5 transition-all ${
+              className={`flex-1 py-1.5 px-2 text-[10px] sm:text-[11px] rounded font-medium flex items-center justify-center gap-1 transition-all whitespace-nowrap ${
                 activeMode === "presets"
                   ? "bg-[#d4af37] text-[#06110a] font-bold shadow-sm"
                   : "text-[#8fa89a] hover:text-white"
               }`}
             >
-              <Grid className="w-3 h-3" />
+              <Grid className="w-3 h-3 shrink-0" />
               <span>Presets ({presets.length})</span>
             </button>
           )}
@@ -269,10 +266,10 @@ export const ImageSourceControl: React.FC<ImageSourceControlProps> = ({
                   <Upload className="w-5 h-5" />
                 </div>
                 <p className="text-xs font-bold text-white">
-                  Click to Browse from Device or Drag &amp; Drop Image Here
+                  Click to Browse or Drag Image Here
                 </p>
                 <p className="text-[10px] text-[#8fa89a]">
-                  Supports JPG, PNG, WebP, GIF from local computer or phone gallery
+                  JPG, PNG, WebP from device or gallery
                 </p>
               </div>
             )}

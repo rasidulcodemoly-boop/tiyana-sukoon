@@ -1932,103 +1932,138 @@ If you have any questions or would like preview photos of your canvas, reply to 
                 {/* 1. HERO CAROUSEL SLIDES CONTROL */}
                 <div
                   id="hero-carousel-section"
-                  className="linear-card p-6 sm:p-7 rounded-3xl border border-[#d4af37]/35 bg-gradient-to-br from-[#0c2417] via-[#091d12] to-[#07160f] space-y-6 shadow-2xl relative"
+                  className="linear-card p-6 rounded-3xl border border-[#d4af37]/30 bg-gradient-to-br from-[#0c2417] via-[#091d12] to-[#07160f] space-y-6 shadow-xl relative"
                 >
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5">
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-11 h-11 rounded-2xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-[0_0_20px_rgba(212,175,55,0.25)]">
-                        <Sparkles className="w-6 h-6" />
+                  {/* Header */}
+                  <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37]">
+                        <Sparkles className="w-5 h-5" />
                       </div>
                       <div>
-                        <div className="flex items-center gap-2.5">
-                          <h3 className="font-bold text-lg text-white">
-                            হিরো ক্যারোজেল স্লাইডার ম্যানেজমেন্ট (Hero Carousel Slides)
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-base text-white">
+                            হিরো ক্যারোজেল স্লাইডার
                           </h3>
-                          <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#d4af37]/25 text-[#f4dc8a] border border-[#d4af37]/50 shadow-sm">
-                            {activeHeroArtworks.length} টি সক্রিয়
+                          <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#d4af37]/20 text-[#f4dc8a] border border-[#d4af37]/35">
+                            {activeHeroArtworks.length} টি সক্রিয়
                           </span>
                         </div>
-                        <p className="text-xs text-[#8fa89a] mt-0.5">
-                          হোমপেজের টপে ব্যানার স্লাইডারে যে ছবিগুলো অ্যানিমেশনে ঘুরবে, এখানে সেগুলোর ক্রম সাজান এবং নতুন ছবি যুক্ত করুন।
-                        </p>
                       </div>
                     </div>
 
-                    {/* Action Bar */}
-                    <div className="flex items-center gap-2 flex-wrap">
+                    {/* Header Action Buttons */}
+                    <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => setIsAddSlideModalOpen(true)}
-                        className="btn-3d-gold px-4 py-2 text-xs font-bold flex items-center gap-1.5 shadow-lg"
+                        className="btn-3d-gold px-4 py-2 text-xs font-bold flex items-center gap-1.5 shadow-md"
                       >
                         <Plus className="w-3.5 h-3.5 stroke-[3]" />
-                        <span>+ নতুন স্লাইড ইমেজ যোগ করুন</span>
+                        <span>নতুন স্লাইড যোগ করুন</span>
                       </button>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const allIds = artworks.map((a) => a.id);
-                          setHeroCarouselArtworkIds(allIds);
-                          showToast(`সব ${allIds.length}টি আর্টওয়ার্ক হিরো স্লাইডারে যুক্ত করা হয়েছে!`);
-                        }}
-                        className="px-3 py-2 rounded-xl text-xs font-semibold bg-[#122e20] text-[#f4dc8a] border border-white/15 hover:border-[#d4af37] transition-all"
-                      >
-                        সব সিলেক্ট (Select All)
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setHeroCarouselArtworkIds([]);
-                          showToast("হিরো স্লাইডার থেকে সব ছবি বাদ দেওয়া হয়েছে!");
-                        }}
-                        className="px-3 py-2 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/25 hover:bg-rose-500/20 transition-all"
-                      >
-                        সব বাদ দিন (Clear All)
-                      </button>
+                      {/* Show Clear All ONLY when there are active slides */}
+                      {activeHeroArtworks.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setHeroCarouselArtworkIds([]);
+                            showToast("হিরো স্লাইডার খালি করা হয়েছে!");
+                          }}
+                          className="px-3 py-2 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/15 border border-rose-500/20 transition-all"
+                        >
+                          সব বাদ দিন
+                        </button>
+                      )}
                     </div>
                   </div>
 
-                  {/* ACTIVE SLIDES DISPLAY WITH REORDERING & ADD CARD */}
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-bold text-[#c4d7cc] uppercase tracking-wider flex items-center gap-2">
-                        <span>বর্তমান সক্রিয় স্লাইডসমূহ (Active Slides in Order)</span>
-                        <span className="text-[10px] font-mono text-[#8fa89a] font-normal">
-                          (তীর চিহ্নে ক্লিক করে ক্রমানুসার পরিবর্তন করুন)
-                        </span>
-                      </span>
-                    </div>
+                  {/* BODY: If 0 slides, show clean Empty State. If > 0 slides, show active slides grid */}
+                  {activeHeroArtworks.length === 0 ? (
+                    <div className="py-10 px-6 rounded-2xl bg-[#06110a]/50 border border-white/5 text-center space-y-4">
+                      <div className="w-12 h-12 mx-auto rounded-2xl bg-[#d4af37]/10 border border-[#d4af37]/25 flex items-center justify-center text-[#d4af37]">
+                        <Sparkles className="w-6 h-6" />
+                      </div>
+                      <div className="max-w-md mx-auto space-y-1">
+                        <h4 className="font-bold text-sm text-white">
+                          বর্তমানে হিরো ক্যারোজেলে কোনো ছবি যোগ করা নেই
+                        </h4>
+                        <p className="text-xs text-[#8fa89a]">
+                          হোমপেজে ঘুরার জন্য আপনার পছন্দের ছবি আপলোড করুন অথবা নিচের ফেসবুক গ্যালারি থেকে ১-ক্লিকেই যুক্ত করুন।
+                        </p>
+                      </div>
 
+                      <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setIsAddSlideModalOpen(true)}
+                          className="btn-3d-gold px-4 py-2 text-xs font-bold flex items-center gap-2 shadow-md"
+                        >
+                          <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                          <span>নতুন ছবি আপলোড করুন</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const candidates = GALLERY_IMAGE_PRESETS.slice(0, 4);
+                            const newIds: string[] = [];
+                            candidates.forEach((preset) => {
+                              let art = artworks.find((a) => a.image === preset.path);
+                              if (!art) {
+                                art = addArtwork({
+                                  title: preset.label,
+                                  titleBangla: preset.label,
+                                  category: "calligraphy",
+                                  price: 4500,
+                                  dimensions: '20" x 28" inches',
+                                  image: preset.path,
+                                  description: `Tiyana's Sukoon Authentic Studio Artwork - ${preset.label}`,
+                                  medium: "Mixed Media on Canvas with 24K Gold Leaf",
+                                  inStock: true,
+                                  isFeatured: true,
+                                });
+                              }
+                              if (!newIds.includes(art.id)) {
+                                newIds.push(art.id);
+                              }
+                            });
+                            setHeroCarouselArtworkIds(newIds);
+                            showToast("গ্যালারি থেকে ৪টি ছবি হিরো স্লাইডারে যুক্ত হয়েছে! ✓", "success");
+                          }}
+                          className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#112d1d] text-[#f4dc8a] border border-[#d4af37]/35 hover:bg-[#d4af37]/20 transition-all flex items-center gap-2"
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span>গ্যালারি থেকে ৪টি ছবি অটো যোগ করুন</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* When active slides exist, show the clean grid with arrows & add card */
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                       {activeHeroArtworks.map((art, idx) => (
                         <div
                           key={art.id}
-                          className="relative rounded-2xl overflow-hidden border border-[#d4af37]/60 bg-[#102d1d] p-2.5 flex flex-col justify-between shadow-[0_0_20px_rgba(212,175,55,0.18)] ring-1 ring-[#d4af37]/30 transition-all group"
+                          className="relative rounded-2xl overflow-hidden border border-[#d4af37]/50 bg-[#102d1d] p-2.5 flex flex-col justify-between shadow-lg ring-1 ring-[#d4af37]/20 transition-all group"
                         >
                           <div>
-                            {/* Slide Thumbnail */}
-                            <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#06110a] mb-2.5 border border-white/10">
+                            <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[#06110a] mb-2 border border-white/10">
                               <Image
                                 src={art.image}
                                 alt={art.title}
                                 fill
                                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                               />
-
-                              {/* Sequence Badge */}
                               <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#d4af37] text-[#07160f] flex items-center gap-1 shadow-md">
                                 <Sparkles className="w-2.5 h-2.5 fill-current" />
-                                <span>Slide #{idx + 1}</span>
+                                <span>#{idx + 1}</span>
                               </div>
-
-                              {/* Remove from Carousel Button */}
                               <button
                                 type="button"
                                 onClick={() => toggleHeroCarouselArtwork(art.id)}
                                 className="absolute top-1.5 right-1.5 w-6 h-6 rounded-md bg-black/75 hover:bg-rose-500 text-white flex items-center justify-center transition-all shadow-md"
-                                title="Remove from Hero Carousel"
+                                title="Remove from Carousel"
                               >
                                 <X className="w-3.5 h-3.5" />
                               </button>
@@ -2037,14 +2072,8 @@ If you have any questions or would like preview photos of your canvas, reply to 
                             <p className="font-bold text-white text-xs line-clamp-1 group-hover:text-[#f4dc8a] transition-colors">
                               {art.title}
                             </p>
-                            {art.titleBangla && (
-                              <p className="text-[10px] text-[#8fa89a] line-clamp-1 font-serif">
-                                {art.titleBangla}
-                              </p>
-                            )}
                           </div>
 
-                          {/* Reordering Controls & Price */}
                           <div className="pt-2 mt-2 border-t border-white/10 flex items-center justify-between">
                             <span className="font-mono text-[#f4dc8a] font-bold text-[11px]">
                               ৳{art.price.toLocaleString()}
@@ -2057,19 +2086,16 @@ If you have any questions or would like preview photos of your canvas, reply to 
                                 disabled={idx === 0}
                                 onClick={() => handleMoveHeroSlide(idx, idx - 1)}
                                 className="p-1 rounded text-[#8fa89a] hover:text-[#d4af37] disabled:opacity-20 hover:bg-white/5 transition-all"
-                                title="Move Earlier (বামে নিন)"
+                                title="Move Earlier"
                               >
                                 <ChevronLeft className="w-3.5 h-3.5" />
                               </button>
-                              <span className="text-[9px] font-mono text-white/50 px-0.5">
-                                {idx + 1}
-                              </span>
                               <button
                                 type="button"
                                 disabled={idx === activeHeroArtworks.length - 1}
                                 onClick={() => handleMoveHeroSlide(idx, idx + 1)}
                                 className="p-1 rounded text-[#8fa89a] hover:text-[#d4af37] disabled:opacity-20 hover:bg-white/5 transition-all"
-                                title="Move Later (ডানে নিন)"
+                                title="Move Later"
                               >
                                 <ChevronRight className="w-3.5 h-3.5" />
                               </button>
@@ -2078,116 +2104,52 @@ If you have any questions or would like preview photos of your canvas, reply to 
                         </div>
                       ))}
 
-                      {/* Interactive "+ Add Slide" Card */}
+                      {/* Add Slide Card at the end of the active list */}
                       <button
                         type="button"
                         onClick={() => setIsAddSlideModalOpen(true)}
-                        className="rounded-2xl border-2 border-dashed border-[#d4af37]/40 hover:border-[#d4af37] bg-[#0c2718]/40 hover:bg-[#0c2718]/80 p-4 flex flex-col items-center justify-center text-center space-y-2 transition-all group min-h-[170px] shadow-sm hover:shadow-[0_0_20px_rgba(212,175,55,0.2)]"
+                        className="rounded-2xl border-2 border-dashed border-[#d4af37]/35 hover:border-[#d4af37] bg-[#0c2718]/40 hover:bg-[#0c2718]/80 p-4 flex flex-col items-center justify-center text-center space-y-2 transition-all group min-h-[170px]"
                       >
-                        <div className="w-12 h-12 rounded-2xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] group-hover:scale-110 transition-transform">
-                          <Plus className="w-6 h-6 stroke-[2.5]" />
+                        <div className="w-10 h-10 rounded-xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] group-hover:scale-110 transition-transform">
+                          <Plus className="w-5 h-5 stroke-[2.5]" />
                         </div>
-                        <div>
-                          <p className="font-bold text-xs text-white group-hover:text-[#f4dc8a]">
-                            + নতুন স্লাইড যোগ করুন
-                          </p>
-                          <p className="text-[10px] text-[#8fa89a] mt-0.5">
-                            ছবি আপলোড, লিঙ্ক বা গ্যালারি থেকে
-                          </p>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* HELPFUL TIPS WHEN SLIDES ARE FEW */}
-                  {activeHeroArtworks.length < 4 && (
-                    <div className="p-4 rounded-2xl bg-gradient-to-r from-[#173b26] to-[#0e271a] border border-[#d4af37]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shrink-0 mt-0.5">
-                          <Sparkles className="w-4 h-4" />
-                        </div>
-                        <div className="space-y-0.5">
-                          <p className="text-xs font-bold text-white">
-                            💡 প্রো-টিপ: হিরো স্লাইডারে অন্তত ৪ থেকে ৮টি ইমেজ রাখুন
-                          </p>
-                          <p className="text-[11px] text-[#9cb5a6]">
-                            কমপক্ষে ৪টি ছবি থাকলে ডেস্কটপ মারকুই এবং মোবাইল ক্যারোজেল অ্যানিমেশন সবচেয়ে সুন্দর ও নিরবচ্ছিন্ন লুপে ঘোরে। নিচের ফেসবুক ফটো লাইব্রেরি থেকে ১-ক্লিকেই পছন্দের ছবি যোগ করতে পারেন।
-                          </p>
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const candidates = GALLERY_IMAGE_PRESETS.slice(0, 6);
-                          const newIds: string[] = [...heroIds];
-                          candidates.forEach((preset) => {
-                            if (newIds.length >= 6) return;
-                            let art = artworks.find((a) => a.image === preset.path);
-                            if (!art) {
-                              art = addArtwork({
-                                title: preset.label,
-                                titleBangla: preset.label,
-                                category: "calligraphy",
-                                price: 4500,
-                                dimensions: '20" x 28" inches',
-                                image: preset.path,
-                                description: `Tiyana's Sukoon Authentic Studio Artwork - ${preset.label}`,
-                                medium: "Mixed Media on Canvas with 24K Gold Leaf",
-                                inStock: true,
-                                isFeatured: true,
-                              });
-                            }
-                            if (!newIds.includes(art.id)) {
-                              newIds.push(art.id);
-                            }
-                          });
-                          setHeroCarouselArtworkIds(newIds);
-                          showToast("গ্যালারি থেকে ফটো অ্যাসেট হিরো স্লাইডারে সফলভাবে যুক্ত হয়েছে! ✓", "success");
-                        }}
-                        className="btn-3d-gold px-4 py-2 text-xs font-bold shrink-0 self-start sm:self-center"
-                      >
-                        + অটো ৪টি ছবি যুক্ত করুন
+                        <p className="font-bold text-xs text-white group-hover:text-[#f4dc8a]">
+                          + নতুন স্লাইড
+                        </p>
                       </button>
                     </div>
                   )}
 
-                  {/* UNSELECTED CATALOG ARTWORKS SECTION (IF ANY) */}
-                  {unselectedArtworks.length > 0 && (
-                    <div className="pt-4 border-t border-white/10 space-y-3">
+                  {/* UNSELECTED CATALOG ARTWORKS SECTION (SHOW ONLY IF ARTWORKS EXIST IN CATALOG THAT ARE NOT IN HERO) */}
+                  {unselectedArtworks.length > 0 && activeHeroArtworks.length > 0 && (
+                    <div className="pt-3 border-t border-white/10 space-y-2.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-[#8fa89a] uppercase tracking-wider">
-                          ক্যাটালগের অন্যান্য আর্টওয়ার্ক (ক্যারোজেলে যুক্ত করতে ক্লিক করুন):
+                        <span className="text-xs font-semibold text-[#8fa89a]">
+                          ক্যাটালগের অন্যান্য আর্টওয়ার্ক (যুক্ত করতে ক্লিক করুন):
                         </span>
                         <span className="text-[11px] font-mono text-[#8fa89a]">
-                          {unselectedArtworks.length} টি বাকি আছে
+                          {unselectedArtworks.length} টি বাকি
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
                         {unselectedArtworks.map((art) => (
                           <div
                             key={art.id}
                             onClick={() => toggleHeroCarouselArtwork(art.id)}
-                            className="p-2 rounded-xl bg-[#07160f]/80 border border-white/10 hover:border-[#d4af37]/60 cursor-pointer transition-all flex flex-col justify-between group opacity-75 hover:opacity-100 hover:scale-[1.02]"
+                            className="p-2 rounded-xl bg-[#07160f]/80 border border-white/10 hover:border-[#d4af37]/60 cursor-pointer transition-all flex items-center gap-2.5 group"
                           >
-                            <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-[#06110a] mb-1.5">
-                              <Image
-                                src={art.image}
-                                alt={art.title}
-                                fill
-                                className="object-cover group-hover:scale-105 transition-transform"
-                              />
-                              <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-md bg-[#06110a]/80 border border-white/20 group-hover:border-[#d4af37] flex items-center justify-center text-[#8fa89a] group-hover:text-[#d4af37] transition-all">
-                                <Plus className="w-3.5 h-3.5" />
-                              </div>
+                            <div className="relative w-9 h-9 rounded-lg overflow-hidden bg-[#06110a] shrink-0 border border-white/10">
+                              <Image src={art.image} alt={art.title} fill className="object-cover" />
                             </div>
-                            <p className="text-[11px] font-semibold text-white line-clamp-1 group-hover:text-[#f4dc8a]">
-                              {art.title}
-                            </p>
-                            <p className="text-[10px] text-emerald-400 font-mono mt-0.5">
-                              + Click to Add
-                            </p>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[11px] font-semibold text-white truncate group-hover:text-[#f4dc8a]">
+                                {art.title}
+                              </p>
+                              <p className="text-[10px] text-emerald-400 font-mono">
+                                + Add
+                              </p>
+                            </div>
                           </div>
                         ))}
                       </div>

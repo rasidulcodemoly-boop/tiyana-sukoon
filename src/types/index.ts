@@ -101,6 +101,8 @@ export interface SiteSettings {
   adminPin: string;
   // Custom ordering
   artworkOrderIds?: string[];
+  // Hero Carousel Selected Artwork IDs
+  heroCarouselArtworkIds?: string[];
   // Editable site images
   siteLogo: string;
   heroImage: string;

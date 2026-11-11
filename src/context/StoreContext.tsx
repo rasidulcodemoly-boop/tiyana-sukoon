@@ -80,6 +80,8 @@ interface StoreContextType {
   deleteArtwork: (id: string) => void;
   deleteArtworks: (ids: string[]) => void;
   reorderArtworks: (newOrder: Artwork[]) => void;
+  toggleHeroCarouselArtwork: (artworkId: string) => void;
+  setHeroCarouselArtworkIds: (ids: string[]) => void;
 
   // Settings
   updateSettings: (newSettings: Partial<SiteSettings>, silent?: boolean) => void;
@@ -680,6 +682,25 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
     showToast("আর্টওয়ার্ক ক্রম/সিরিয়াল সফলভাবে সাজানো হয়েছে! ✓", "success");
   };
 
+  const toggleHeroCarouselArtwork = (artworkId: string) => {
+    const current = settings.heroCarouselArtworkIds || initialArtworks.slice(0, 8).map((a) => a.id);
+    const exists = current.includes(artworkId);
+    let updated: string[];
+    if (exists) {
+      updated = current.filter((id) => id !== artworkId);
+      showToast("হিরো ক্যারোজেল থেকে সরানো হয়েছে। (Removed from Hero Carousel)", "info");
+    } else {
+      updated = [...current, artworkId];
+      showToast("হিরো ক্যারোজেল স্লাইডে যুক্ত করা হয়েছে! ✓ (Added to Hero Carousel)", "success");
+    }
+    updateSettings({ heroCarouselArtworkIds: updated }, true);
+  };
+
+  const setHeroCarouselArtworkIds = (ids: string[]) => {
+    updateSettings({ heroCarouselArtworkIds: ids }, true);
+    showToast("হিরো ক্যারোজেল স্লাইডার আপডেট করা হয়েছে! ✓", "success");
+  };
+
   // Settings update with Supabase sync
   const updateSettings = (newSettings: Partial<SiteSettings>, silent?: boolean) => {
     const updated = { ...settings, ...newSettings };
@@ -773,6 +794,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
         deleteArtwork,
         deleteArtworks,
         reorderArtworks,
+        toggleHeroCarouselArtwork,
+        setHeroCarouselArtworkIds,
         updateSettings,
       }}
     >

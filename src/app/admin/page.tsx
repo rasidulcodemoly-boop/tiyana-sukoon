@@ -241,6 +241,8 @@ const AdminDashboardInner: React.FC = () => {
     deleteArtwork,
     deleteArtworks,
     reorderArtworks,
+    toggleHeroCarouselArtwork,
+    setHeroCarouselArtworkIds,
     updateSettings,
     showToast,
     isSupabaseActive,
@@ -1262,13 +1264,14 @@ If you have any questions or would like preview photos of your canvas, reply to 
                           <th className="p-3">ক্যাটাগরি</th>
                           <th className="p-3">মূল্য (৳)</th>
                           <th className="p-3">স্টক স্ট্যাটাস</th>
+                          <th className="p-3 text-center">হিরো ক্যারোজেল</th>
                           <th className="p-3 text-right">অ্যাকশন</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5">
                         {filteredArtworks.length === 0 ? (
                           <tr>
-                            <td colSpan={8} className="p-8 text-center text-[#8fa89a]">
+                            <td colSpan={9} className="p-8 text-center text-[#8fa89a]">
                               No artworks matching your criteria.
                             </td>
                           </tr>
@@ -1420,6 +1423,40 @@ If you have any questions or would like preview photos of your canvas, reply to 
                                   </button>
                                 </td>
 
+                                {/* Hero Carousel Toggle */}
+                                <td className="p-3 text-center whitespace-nowrap">
+                                  {(() => {
+                                    const heroIds =
+                                      settings.heroCarouselArtworkIds ||
+                                      artworks.slice(0, 8).map((a) => a.id);
+                                    const inHero = heroIds.includes(art.id);
+                                    const heroSlideIndex = heroIds.indexOf(art.id);
+                                    return (
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleHeroCarouselArtwork(art.id)}
+                                        className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 mx-auto transition-all ${
+                                          inHero
+                                            ? "bg-[#d4af37]/25 text-[#f4dc8a] border border-[#d4af37]/50 shadow-sm"
+                                            : "bg-[#07160f] text-[#6b8275] border border-white/10 hover:text-white hover:border-white/20"
+                                        }`}
+                                        title={
+                                          inHero
+                                            ? "হিরো ক্যারোজেল থেকে বাদ দিতে ক্লিক করুন"
+                                            : "হিরো ক্যারোজেলে যুক্ত করতে ক্লিক করুন"
+                                        }
+                                      >
+                                        <Sparkles className="w-3 h-3 text-[#d4af37]" />
+                                        <span>
+                                          {inHero
+                                            ? `In Slide #${heroSlideIndex + 1}`
+                                            : "+ Add to Hero"}
+                                        </span>
+                                      </button>
+                                    );
+                                  })()}
+                                </td>
+
                                 {/* Actions */}
                                 <td className="p-3 text-right whitespace-nowrap space-x-1.5">
                                   <button
@@ -1555,6 +1592,45 @@ If you have any questions or would like preview photos of your canvas, reply to 
                               />
                             </div>
 
+                            {/* Bottom Left: Hero Carousel Slide Toggle */}
+                            {(() => {
+                              const heroIds =
+                                settings.heroCarouselArtworkIds ||
+                                artworks.slice(0, 8).map((a) => a.id);
+                              const inHero = heroIds.includes(art.id);
+                              const heroSlideIndex = heroIds.indexOf(art.id);
+                              return (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleHeroCarouselArtwork(art.id);
+                                  }}
+                                  className={`absolute bottom-2 left-2 px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 backdrop-blur-md transition-all shadow-md ${
+                                    inHero
+                                      ? "bg-[#d4af37]/90 text-[#07160f] border border-[#f4dc8a] shadow-[0_0_12px_rgba(212,175,55,0.4)]"
+                                      : "bg-[#06110a]/85 text-[#8fa89a] border border-white/15 hover:text-white hover:border-white/30"
+                                  }`}
+                                  title={
+                                    inHero
+                                      ? "হিরো ক্যারোজেল থেকে বাদ দিন"
+                                      : "হিরো ক্যারোজেল স্লাইডারে যুক্ত করুন"
+                                  }
+                                >
+                                  <Sparkles
+                                    className={`w-3 h-3 ${
+                                      inHero ? "text-[#07160f]" : "text-[#d4af37]"
+                                    }`}
+                                  />
+                                  <span>
+                                    {inHero
+                                      ? `In Hero #${heroSlideIndex + 1}`
+                                      : "+ Hero Slide"}
+                                  </span>
+                                </button>
+                              );
+                            })()}
+
                             <button
                               onClick={() => setEditingArtwork(art)}
                               className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-[#06110a]/85 text-[#f4dc8a] border border-white/10 hover:border-[#d4af37] flex items-center gap-1 text-[11px] font-medium backdrop-blur-sm"
@@ -1660,6 +1736,152 @@ If you have any questions or would like preview photos of your canvas, reply to 
                 <p className="text-xs text-[#8fa89a]">
                   Change every single image on the storefront: Brand logo, hero featured piece, philosophy story banner, and gallery archives.
                 </p>
+              </div>
+
+              {/* HERO CAROUSEL SLIDES CONTROL */}
+              <div className="linear-card p-6 rounded-2xl border border-[#d4af37]/35 bg-gradient-to-br from-[#0c2417] via-[#091d12] to-[#07160f] space-y-5 shadow-xl">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-inner">
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base text-white flex items-center gap-2">
+                        হিরো ক্যারোজেল স্লাইডার ম্যানেজমেন্ট (Hero Carousel Slides)
+                        <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#d4af37]/20 text-[#f4dc8a] border border-[#d4af37]/40">
+                          {
+                            (
+                              settings.heroCarouselArtworkIds ||
+                              artworks.slice(0, 8).map((a) => a.id)
+                            ).length
+                          }{" "}
+                          টি স্লাইডে সক্রিয়
+                        </span>
+                      </h3>
+                      <p className="text-xs text-[#8fa89a]">
+                        হোমপেজের টপে ব্যানার স্লাইডারে যে ছবিগুলো অ্যানিমেশনে ঘুরবে, সেগুলো টিক দিয়ে যুক্ত বা বাদ দিন।
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Bulk Actions */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const allIds = artworks.map((a) => a.id);
+                        setHeroCarouselArtworkIds(allIds);
+                        showToast(`সব ${allIds.length}টি আর্টওয়ার্ক হিরো স্লাইডারে যুক্ত করা হয়েছে!`);
+                      }}
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#122e20] text-[#f4dc8a] border border-white/15 hover:border-[#d4af37] transition-all"
+                    >
+                      সব সিলেক্ট করুন (Select All)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const top8Ids = artworks.slice(0, 8).map((a) => a.id);
+                        setHeroCarouselArtworkIds(top8Ids);
+                        showToast("হিরো স্লাইডার ডিফল্ট প্রথম ৮টি আর্টওয়ার্কে রিসেট করা হয়েছে!");
+                      }}
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#122e20] text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all"
+                    >
+                      ডিফল্ট ৮টি (Reset Top 8)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHeroCarouselArtworkIds([]);
+                        showToast("হিরো স্লাইডার থেকে সব ছবি বাদ দেওয়া হয়েছে!");
+                      }}
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/25 hover:bg-rose-500/20 transition-all"
+                    >
+                      সব বাদ দিন (Clear All)
+                    </button>
+                  </div>
+                </div>
+
+                {/* Artworks Selection Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
+                  {artworks.map((art) => {
+                    const heroIds =
+                      settings.heroCarouselArtworkIds ||
+                      artworks.slice(0, 8).map((a) => a.id);
+                    const inHero = heroIds.includes(art.id);
+                    const heroSlideIndex = heroIds.indexOf(art.id);
+
+                    return (
+                      <div
+                        key={art.id}
+                        onClick={() => toggleHeroCarouselArtwork(art.id)}
+                        className={`relative rounded-xl overflow-hidden border p-2 cursor-pointer transition-all duration-200 flex flex-col justify-between group select-none ${
+                          inHero
+                            ? "bg-[#102d1d] border-[#d4af37] shadow-[0_0_15px_rgba(212,175,55,0.25)] ring-1 ring-[#d4af37]/50"
+                            : "bg-[#07160f]/80 border-white/10 hover:border-white/30 opacity-70 hover:opacity-100"
+                        }`}
+                      >
+                        <div>
+                          {/* Image Thumbnail with badges */}
+                          <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-[#06110a] mb-2">
+                            <Image
+                              src={art.image}
+                              alt={art.title}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            {inHero ? (
+                              <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#d4af37] text-[#07160f] flex items-center gap-1 shadow-md">
+                                <Sparkles className="w-2.5 h-2.5 fill-current" />
+                                <span>#{heroSlideIndex + 1}</span>
+                              </div>
+                            ) : (
+                              <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-black/60 text-[#8fa89a] backdrop-blur-sm">
+                                Not in slide
+                              </div>
+                            )}
+
+                            {/* Checkbox / Toggle Icon */}
+                            <div
+                              className={`absolute top-1.5 right-1.5 w-5 h-5 rounded-md flex items-center justify-center transition-all ${
+                                inHero
+                                  ? "bg-[#d4af37] text-[#07160f]"
+                                  : "bg-[#06110a]/80 text-[#8fa89a] border border-white/20 group-hover:border-white/50"
+                              }`}
+                            >
+                              {inHero ? (
+                                <Check className="w-3.5 h-3.5 stroke-[3]" />
+                              ) : (
+                                <Plus className="w-3.5 h-3.5" />
+                              )}
+                            </div>
+                          </div>
+
+                          <p className="font-bold text-white text-[11px] line-clamp-1 group-hover:text-[#f4dc8a] transition-colors">
+                            {art.title}
+                          </p>
+                          {art.titleBangla && (
+                            <p className="text-[10px] text-[#8fa89a] line-clamp-1 font-serif">
+                              {art.titleBangla}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="pt-2 mt-1 border-t border-white/5 flex items-center justify-between text-[10px]">
+                          <span className="font-mono text-[#f4dc8a] font-bold">
+                            ৳{art.price.toLocaleString()}
+                          </span>
+                          <span
+                            className={`font-semibold ${
+                              inHero ? "text-emerald-400" : "text-[#6b8275]"
+                            }`}
+                          >
+                            {inHero ? "Active Slide" : "+ Click to Add"}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Section A: Global Core Images with Local File Upload */}
@@ -3243,7 +3465,7 @@ If you have any questions or would like preview photos of your canvas, reply to 
               </div>
 
               {/* Status toggles */}
-              <div className="flex items-center gap-6 pt-1">
+              <div className="flex flex-wrap items-center gap-6 pt-1">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -3273,6 +3495,28 @@ If you have any questions or would like preview photos of your canvas, reply to 
                   />
                   <span className="text-white font-medium">Featured on Homepage</span>
                 </label>
+
+                {/* Hero Carousel Toggle */}
+                {(() => {
+                  const heroIds =
+                    settings.heroCarouselArtworkIds ||
+                    artworks.slice(0, 8).map((a) => a.id);
+                  const inHero = heroIds.includes(editingArtwork.id);
+                  return (
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={inHero}
+                        onChange={() => toggleHeroCarouselArtwork(editingArtwork.id)}
+                        className="rounded bg-[#07160f] border-white/20 text-[#d4af37]"
+                      />
+                      <span className="text-white font-medium flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" />
+                        <span>Hero Carousel Slide (হিরো স্লাইডার)</span>
+                      </span>
+                    </label>
+                  );
+                })()}
               </div>
 
               <div className="pt-2 flex items-center justify-end gap-2">

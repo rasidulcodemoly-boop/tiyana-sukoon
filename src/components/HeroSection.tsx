@@ -1,15 +1,26 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import { useStore } from "../context/StoreContext";
+import { Artwork } from "../types";
 import { ArrowRight, ZoomIn } from "lucide-react";
 
 export const HeroSection: React.FC = () => {
-  const { setSelectedArtworkForModal, artworks, language, t } = useStore();
+  const { setSelectedArtworkForModal, artworks, settings, language, t } = useStore();
 
-  // Desktop Carousel: Top 10 artworks duplicated for infinite marquee
-  const carouselArtworks = artworks.length > 0 ? artworks.slice(0, 8) : [];
+  // Desktop & Mobile Carousel: Artworks selected from Admin Panel (or fallback)
+  const carouselArtworks = useMemo(() => {
+    const selectedIds = settings.heroCarouselArtworkIds;
+    if (selectedIds && Array.isArray(selectedIds) && selectedIds.length > 0) {
+      const selected = selectedIds
+        .map((id) => artworks.find((a) => a.id === id))
+        .filter((a): a is Artwork => Boolean(a));
+      if (selected.length > 0) return selected;
+    }
+    return artworks.length > 0 ? artworks.slice(0, 8) : [];
+  }, [artworks, settings.heroCarouselArtworkIds]);
+
   const displayArtworks = [...carouselArtworks, ...carouselArtworks];
 
   // Mobile View: 2 images displayed simultaneously, cycling 1-by-1 every 3 seconds

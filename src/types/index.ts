@@ -19,6 +19,7 @@ export interface Artwork {
   medium: string;
   finish?: string;
   image: string;
+  images?: string[];
   isFeatured?: boolean;
   inStock: boolean;
   badge?: string;

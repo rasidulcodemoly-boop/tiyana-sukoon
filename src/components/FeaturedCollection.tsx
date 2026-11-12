@@ -58,7 +58,8 @@ export const FeaturedCollection: React.FC = () => {
     return `#TS-${String(index + 1).padStart(2, "0")}`;
   };
 
-  const handleAddToCart = (artwork: Artwork) => {
+  const handleAddToCart = (artwork: Artwork, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     addToCart(artwork, 1, "Floating Gold Leaf Frame");
     setJustAddedId(artwork.id);
     setTimeout(() => {
@@ -66,7 +67,8 @@ export const FeaturedCollection: React.FC = () => {
     }, 1500);
   };
 
-  const handleBuyNow = (artwork: Artwork) => {
+  const handleBuyNow = (artwork: Artwork, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     addToCart(artwork, 1, "Floating Gold Leaf Frame");
     setIsCartOpen(true);
   };
@@ -154,7 +156,8 @@ export const FeaturedCollection: React.FC = () => {
               return (
                 <div
                   key={item.id}
-                  className="group linear-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 border border-white/10 hover:border-[#d4af37]/40"
+                  onClick={() => setSelectedArtworkForModal(item)}
+                  className="group linear-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 border border-white/10 hover:border-[#d4af37]/40 cursor-pointer"
                 >
                   <div>
                     {/* Image container */}
@@ -252,7 +255,7 @@ export const FeaturedCollection: React.FC = () => {
                       <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
                         <button
                           type="button"
-                          onClick={() => handleAddToCart(item)}
+                          onClick={(e) => handleAddToCart(item, e)}
                           className="py-2 sm:py-2.5 px-1.5 rounded-xl text-[10px] sm:text-xs font-semibold bg-[#0b2416] hover:bg-[#123823] text-[#f4dc8a] border border-[#d4af37]/40 flex items-center justify-center gap-1 transition-all active:scale-95 shadow-sm"
                           title="Add to Cart"
                         >
@@ -270,7 +273,7 @@ export const FeaturedCollection: React.FC = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleBuyNow(item)}
+                          onClick={(e) => handleBuyNow(item, e)}
                           className="btn-3d-gold py-2 sm:py-2.5 px-2 rounded-xl text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1 shadow-md active:scale-95"
                           title="Buy Now - Instant Checkout"
                         >
@@ -283,7 +286,7 @@ export const FeaturedCollection: React.FC = () => {
                     {buttonMode === "cart_only" && (
                       <button
                         type="button"
-                        onClick={() => handleAddToCart(item)}
+                        onClick={(e) => handleAddToCart(item, e)}
                         className="w-full btn-3d-gold py-2 sm:py-2.5 text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-md"
                       >
                         {justAddedId === item.id ? (
@@ -303,7 +306,7 @@ export const FeaturedCollection: React.FC = () => {
                     {buttonMode === "buynow_only" && (
                       <button
                         type="button"
-                        onClick={() => handleBuyNow(item)}
+                        onClick={(e) => handleBuyNow(item, e)}
                         className="w-full btn-3d-gold py-2 sm:py-2.5 text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-md"
                       >
                         <Zap className="w-3.5 h-3.5 text-[#0f1811] fill-[#0f1811]" />

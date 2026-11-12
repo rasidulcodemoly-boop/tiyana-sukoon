@@ -108,4 +108,13 @@ export interface SiteSettings {
   heroImage: string;
   storyImage: string;
   bannerImage: string;
+  // Product Card Customizer Controls
+  cardShowItemCode?: boolean;
+  cardShowDimensions?: boolean;
+  cardShowTitle?: boolean;
+  cardShowBanglaTitle?: boolean;
+  cardShowPrice?: boolean;
+  cardShowOriginalPrice?: boolean;
+  cardShowBadge?: boolean;
+  cardButtonMode?: "both" | "cart_only" | "buynow_only";
 }

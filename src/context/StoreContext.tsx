@@ -161,9 +161,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
         .eq("id", "current")
         .maybeSingle();
 
-      let activeSettings = settings;
+      let activeSettings = { ...initialSettings, ...settings };
       if (!settError && settData?.settings) {
-        activeSettings = { ...settings, ...settData.settings };
+        activeSettings = { ...initialSettings, ...settings, ...settData.settings };
         setSettings(activeSettings);
       }
 
@@ -259,7 +259,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({
       if (savedInquiries) setInquiries(JSON.parse(savedInquiries));
 
       const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-      if (savedSettings) setSettings(JSON.parse(savedSettings));
+      if (savedSettings) setSettings({ ...initialSettings, ...JSON.parse(savedSettings) });
 
       const savedCart = localStorage.getItem(STORAGE_KEYS.CART);
       if (savedCart) setCart(JSON.parse(savedCart));

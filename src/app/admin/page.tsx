@@ -2950,14 +2950,14 @@ If you have any questions or would like preview photos of your canvas, reply to 
 
           {/* TAB 6: SETTINGS & CONFIGURATION */}
           {activeTab === "settings" && (
-            <div className="max-w-2xl space-y-6 animate-fadeIn pb-12">
+            <div className="max-w-4xl space-y-6 animate-fadeIn pb-12">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="text-2xl font-bold text-white tracking-tight">
                     Store &amp; Studio Configuration
                   </h2>
                   <p className="text-xs text-[#8fa89a]">
-                    Modify announcement banner, studio phone contacts, delivery fees, and emergency PIN.
+                    Modify announcement banner, studio phone contacts, delivery fees, and order card layout.
                   </p>
                 </div>
 
@@ -2979,6 +2979,311 @@ If you have any questions or would like preview photos of your canvas, reply to 
                     </>
                   )}
                 </button>
+              </div>
+
+              {/* 1. PRODUCT CARD DESIGN & DISPLAY CONTROLS */}
+              <div className="linear-card p-5 sm:p-6 rounded-2xl border border-[#d4af37]/35 space-y-5 bg-gradient-to-br from-[#071a11] via-[#05130b] to-[#040e08] shadow-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#d4af37]" />
+                      <h3 className="text-base font-bold text-white tracking-tight">
+                        প্রোডাক্ট ও অর্ডার কার্ড ডিজাইন কন্ট্রোল (Product Card Customizer)
+                      </h3>
+                    </div>
+                    <p className="text-xs text-[#8fa89a] mt-1">
+                      ওয়েবসাইটের প্রতিটি আর্টওয়ার্ক কার্ডে কোন তথ্য বা বাটন প্রদর্শিত হবে বা হাইড থাকবে তা এখান থেকে নির্ধারণ করুন।
+                    </p>
+                  </div>
+                  <span className="text-[11px] font-mono text-[#d4af37] bg-[#0c2417] px-2.5 py-1 rounded-full border border-[#d4af37]/30 self-start sm:self-auto">
+                    ● লাইভ সিংক্রোনাইজড
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                  {/* Toggles Column */}
+                  <div className="lg:col-span-7 space-y-3.5">
+                    {/* 1. Unique Item Code */}
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-[#07160f] border border-white/5 hover:border-[#d4af37]/30 transition-all">
+                      <div className="pr-3">
+                        <p className="text-xs font-bold text-white">ইউনিক আইটেম নাম্বার / SKU (#TS-01)</p>
+                        <p className="text-[11px] text-[#8fa89a]">প্রতিটি আর্টওয়ার্কের সুনির্দিষ্ট সিরিয়াল বা ইউনিক আইটেম কোড</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const nextVal = settingsForm.cardShowItemCode === false ? true : false;
+                          setSettingsForm((prev) => ({ ...prev, cardShowItemCode: nextVal }));
+                          updateSettings({ cardShowItemCode: nextVal }, true);
+                        }}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          settingsForm.cardShowItemCode !== false ? "bg-[#d4af37]" : "bg-[#163825]"
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[#0a150e] shadow ring-0 transition duration-200 ease-in-out ${
+                            settingsForm.cardShowItemCode !== false ? "translate-x-5" : "translate-x-0"
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* 2. Dimensions / Size */}
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-[#07160f] border border-white/5 hover:border-[#d4af37]/30 transition-all">
+                      <div className="pr-3">
+                        <p className="text-xs font-bold text-white">ইমেজের সাইজ / মাপ (Dimensions)</p>
+                        <p className="text-[11px] text-[#8fa89a]">ক্যানভাস সাইজ যেমন: 20&quot; x 24&quot; INCHES</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const nextVal = settingsForm.cardShowDimensions === false ? true : false;
+                          setSettingsForm((prev) => ({ ...prev, cardShowDimensions: nextVal }));
+                          updateSettings({ cardShowDimensions: nextVal }, true);
+                        }}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          settingsForm.cardShowDimensions !== false ? "bg-[#d4af37]" : "bg-[#163825]"
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[#0a150e] shadow ring-0 transition duration-200 ease-in-out ${
+                            settingsForm.cardShowDimensions !== false ? "translate-x-5" : "translate-x-0"
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* 3. Regular Price / Strikethrough */}
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-[#07160f] border border-white/5 hover:border-[#d4af37]/30 transition-all">
+                      <div className="pr-3">
+                        <p className="text-xs font-bold text-white">রেগুলার প্রাইস / ডিসকাউন্ট স্ট্রাইকথ্রু</p>
+                        <p className="text-[11px] text-[#8fa89a]">আগের দাম কেটে ডিসকাউন্ট অফার দেখানো (যেমন: ৳3,200)</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const nextVal = settingsForm.cardShowOriginalPrice === false ? true : false;
+                          setSettingsForm((prev) => ({ ...prev, cardShowOriginalPrice: nextVal }));
+                          updateSettings({ cardShowOriginalPrice: nextVal }, true);
+                        }}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          settingsForm.cardShowOriginalPrice !== false ? "bg-[#d4af37]" : "bg-[#163825]"
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[#0a150e] shadow ring-0 transition duration-200 ease-in-out ${
+                            settingsForm.cardShowOriginalPrice !== false ? "translate-x-5" : "translate-x-0"
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* 4. Special Badges */}
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-[#07160f] border border-white/5 hover:border-[#d4af37]/30 transition-all">
+                      <div className="pr-3">
+                        <p className="text-xs font-bold text-white">স্পেশাল ব্যাজ ও স্টিকার (Badges)</p>
+                        <p className="text-[11px] text-[#8fa89a]">ইমেজের উপর TRENDING বা SIGNATURE স্টিকার প্রদর্শন</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const nextVal = settingsForm.cardShowBadge === false ? true : false;
+                          setSettingsForm((prev) => ({ ...prev, cardShowBadge: nextVal }));
+                          updateSettings({ cardShowBadge: nextVal }, true);
+                        }}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          settingsForm.cardShowBadge !== false ? "bg-[#d4af37]" : "bg-[#163825]"
+                        }`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[#0a150e] shadow ring-0 transition duration-200 ease-in-out ${
+                            settingsForm.cardShowBadge !== false ? "translate-x-5" : "translate-x-0"
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* 5. Action Buttons Mode */}
+                    <div className="p-3.5 rounded-xl bg-[#07160f] border border-white/5 space-y-2.5">
+                      <div>
+                        <p className="text-xs font-bold text-white">অ্যাকশন বাটন প্রদর্শন সিস্টেম (Buttons System)</p>
+                        <p className="text-[11px] text-[#8fa89a]">কার্ডে কয়টি ও কোন বাটনগুলো প্রদর্শন করা হবে তা নির্বাচন করুন:</p>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSettingsForm((prev) => ({ ...prev, cardButtonMode: "both" }));
+                            updateSettings({ cardButtonMode: "both" }, true);
+                          }}
+                          className={`p-2.5 rounded-xl text-xs font-semibold text-center border transition-all ${
+                            (settingsForm.cardButtonMode || "both") === "both"
+                              ? "bg-[#163825] text-[#f4dc8a] border-[#d4af37] shadow-sm"
+                              : "bg-[#05110b] text-[#8fa89a] border-white/10 hover:border-white/20"
+                          }`}
+                        >
+                          <div className="font-bold flex items-center justify-center gap-1">
+                            <ShoppingBag className="w-3.5 h-3.5" />
+                            <Zap className="w-3.5 h-3.5 text-[#d4af37]" />
+                            <span>উভয় বাটন (Both)</span>
+                          </div>
+                          <div className="text-[10px] text-[#8fa89a] mt-0.5">Add to Cart + Buy Now</div>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSettingsForm((prev) => ({ ...prev, cardButtonMode: "cart_only" }));
+                            updateSettings({ cardButtonMode: "cart_only" }, true);
+                          }}
+                          className={`p-2.5 rounded-xl text-xs font-semibold text-center border transition-all ${
+                            settingsForm.cardButtonMode === "cart_only"
+                              ? "bg-[#163825] text-[#f4dc8a] border-[#d4af37] shadow-sm"
+                              : "bg-[#05110b] text-[#8fa89a] border-white/10 hover:border-white/20"
+                          }`}
+                        >
+                          <div className="font-bold flex items-center justify-center gap-1">
+                            <ShoppingBag className="w-3.5 h-3.5" />
+                            <span>শুধু Cart বাটন</span>
+                          </div>
+                          <div className="text-[10px] text-[#8fa89a] mt-0.5">Add to Cart Only</div>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSettingsForm((prev) => ({ ...prev, cardButtonMode: "buynow_only" }));
+                            updateSettings({ cardButtonMode: "buynow_only" }, true);
+                          }}
+                          className={`p-2.5 rounded-xl text-xs font-semibold text-center border transition-all ${
+                            settingsForm.cardButtonMode === "buynow_only"
+                              ? "bg-[#163825] text-[#f4dc8a] border-[#d4af37] shadow-sm"
+                              : "bg-[#05110b] text-[#8fa89a] border-white/10 hover:border-white/20"
+                          }`}
+                        >
+                          <div className="font-bold flex items-center justify-center gap-1">
+                            <Zap className="w-3.5 h-3.5 text-[#d4af37]" />
+                            <span>শুধু Buy Now বাটন</span>
+                          </div>
+                          <div className="text-[10px] text-[#8fa89a] mt-0.5">Instant Checkout Only</div>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Live Interactive Preview Column */}
+                  <div className="lg:col-span-5 flex flex-col items-center p-4 rounded-xl bg-[#040e08] border border-[#d4af37]/30 shadow-inner">
+                    <div className="w-full flex items-center justify-between pb-3 border-b border-white/10 mb-3">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#d4af37] font-bold">
+                        ● লাইভ কার্ড প্রিভিউ (Live Preview)
+                      </span>
+                      <span className="text-[10px] text-[#8fa89a]">রিয়েল-টাইম নমুনা</span>
+                    </div>
+
+                    {/* Mock Minimalist Card */}
+                    <div className="w-full max-w-[270px] linear-card rounded-xl overflow-hidden flex flex-col justify-between border border-white/15 shadow-xl">
+                      <div>
+                        {/* Image container */}
+                        <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#07150d]">
+                          <Image
+                            src={artworks[0]?.image || "/artwork/artwork_4.jpg"}
+                            alt="Card Preview"
+                            fill
+                            sizes="270px"
+                            className="object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#06110a] via-transparent to-black/25 pointer-events-none" />
+
+                          {/* Badge */}
+                          {settingsForm.cardShowBadge !== false && (
+                            <div className="absolute top-2 left-2 z-10">
+                              <span className="px-1.5 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-wider bg-[#0a1b12]/90 text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm">
+                                TRENDING
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Unique Code */}
+                          {settingsForm.cardShowItemCode !== false && (
+                            <div className="absolute top-2 right-2 z-10">
+                              <span className="px-1.5 py-0.5 rounded-md text-[9px] font-mono font-bold bg-[#06140d]/90 text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm">
+                                #TS-01
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Quick view icon */}
+                          <div className="absolute bottom-2 right-2 z-10 p-1.5 rounded-lg bg-[#06110a]/80 text-[#e5ede7] border border-white/10">
+                            <Eye className="w-3.5 h-3.5" />
+                          </div>
+                        </div>
+
+                        {/* Minimalist Details */}
+                        <div className="p-3 space-y-1">
+                          {settingsForm.cardShowDimensions !== false && (
+                            <div className="text-[10px] font-mono text-[#8fa89a] uppercase tracking-wider">
+                              20&quot; x 24&quot; INCHES
+                            </div>
+                          )}
+
+                          <h4 className="font-bold text-xs text-white line-clamp-1">
+                            Floral Arabesque &amp; Sacred Geometry
+                          </h4>
+
+                          <p className="text-[10px] text-[#8fa89a] line-clamp-1 font-serif">
+                            ইসলামিক জ্যামিতিক নকশা ও ফুলেল ক্যানভাস
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Price & Buttons */}
+                      <div className="p-3 pt-2 border-t border-white/5 space-y-2">
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-sm font-extrabold text-[#fceb9e]">
+                            ৳2,800
+                          </span>
+                          {settingsForm.cardShowOriginalPrice !== false && (
+                            <span className="text-[10px] text-[#8fa89a] line-through">
+                              ৳3,200
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Action Buttons based on admin buttonMode */}
+                        {(settingsForm.cardButtonMode || "both") === "both" && (
+                          <div className="grid grid-cols-2 gap-1.5">
+                            <div className="py-1.5 px-1 rounded-lg text-[10px] font-semibold bg-[#0b2416] text-[#f4dc8a] border border-[#d4af37]/40 flex items-center justify-center gap-1">
+                              <ShoppingBag className="w-3 h-3" />
+                              <span>Add to Cart</span>
+                            </div>
+                            <div className="btn-3d-gold py-1.5 px-1 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 shadow-sm">
+                              <Zap className="w-3 h-3 text-[#0f1811] fill-[#0f1811]" />
+                              <span>Buy Now</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {settingsForm.cardButtonMode === "cart_only" && (
+                          <div className="w-full btn-3d-gold py-1.5 text-[10px] font-bold flex items-center justify-center gap-1 shadow-sm">
+                            <ShoppingBag className="w-3 h-3 text-[#0f1811]" />
+                            <span>Add to Cart</span>
+                          </div>
+                        )}
+
+                        {settingsForm.cardButtonMode === "buynow_only" && (
+                          <div className="w-full btn-3d-gold py-1.5 text-[10px] font-bold flex items-center justify-center gap-1 shadow-sm">
+                            <Zap className="w-3 h-3 text-[#0f1811] fill-[#0f1811]" />
+                            <span>Buy Now</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="text-[10px] text-[#8fa89a] text-center mt-3 leading-relaxed">
+                      💡 বাম পাশের টগল বা বাটন মোড পরিবর্তন করলে লাইভ প্রিভিউ এবং ওয়েবসাইটে তাৎক্ষণিকভাবে কার্ডটি আপডেট হবে।
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div className="linear-card p-6 rounded-2xl border border-white/10 space-y-5">

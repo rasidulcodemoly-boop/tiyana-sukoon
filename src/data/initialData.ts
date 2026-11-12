@@ -646,4 +646,12 @@ export const initialSettings: SiteSettings = {
   heroImage: "/artwork/artwork_4.jpg",
   storyImage: "/artwork/artwork_1.jpg",
   bannerImage: "/artwork/artwork_2.jpg",
+  cardShowItemCode: true,
+  cardShowDimensions: true,
+  cardShowTitle: true,
+  cardShowBanglaTitle: true,
+  cardShowPrice: true,
+  cardShowOriginalPrice: true,
+  cardShowBadge: true,
+  cardButtonMode: "both",
 };

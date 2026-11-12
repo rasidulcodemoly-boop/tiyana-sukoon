@@ -9,10 +9,19 @@ import {
   Eye,
   Check,
   Search,
+  Zap,
 } from "lucide-react";
 
 export const FeaturedCollection: React.FC = () => {
-  const { artworks, addToCart, setSelectedArtworkForModal, language, t } = useStore();
+  const {
+    artworks,
+    addToCart,
+    setSelectedArtworkForModal,
+    language,
+    t,
+    settings,
+    setIsCartOpen,
+  } = useStore();
   const [activeCategory, setActiveCategory] = useState<ArtworkCategory>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [justAddedId, setJustAddedId] = useState<string | null>(null);
@@ -41,6 +50,14 @@ export const FeaturedCollection: React.FC = () => {
     return matchesCategory && matchesQuery;
   });
 
+  const getItemCode = (artwork: Artwork, index: number) => {
+    const match = artwork.id.match(/\d+/);
+    if (match) {
+      return `#TS-${match[0].padStart(2, "0")}`;
+    }
+    return `#TS-${String(index + 1).padStart(2, "0")}`;
+  };
+
   const handleAddToCart = (artwork: Artwork) => {
     addToCart(artwork, 1, "Floating Gold Leaf Frame");
     setJustAddedId(artwork.id);
@@ -48,6 +65,21 @@ export const FeaturedCollection: React.FC = () => {
       setJustAddedId(null);
     }, 1500);
   };
+
+  const handleBuyNow = (artwork: Artwork) => {
+    addToCart(artwork, 1, "Floating Gold Leaf Frame");
+    setIsCartOpen(true);
+  };
+
+  // Card visibility settings from admin controls
+  const showItemCode = settings.cardShowItemCode !== false;
+  const showDimensions = settings.cardShowDimensions !== false;
+  const showTitle = settings.cardShowTitle !== false;
+  const showBanglaTitle = settings.cardShowBanglaTitle !== false;
+  const showPrice = settings.cardShowPrice !== false;
+  const showOriginalPrice = settings.cardShowOriginalPrice !== false;
+  const showBadge = settings.cardShowBadge !== false;
+  const buttonMode = settings.cardButtonMode || "both";
 
   return (
     <section id="collections" className="py-20 bg-[#06110a] relative">
@@ -117,114 +149,171 @@ export const FeaturedCollection: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-            {filteredArtworks.map((item) => (
-              <div
-                key={item.id}
-                className="group linear-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5"
-              >
-                <div>
-                  {/* Image container */}
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#07150d]">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-108"
-                    />
+            {filteredArtworks.map((item, index) => {
+              const itemCode = getItemCode(item, index);
+              return (
+                <div
+                  key={item.id}
+                  className="group linear-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 border border-white/10 hover:border-[#d4af37]/40"
+                >
+                  <div>
+                    {/* Image container */}
+                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#07150d]">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
 
-                    {/* Gradient shadow for text readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#06110a] via-transparent to-black/30 pointer-events-none" />
+                      {/* Gradient shadow for text readability */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#06110a] via-transparent to-black/25 pointer-events-none" />
 
-                    {/* Top Badges */}
-                    <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 flex items-center gap-1.5 z-10">
-                      {item.badge && (
-                        <span className="px-1.5 sm:px-2 py-0.5 rounded-md text-[8px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#0a1b12]/90 text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm backdrop-blur-md">
-                          {item.badge}
-                        </span>
+                      {/* Top Badges & Unique Code */}
+                      <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 flex items-center gap-1.5 z-10">
+                        {showBadge && item.badge && (
+                          <span className="px-1.5 sm:px-2 py-0.5 rounded-md text-[8px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#0a1b12]/90 text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm backdrop-blur-md">
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
+
+                      {showItemCode && (
+                        <div className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-10">
+                          <span className="px-1.5 sm:px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-mono font-bold bg-[#06140d]/90 text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm backdrop-blur-md tracking-wider">
+                            {itemCode}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Quick View Button on Image */}
+                      <button
+                        onClick={() => setSelectedArtworkForModal(item)}
+                        className="absolute bottom-2 right-2 sm:bottom-2.5 sm:right-2.5 z-10 p-1.5 sm:p-2 rounded-lg bg-[#06110a]/80 text-[#e5ede7] border border-white/10 opacity-90 group-hover:opacity-100 hover:text-[#f4dc8a] hover:border-[#d4af37] transition-all backdrop-blur-sm"
+                        title="Inspect Artwork Details"
+                      >
+                        <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      </button>
+                    </div>
+
+                    {/* Minimalist Artwork Information */}
+                    <div className="p-2.5 sm:p-4 space-y-1 sm:space-y-1.5">
+                      {/* Size / Dimensions */}
+                      {showDimensions && (
+                        <div className="text-[9px] sm:text-[11px] font-mono text-[#8fa89a] uppercase tracking-wider">
+                          {item.dimensions}
+                        </div>
+                      )}
+
+                      {/* Title */}
+                      {showTitle && (
+                        <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-[#f4dc8a] transition-colors line-clamp-1">
+                          {language === "bn" && item.titleBangla ? item.titleBangla : item.title}
+                        </h3>
+                      )}
+
+                      {/* Subtitle */}
+                      {showBanglaTitle && (
+                        <>
+                          {language === "en" && item.titleBangla && (
+                            <p className="text-[10px] sm:text-xs text-[#8fa89a] line-clamp-1 font-serif">
+                              {item.titleBangla}
+                            </p>
+                          )}
+                          {language === "bn" && (
+                            <p className="text-[10px] sm:text-xs text-[#8fa89a] line-clamp-1 font-mono">
+                              {item.title}
+                            </p>
+                          )}
+                        </>
                       )}
                     </div>
-
-                    {/* Quick View Button on Image */}
-                    <button
-                      onClick={() => setSelectedArtworkForModal(item)}
-                      className="absolute bottom-2 right-2 sm:bottom-2.5 sm:right-2.5 z-10 p-1.5 sm:p-2 rounded-lg bg-[#06110a]/80 text-[#e5ede7] border border-white/10 opacity-90 group-hover:opacity-100 hover:text-[#f4dc8a] hover:border-[#d4af37] transition-all backdrop-blur-sm"
-                      title="Inspect Artwork Details"
-                    >
-                      <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    </button>
                   </div>
 
-                  {/* Artwork Information */}
-                  <div className="p-2.5 sm:p-4 space-y-1 sm:space-y-2">
-                    <div className="flex items-center justify-between text-[9px] sm:text-[11px] text-[#8fa89a]">
-                      <span className="font-mono uppercase">{item.dimensions}</span>
-                      <span className="text-emerald-400 font-medium">● In Studio</span>
-                    </div>
-
-                    <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-[#f4dc8a] transition-colors line-clamp-1">
-                      {language === "bn" && item.titleBangla ? item.titleBangla : item.title}
-                    </h3>
-
-                    {language === "en" && item.titleBangla && (
-                      <p className="text-[10px] sm:text-xs text-[#8fa89a] line-clamp-1 font-serif">
-                        {item.titleBangla}
-                      </p>
-                    )}
-                    {language === "bn" && (
-                      <p className="text-[10px] sm:text-xs text-[#8fa89a] line-clamp-1 font-mono">
-                        {item.title}
-                      </p>
+                  {/* Bottom Action Area: Price & Buttons */}
+                  <div className="p-2.5 sm:p-4 pt-2 border-t border-white/5 space-y-2 sm:space-y-2.5">
+                    {/* Price Row */}
+                    {showPrice && (
+                      <div className="flex items-baseline gap-1.5 sm:gap-2">
+                        <span className="text-sm sm:text-lg font-extrabold text-[#fceb9e]">
+                          ৳{item.price.toLocaleString()}
+                        </span>
+                        {showOriginalPrice && item.originalPrice && (
+                          <span className="text-[10px] sm:text-xs text-[#8fa89a] line-through">
+                            ৳{item.originalPrice.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
                     )}
 
-                    <p className="hidden sm:block text-[12px] text-[#9cb5a6] line-clamp-2 leading-relaxed">
-                      {item.description}
-                    </p>
+                    {/* Action Buttons based on admin buttonMode */}
+                    {buttonMode === "both" && (
+                      <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleAddToCart(item)}
+                          className="py-2 sm:py-2.5 px-1.5 rounded-xl text-[10px] sm:text-xs font-semibold bg-[#0b2416] hover:bg-[#123823] text-[#f4dc8a] border border-[#d4af37]/40 flex items-center justify-center gap-1 transition-all active:scale-95 shadow-sm"
+                          title="Add to Cart"
+                        >
+                          {justAddedId === item.id ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <span className="text-emerald-300 font-bold">{t("colAdded")}</span>
+                            </>
+                          ) : (
+                            <>
+                              <ShoppingBag className="w-3.5 h-3.5" />
+                              <span className="truncate">{t("colAddToCart")}</span>
+                            </>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleBuyNow(item)}
+                          className="btn-3d-gold py-2 sm:py-2.5 px-2 rounded-xl text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1 shadow-md active:scale-95"
+                          title="Buy Now - Instant Checkout"
+                        >
+                          <Zap className="w-3.5 h-3.5 text-[#0f1811] fill-[#0f1811]" />
+                          <span className="truncate">{t("colBuyNow")}</span>
+                        </button>
+                      </div>
+                    )}
 
-                    {item.finish && (
-                      <span className="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] bg-[#0a1f14] text-[#f4dc8a] border border-white/5">
-                        {item.finish}
-                      </span>
+                    {buttonMode === "cart_only" && (
+                      <button
+                        type="button"
+                        onClick={() => handleAddToCart(item)}
+                        className="w-full btn-3d-gold py-2 sm:py-2.5 text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-md"
+                      >
+                        {justAddedId === item.id ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-[#0f1811]" />
+                            <span>{t("colAdded")}</span>
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingBag className="w-3.5 h-3.5 text-[#0f1811]" />
+                            <span>{t("colAddToCart")}</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    {buttonMode === "buynow_only" && (
+                      <button
+                        type="button"
+                        onClick={() => handleBuyNow(item)}
+                        className="w-full btn-3d-gold py-2 sm:py-2.5 text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 shadow-md"
+                      >
+                        <Zap className="w-3.5 h-3.5 text-[#0f1811] fill-[#0f1811]" />
+                        <span>{t("colBuyNow")}</span>
+                      </button>
                     )}
                   </div>
                 </div>
-
-                {/* Bottom Action Area: Price & 3D Button */}
-                <div className="p-2.5 sm:p-4 pt-1.5 sm:pt-2 border-t border-white/5 space-y-2 sm:space-y-3">
-                  <div className="flex items-baseline justify-between">
-                    <div>
-                      <span className="text-sm sm:text-lg font-extrabold text-[#fceb9e]">
-                        ৳{item.price.toLocaleString()}
-                      </span>
-                      {item.originalPrice && (
-                        <span className="text-[10px] sm:text-xs text-[#8fa89a] line-through ml-1 sm:ml-2">
-                          ৳{item.originalPrice.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                    <span className="hidden sm:inline text-[10px] text-[#8fa89a]">Framed & Ready</span>
-                  </div>
-
-                  {/* 3D Action Button */}
-                  <button
-                    onClick={() => handleAddToCart(item)}
-                    className="w-full btn-3d-gold py-2 sm:py-2.5 text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 sm:gap-1.5"
-                  >
-                    {justAddedId === item.id ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-[#0f1811]" />
-                        <span>{t("colAdded")}</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingBag className="w-3.5 h-3.5 text-[#0f1811]" />
-                        <span>{t("colAddToCart")}</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

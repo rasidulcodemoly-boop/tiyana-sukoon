@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useStore } from "../context/StoreContext";
 import { Artwork, ArtworkCategory } from "../types";
 import {
@@ -68,6 +69,7 @@ export const FeaturedCollection: React.FC = () => {
   };
 
   const handleAddToCart = (artwork: Artwork, e?: React.MouseEvent) => {
+    e?.preventDefault();
     e?.stopPropagation();
     addToCart(artwork, 1, "Floating Gold Leaf Frame");
     setJustAddedId(artwork.id);
@@ -77,6 +79,7 @@ export const FeaturedCollection: React.FC = () => {
   };
 
   const handleBuyNow = (artwork: Artwork, e?: React.MouseEvent) => {
+    e?.preventDefault();
     e?.stopPropagation();
     addToCart(artwork, 1, "Floating Gold Leaf Frame");
     setIsCartOpen(true);
@@ -162,10 +165,10 @@ export const FeaturedCollection: React.FC = () => {
             {filteredArtworks.map((item, index) => {
               const itemCode = artworkCodeMap.get(item.id) || `#TS-${String(index + 1).padStart(2, "0")}`;
               return (
-                <div
+                <Link
                   key={item.id}
-                  onClick={() => setSelectedArtworkForModal(item)}
-                  className="group linear-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 border border-white/10 hover:border-[#d4af37]/40 cursor-pointer"
+                  href={`/artwork/${item.id}`}
+                  className="group linear-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 border border-white/10 hover:border-[#d4af37]/40 cursor-pointer block"
                 >
                   <div>
                     {/* Image container: 3:4 portrait ratio */}
@@ -181,14 +184,13 @@ export const FeaturedCollection: React.FC = () => {
                       {/* Gradient shadow for subtle aesthetic depth */}
                       <div className="absolute inset-0 bg-gradient-to-t from-[#06110a]/50 via-transparent to-transparent pointer-events-none" />
 
-                      {/* Quick View Button on Image */}
-                      <button
-                        onClick={() => setSelectedArtworkForModal(item)}
+                      {/* Inspect Indicator on Image */}
+                      <div
                         className="absolute bottom-2.5 right-2.5 z-10 p-1.5 sm:p-2 rounded-lg bg-[#06110a]/80 text-[#e5ede7] border border-white/10 opacity-90 group-hover:opacity-100 hover:text-[#f4dc8a] hover:border-[#d4af37] transition-all backdrop-blur-sm"
-                        title="Inspect Artwork Details"
+                        title="আর্টওয়ার্ক বিস্তারিত দেখুন"
                       >
                         <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      </button>
+                      </div>
                     </div>
 
                     {/* Minimalist Artwork Information */}
@@ -314,7 +316,7 @@ export const FeaturedCollection: React.FC = () => {
                       </button>
                     )}
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

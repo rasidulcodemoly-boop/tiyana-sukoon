@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useStore } from "../context/StoreContext";
 import {
   X,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 
 export const GalleryLightbox: React.FC = () => {
+  const router = useRouter();
   const { artworks, addToCart, setSelectedArtworkForModal, language, t } = useStore();
   const [activeTab, setActiveTab] = useState<string>("all");
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
@@ -225,7 +227,7 @@ export const GalleryLightbox: React.FC = () => {
                 <button
                   onClick={() => {
                     closeLightbox();
-                    setSelectedArtworkForModal(currentArt);
+                    router.push(`/artwork/${currentArt.id}`);
                   }}
                   className="btn-3d-dark px-4 py-2.5 text-xs text-[#c4d7cc]"
                 >

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useStore } from "../context/StoreContext";
 import { Artwork } from "../types";
 import { ArrowRight, ZoomIn } from "lucide-react";
@@ -163,10 +164,10 @@ export const HeroSection: React.FC = () => {
                 onTransitionEnd={handleTransitionEnd}
               >
                 {mobileDisplayArtworks.map((art, idx) => (
-                  <div
+                  <Link
                     key={`mob-${art.id}-${idx}`}
-                    onClick={() => setSelectedArtworkForModal(art)}
-                    className="relative w-[calc(50%-6px)] shrink-0 aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer border border-[#d4af37]/35 bg-[#08180f] shadow-[0_10px_25px_rgba(0,0,0,0.7)] active:scale-[0.98] transition-all"
+                    href={`/artwork/${art.id}`}
+                    className="relative w-[calc(50%-6px)] shrink-0 aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer border border-[#d4af37]/35 bg-[#08180f] shadow-[0_10px_25px_rgba(0,0,0,0.7)] active:scale-[0.98] transition-all block"
                     title="Click to view full piece"
                   >
                     {/* Artwork Image */}
@@ -203,7 +204,7 @@ export const HeroSection: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -239,10 +240,10 @@ export const HeroSection: React.FC = () => {
             {/* Continuous Horizontal Marquee Carousel */}
             <div className="animate-marquee gap-4 sm:gap-6 py-2">
               {displayArtworks.map((art, idx) => (
-                <div
+                <Link
                   key={`desk-${art.id}-${idx}`}
-                  onClick={() => setSelectedArtworkForModal(art)}
-                  className="group relative w-[220px] sm:w-[270px] md:w-[310px] aspect-[4/5] shrink-0 rounded-2xl overflow-hidden cursor-pointer border border-white/10 bg-[#08180f] shadow-xl hover:border-[#d4af37]/60 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(212,175,55,0.2)]"
+                  href={`/artwork/${art.id}`}
+                  className="group relative w-[220px] sm:w-[270px] md:w-[310px] aspect-[4/5] shrink-0 rounded-2xl overflow-hidden cursor-pointer border border-white/10 bg-[#08180f] shadow-xl hover:border-[#d4af37]/60 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(212,175,55,0.2)] block"
                   title="Click to view full piece"
                 >
                   {/* Artwork Image */}
@@ -281,7 +282,7 @@ export const HeroSection: React.FC = () => {
                       </span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

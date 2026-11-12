@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { StoreProvider, useStore } from "../../context/StoreContext";
 import { ImageSourceControl } from "../../components/ImageSourceControl";
+import { MultiGalleryImageControl } from "../../components/MultiGalleryImageControl";
 import {
   Artwork,
   Order,
@@ -613,7 +614,6 @@ const AdminDashboardInner: React.FC = () => {
     inStock: true,
     isFeatured: true,
   });
-  const [galleryInputUrl, setGalleryInputUrl] = useState("");
 
   // Supabase Auth Login
   const handleSupabaseLogin = async (e: React.FormEvent) => {
@@ -3930,107 +3930,14 @@ If you have any questions or would like preview photos of your canvas, reply to 
                 presets={GALLERY_IMAGE_PRESETS}
               />
 
-              {/* Multiple Gallery Images for Detail Modal Showcase */}
-              <div className="p-3.5 rounded-xl bg-[#07160f] border border-[#d4af37]/25 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="block text-xs font-bold text-[#f4dc8a] flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" />
-                      <span>গ্যালারি অতিরিক্ত ইমেজসমূহ (Multiple Gallery Images)</span>
-                    </label>
-                    <p className="text-[11px] text-[#8fa89a]">
-                      ডিটেইল পেজে বড় ছবির নিচে থাম্বনেইল হিসেবে শো হবে। বিভিন্ন অ্যাঙ্গেল বা রুম ডেকোর ফটো যোগ করুন।
-                    </p>
-                  </div>
-                  <span className="text-[10px] font-mono text-[#d4af37] bg-[#11271b] px-2 py-0.5 rounded border border-[#d4af37]/30">
-                    {(newArtForm.images?.length || 0)} টি ইমেজ যুক্ত আছে
-                  </span>
-                </div>
-
-                {/* Thumbnails preview */}
-                {newArtForm.images && newArtForm.images.length > 0 && (
-                  <div className="flex flex-wrap gap-2 p-2 rounded-lg bg-[#040e08] border border-white/5">
-                    {newArtForm.images.map((gImg, gIdx) => (
-                      <div
-                        key={gIdx}
-                        className="relative group w-14 h-14 rounded-lg overflow-hidden border border-white/20 bg-[#07150d]"
-                      >
-                        <Image
-                          src={gImg}
-                          alt={`Gallery ${gIdx + 1}`}
-                          fill
-                          className="object-cover"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = newArtForm.images?.filter((_, i) => i !== gIdx);
-                            setNewArtForm({ ...newArtForm, images: updated });
-                          }}
-                          className="absolute top-1 right-1 p-0.5 rounded-full bg-red-600/90 text-white hover:bg-red-700 shadow-sm"
-                          title="Remove image"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Add new image input */}
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    placeholder="অতিরিক্ত ছবির URL দিন বা নিচের প্রিসেট থেকে ক্লিক করুন..."
-                    value={galleryInputUrl}
-                    onChange={(e) => setGalleryInputUrl(e.target.value)}
-                    className="flex-1 px-3 py-1.5 text-xs rounded-lg bg-[#05110a] border border-white/10 text-white placeholder-[#687f71] focus:outline-none focus:border-[#d4af37]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (galleryInputUrl.trim()) {
-                        const current = newArtForm.images || [];
-                        setNewArtForm({
-                          ...newArtForm,
-                          images: [...current, galleryInputUrl.trim()],
-                        });
-                        setGalleryInputUrl("");
-                      }
-                    }}
-                    disabled={!galleryInputUrl.trim()}
-                    className="btn-3d-gold px-3 py-1.5 text-xs font-bold whitespace-nowrap disabled:opacity-50"
-                  >
-                    + Add to Gallery
-                  </button>
-                </div>
-
-                {/* Quick preset selector */}
-                <div className="space-y-1">
-                  <span className="text-[10px] text-[#8fa89a]">স্টুডিও ফটো লাইব্রেরি থেকে দ্রুত যুক্ত করুন:</span>
-                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-                    {GALLERY_IMAGE_PRESETS.slice(0, 10).map((preset) => (
-                      <button
-                        key={preset.path}
-                        type="button"
-                        onClick={() => {
-                          const current = newArtForm.images || [];
-                          if (!current.includes(preset.path)) {
-                            setNewArtForm({
-                              ...newArtForm,
-                              images: [...current, preset.path],
-                            });
-                          }
-                        }}
-                        className="flex-shrink-0 relative w-9 h-9 rounded-md overflow-hidden border border-white/10 hover:border-[#d4af37] transition-all"
-                        title={`Add ${preset.label}`}
-                      >
-                        <Image src={preset.path} alt={preset.label} fill className="object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              {/* Multiple Gallery Images with Full Local Multi-File Drag-and-Drop, URL & Presets */}
+              <MultiGalleryImageControl
+                images={newArtForm.images || []}
+                onChange={(updatedImages) =>
+                  setNewArtForm({ ...newArtForm, images: updatedImages })
+                }
+                presets={GALLERY_IMAGE_PRESETS}
+              />
 
               {/* Title & Bangla Title */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -4248,107 +4155,14 @@ If you have any questions or would like preview photos of your canvas, reply to 
                 presets={GALLERY_IMAGE_PRESETS}
               />
 
-              {/* Multiple Gallery Images for Detail Modal Showcase */}
-              <div className="p-3.5 rounded-xl bg-[#07160f] border border-[#d4af37]/25 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="block text-xs font-bold text-[#f4dc8a] flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" />
-                      <span>গ্যালারি অতিরিক্ত ইমেজসমূহ (Multiple Gallery Images)</span>
-                    </label>
-                    <p className="text-[11px] text-[#8fa89a]">
-                      ডিটেইল পেজে বড় ছবির নিচে থাম্বনেইল হিসেবে শো হবে। বিভিন্ন অ্যাঙ্গেল বা রুম ডেকোর ফটো যোগ করুন।
-                    </p>
-                  </div>
-                  <span className="text-[10px] font-mono text-[#d4af37] bg-[#11271b] px-2 py-0.5 rounded border border-[#d4af37]/30">
-                    {(editingArtwork.images?.length || 0)} টি ইমেজ যুক্ত আছে
-                  </span>
-                </div>
-
-                {/* Thumbnails preview */}
-                {editingArtwork.images && editingArtwork.images.length > 0 && (
-                  <div className="flex flex-wrap gap-2 p-2 rounded-lg bg-[#040e08] border border-white/5">
-                    {editingArtwork.images.map((gImg, gIdx) => (
-                      <div
-                        key={gIdx}
-                        className="relative group w-14 h-14 rounded-lg overflow-hidden border border-white/20 bg-[#07150d]"
-                      >
-                        <Image
-                          src={gImg}
-                          alt={`Gallery ${gIdx + 1}`}
-                          fill
-                          className="object-cover"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = editingArtwork.images?.filter((_, i) => i !== gIdx);
-                            setEditingArtwork({ ...editingArtwork, images: updated });
-                          }}
-                          className="absolute top-1 right-1 p-0.5 rounded-full bg-red-600/90 text-white hover:bg-red-700 shadow-sm"
-                          title="Remove image"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Add new image input */}
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    placeholder="অতিরিক্ত ছবির URL দিন বা নিচের প্রিসেট থেকে ক্লিক করুন..."
-                    value={galleryInputUrl}
-                    onChange={(e) => setGalleryInputUrl(e.target.value)}
-                    className="flex-1 px-3 py-1.5 text-xs rounded-lg bg-[#05110a] border border-white/10 text-white placeholder-[#687f71] focus:outline-none focus:border-[#d4af37]"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (galleryInputUrl.trim()) {
-                        const current = editingArtwork.images || [];
-                        setEditingArtwork({
-                          ...editingArtwork,
-                          images: [...current, galleryInputUrl.trim()],
-                        });
-                        setGalleryInputUrl("");
-                      }
-                    }}
-                    disabled={!galleryInputUrl.trim()}
-                    className="btn-3d-gold px-3 py-1.5 text-xs font-bold whitespace-nowrap disabled:opacity-50"
-                  >
-                    + Add to Gallery
-                  </button>
-                </div>
-
-                {/* Quick preset selector */}
-                <div className="space-y-1">
-                  <span className="text-[10px] text-[#8fa89a]">স্টুডিও ফটো লাইব্রেরি থেকে দ্রুত যুক্ত করুন:</span>
-                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-                    {GALLERY_IMAGE_PRESETS.slice(0, 10).map((preset) => (
-                      <button
-                        key={preset.path}
-                        type="button"
-                        onClick={() => {
-                          const current = editingArtwork.images || [];
-                          if (!current.includes(preset.path)) {
-                            setEditingArtwork({
-                              ...editingArtwork,
-                              images: [...current, preset.path],
-                            });
-                          }
-                        }}
-                        className="flex-shrink-0 relative w-9 h-9 rounded-md overflow-hidden border border-white/10 hover:border-[#d4af37] transition-all"
-                        title={`Add ${preset.label}`}
-                      >
-                        <Image src={preset.path} alt={preset.label} fill className="object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              {/* Multiple Gallery Images with Full Local Multi-File Drag-and-Drop, URL & Presets */}
+              <MultiGalleryImageControl
+                images={editingArtwork.images || []}
+                onChange={(updatedImages) =>
+                  setEditingArtwork({ ...editingArtwork, images: updatedImages })
+                }
+                presets={GALLERY_IMAGE_PRESETS}
+              />
 
               {/* Title & Bangla Title */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

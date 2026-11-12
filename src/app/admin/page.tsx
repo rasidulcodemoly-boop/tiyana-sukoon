@@ -3080,32 +3080,7 @@ If you have any questions or would like preview photos of your canvas, reply to 
                       </button>
                     </div>
 
-                    {/* 4. Special Badges */}
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-[#07160f] border border-white/5 hover:border-[#d4af37]/30 transition-all">
-                      <div className="pr-3">
-                        <p className="text-xs font-bold text-white">স্পেশাল ব্যাজ ও স্টিকার (Badges)</p>
-                        <p className="text-[11px] text-[#8fa89a]">ইমেজের উপর TRENDING বা SIGNATURE স্টিকার প্রদর্শন</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const nextVal = settingsForm.cardShowBadge === false ? true : false;
-                          setSettingsForm((prev) => ({ ...prev, cardShowBadge: nextVal }));
-                          updateSettings({ cardShowBadge: nextVal }, true);
-                        }}
-                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                          settingsForm.cardShowBadge !== false ? "bg-[#d4af37]" : "bg-[#163825]"
-                        }`}
-                      >
-                        <span
-                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[#0a150e] shadow ring-0 transition duration-200 ease-in-out ${
-                            settingsForm.cardShowBadge !== false ? "translate-x-5" : "translate-x-0"
-                          }`}
-                        />
-                      </button>
-                    </div>
-
-                    {/* 5. Action Buttons Mode */}
+                    {/* 4. Action Buttons Mode */}
                     <div className="p-3.5 rounded-xl bg-[#07160f] border border-white/5 space-y-2.5">
                       <div>
                         <p className="text-xs font-bold text-white">অ্যাকশন বাটন প্রদর্শন সিস্টেম (Buttons System)</p>
@@ -3185,8 +3160,8 @@ If you have any questions or would like preview photos of your canvas, reply to 
                     {/* Mock Minimalist Card */}
                     <div className="w-full max-w-[270px] linear-card rounded-xl overflow-hidden flex flex-col justify-between border border-white/15 shadow-xl">
                       <div>
-                        {/* Image container */}
-                        <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#07150d]">
+                        {/* Image container: 3:4 portrait ratio */}
+                        <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#07150d]">
                           <Image
                             src={artworks[0]?.image || "/artwork/artwork_4.jpg"}
                             alt="Card Preview"
@@ -3194,25 +3169,7 @@ If you have any questions or would like preview photos of your canvas, reply to 
                             sizes="270px"
                             className="object-cover"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#06110a] via-transparent to-black/25 pointer-events-none" />
-
-                          {/* Badge */}
-                          {settingsForm.cardShowBadge !== false && (
-                            <div className="absolute top-2 left-2 z-10">
-                              <span className="px-1.5 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-wider bg-[#0a1b12]/90 text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm">
-                                TRENDING
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Unique Code */}
-                          {settingsForm.cardShowItemCode !== false && (
-                            <div className="absolute top-2 right-2 z-10">
-                              <span className="px-1.5 py-0.5 rounded-md text-[9px] font-mono font-bold bg-[#06140d]/90 text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm">
-                                #TS-01
-                              </span>
-                            </div>
-                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#06110a]/50 via-transparent to-transparent pointer-events-none" />
 
                           {/* Quick view icon */}
                           <div className="absolute bottom-2 right-2 z-10 p-1.5 rounded-lg bg-[#06110a]/80 text-[#e5ede7] border border-white/10">
@@ -3221,10 +3178,19 @@ If you have any questions or would like preview photos of your canvas, reply to 
                         </div>
 
                         {/* Minimalist Details */}
-                        <div className="p-3 space-y-1">
-                          {settingsForm.cardShowDimensions !== false && (
-                            <div className="text-[10px] font-mono text-[#8fa89a] uppercase tracking-wider">
-                              20&quot; x 24&quot; INCHES
+                        <div className="p-3 space-y-1.5">
+                          {(settingsForm.cardShowItemCode !== false || settingsForm.cardShowDimensions !== false) && (
+                            <div className="flex items-center justify-between gap-2 text-[10px] pb-0.5">
+                              {settingsForm.cardShowItemCode !== false && (
+                                <span className="font-mono font-bold text-[#f4dc8a] bg-[#0c2417] border border-[#d4af37]/35 px-1.5 py-0.5 rounded text-[9px] shadow-sm tracking-wider">
+                                  #TS-01
+                                </span>
+                              )}
+                              {settingsForm.cardShowDimensions !== false && (
+                                <span className="font-mono text-[#8fa89a] uppercase tracking-wider ml-auto">
+                                  20&quot; x 24&quot; INCHES
+                                </span>
+                              )}
                             </div>
                           )}
 

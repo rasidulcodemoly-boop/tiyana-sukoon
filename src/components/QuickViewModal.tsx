@@ -25,6 +25,7 @@ import {
 
 export const QuickViewModal: React.FC = () => {
   const {
+    artworks,
     selectedArtworkForModal,
     setSelectedArtworkForModal,
     addToCart,
@@ -50,9 +51,9 @@ export const QuickViewModal: React.FC = () => {
 
   const item = selectedArtworkForModal;
 
-  // Extract unique code or format #TS-XX
-  const numMatch = item.id.match(/\d+/);
-  const itemCode = numMatch ? `#TS-${numMatch[0].padStart(2, "0")}` : "#TS-01";
+  // Stable, globally unique sequential item code across catalog (#TS-01, #TS-02...)
+  const artIndex = artworks.findIndex((a) => a.id === item.id);
+  const itemCode = artIndex >= 0 ? `#TS-${String(artIndex + 1).padStart(2, "0")}` : "#TS-01";
 
   // Build gallery images list (primary image + gallery images deduplicated)
   const galleryList: string[] = [

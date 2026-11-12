@@ -35,6 +35,15 @@ export const FeaturedCollection: React.FC = () => {
     { label: t("colCatCustom"), value: "custom-orders" },
   ];
 
+  // Master map for guaranteed globally unique serial codes (#TS-01, #TS-02...)
+  const artworkCodeMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+    artworks.forEach((art, idx) => {
+      map.set(art.id, `#TS-${String(idx + 1).padStart(2, "0")}`);
+    });
+    return map;
+  }, [artworks]);
+
   const filteredArtworks = artworks.filter((item) => {
     const matchesCategory =
       activeCategory === "all" || item.category === activeCategory;
@@ -80,7 +89,6 @@ export const FeaturedCollection: React.FC = () => {
   const showBanglaTitle = settings.cardShowBanglaTitle !== false;
   const showPrice = settings.cardShowPrice !== false;
   const showOriginalPrice = settings.cardShowOriginalPrice !== false;
-  const showBadge = settings.cardShowBadge !== false;
   const buttonMode = settings.cardButtonMode || "both";
 
   return (
@@ -152,7 +160,7 @@ export const FeaturedCollection: React.FC = () => {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {filteredArtworks.map((item, index) => {
-              const itemCode = getItemCode(item, index);
+              const itemCode = artworkCodeMap.get(item.id) || `#TS-${String(index + 1).padStart(2, "0")}`;
               return (
                 <div
                   key={item.id}
@@ -160,8 +168,8 @@ export const FeaturedCollection: React.FC = () => {
                   className="group linear-card rounded-xl sm:rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 border border-white/10 hover:border-[#d4af37]/40 cursor-pointer"
                 >
                   <div>
-                    {/* Image container */}
-                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#07150d]">
+                    {/* Image container: 3:4 portrait ratio */}
+                    <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#07150d]">
                       <Image
                         src={item.image}
                         alt={item.title}
@@ -170,30 +178,13 @@ export const FeaturedCollection: React.FC = () => {
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
 
-                      {/* Gradient shadow for text readability */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#06110a] via-transparent to-black/25 pointer-events-none" />
-
-                      {/* Top Badges & Unique Code */}
-                      <div className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 flex items-center gap-1.5 z-10">
-                        {showBadge && item.badge && (
-                          <span className="px-1.5 sm:px-2 py-0.5 rounded-md text-[8px] sm:text-[10px] font-bold uppercase tracking-wider bg-[#0a1b12]/90 text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm backdrop-blur-md">
-                            {item.badge}
-                          </span>
-                        )}
-                      </div>
-
-                      {showItemCode && (
-                        <div className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-10">
-                          <span className="px-1.5 sm:px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-mono font-bold bg-[#06140d]/90 text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm backdrop-blur-md tracking-wider">
-                            {itemCode}
-                          </span>
-                        </div>
-                      )}
+                      {/* Gradient shadow for subtle aesthetic depth */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#06110a]/50 via-transparent to-transparent pointer-events-none" />
 
                       {/* Quick View Button on Image */}
                       <button
                         onClick={() => setSelectedArtworkForModal(item)}
-                        className="absolute bottom-2 right-2 sm:bottom-2.5 sm:right-2.5 z-10 p-1.5 sm:p-2 rounded-lg bg-[#06110a]/80 text-[#e5ede7] border border-white/10 opacity-90 group-hover:opacity-100 hover:text-[#f4dc8a] hover:border-[#d4af37] transition-all backdrop-blur-sm"
+                        className="absolute bottom-2.5 right-2.5 z-10 p-1.5 sm:p-2 rounded-lg bg-[#06110a]/80 text-[#e5ede7] border border-white/10 opacity-90 group-hover:opacity-100 hover:text-[#f4dc8a] hover:border-[#d4af37] transition-all backdrop-blur-sm"
                         title="Inspect Artwork Details"
                       >
                         <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -201,11 +192,20 @@ export const FeaturedCollection: React.FC = () => {
                     </div>
 
                     {/* Minimalist Artwork Information */}
-                    <div className="p-2.5 sm:p-4 space-y-1 sm:space-y-1.5">
-                      {/* Size / Dimensions */}
-                      {showDimensions && (
-                        <div className="text-[9px] sm:text-[11px] font-mono text-[#8fa89a] uppercase tracking-wider">
-                          {item.dimensions}
+                    <div className="p-2.5 sm:p-4 space-y-1.5">
+                      {/* Unique Code & Dimensions Row BELOW Image */}
+                      {(showItemCode || showDimensions) && (
+                        <div className="flex items-center justify-between gap-2 text-[9px] sm:text-[11px] pb-0.5">
+                          {showItemCode && (
+                            <span className="font-mono font-bold text-[#f4dc8a] bg-[#0c2417] border border-[#d4af37]/35 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] shadow-sm tracking-wider">
+                              {itemCode}
+                            </span>
+                          )}
+                          {showDimensions && (
+                            <span className="font-mono text-[#8fa89a] uppercase tracking-wider ml-auto">
+                              {item.dimensions}
+                            </span>
+                          )}
                         </div>
                       )}
 

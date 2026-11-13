@@ -164,6 +164,19 @@ export async function testSupabaseConnection(): Promise<{
 // ----------------------------------------------------
 
 export function dbToArtwork(row: any): Artwork {
+  let images: string[] = [];
+  if (Array.isArray(row.images) && row.images.length > 0) {
+    images = row.images;
+  } else if (row.spiritual_message && typeof row.spiritual_message === "string" && row.spiritual_message.startsWith("__META__:")) {
+    try {
+      const parsed = JSON.parse(row.spiritual_message.replace("__META__:", ""));
+      if (Array.isArray(parsed.images)) images = parsed.images;
+    } catch {}
+  }
+  if (images.length === 0 && row.image) {
+    images = [row.image];
+  }
+
   return {
     id: row.id,
     title: row.title,
@@ -172,12 +185,15 @@ export function dbToArtwork(row: any): Artwork {
     price: Number(row.price),
     originalPrice: row.original_price ? Number(row.original_price) : undefined,
     description: row.description || "",
-    spiritualMessage: row.spiritual_message || "",
+    spiritualMessage:
+      row.spiritual_message && row.spiritual_message.startsWith("__META__:")
+        ? ""
+        : (row.spiritual_message || ""),
     dimensions: row.dimensions || "12x12 inch",
     medium: row.medium || "Textured Acrylic on Canvas",
     finish: row.finish || "Varnished",
     image: row.image,
-    images: Array.isArray(row.images) && row.images.length > 0 ? row.images : (row.image ? [row.image] : []),
+    images,
     isFeatured: Boolean(row.is_featured),
     inStock: Boolean(row.in_stock),
     badge: row.badge || undefined,
@@ -186,6 +202,13 @@ export function dbToArtwork(row: any): Artwork {
 }
 
 export function artworkToDb(art: Artwork) {
+  // If multiple gallery images exist, encode safely into spiritual_message metadata
+  // to maintain full backward compatibility with Supabase schema where 'images' column doesn't exist
+  let spiritualMessage = art.spiritualMessage || null;
+  if (Array.isArray(art.images) && art.images.length > 0) {
+    spiritualMessage = `__META__:${JSON.stringify({ images: art.images })}`;
+  }
+
   return {
     id: art.id,
     title: art.title,
@@ -194,12 +217,11 @@ export function artworkToDb(art: Artwork) {
     price: art.price,
     original_price: art.originalPrice || null,
     description: art.description,
-    spiritual_message: art.spiritualMessage || null,
+    spiritual_message: spiritualMessage,
     dimensions: art.dimensions,
     medium: art.medium,
     finish: art.finish || null,
     image: art.image,
-    images: art.images || (art.image ? [art.image] : []),
     is_featured: Boolean(art.isFeatured),
     in_stock: Boolean(art.inStock),
     badge: art.badge || null,

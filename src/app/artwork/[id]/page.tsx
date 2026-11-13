@@ -456,7 +456,7 @@ const ArtworkDetailContent: React.FC = () => {
               }`}
             >
               <FileText className="w-4 h-4 text-[#d4af37]" />
-              <span>ডেসক্রিপশন ও আধ্যাত্মিক তাৎপর্য (Story &amp; Specs)</span>
+              <span>ডেসক্রিপশন ও স্পেসিফিকেশন (Description &amp; Specs)</span>
             </button>
 
             <button

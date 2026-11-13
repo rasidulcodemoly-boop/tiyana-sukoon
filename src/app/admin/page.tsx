@@ -4086,20 +4086,6 @@ If you have any questions or would like preview photos of your canvas, reply to 
                 />
               </div>
 
-              {/* Spiritual Message */}
-              <div>
-                <label className="block text-[#c4d7cc] mb-1">Spiritual Message (বার্তার বিবরণ)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. 🤍 সূরা আল-ফালাকের বার্তা: সৃষ্টির অনিষ্ট থেকে আল্লাহর আশ্রয় প্রার্থনা..."
-                  value={newArtForm.spiritualMessage}
-                  onChange={(e) =>
-                    setNewArtForm({ ...newArtForm, spiritualMessage: e.target.value })
-                  }
-                  className="w-full px-3 py-2 rounded-lg bg-[#07160f] border border-white/10 text-white"
-                />
-              </div>
-
               {/* Detailed Description */}
               <div>
                 <label className="block text-[#c4d7cc] mb-1">Detailed Description (ফেসবুক পোস্টের মূল টেক্সট)</label>
@@ -4296,19 +4282,6 @@ If you have any questions or would like preview photos of your canvas, reply to 
                   value={editingArtwork.medium}
                   onChange={(e) =>
                     setEditingArtwork({ ...editingArtwork, medium: e.target.value })
-                  }
-                  className="w-full px-3 py-2 rounded-lg bg-[#07160f] border border-white/10 text-white"
-                />
-              </div>
-
-              {/* Spiritual Message */}
-              <div>
-                <label className="block text-[#c4d7cc] mb-1">Spiritual Message (বার্তার বিবরণ)</label>
-                <input
-                  type="text"
-                  value={editingArtwork.spiritualMessage || ""}
-                  onChange={(e) =>
-                    setEditingArtwork({ ...editingArtwork, spiritualMessage: e.target.value })
                   }
                   className="w-full px-3 py-2 rounded-lg bg-[#07160f] border border-white/10 text-white"
                 />

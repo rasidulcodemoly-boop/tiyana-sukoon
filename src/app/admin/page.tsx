@@ -6,6 +6,7 @@ import Link from "next/link";
 import { StoreProvider, useStore } from "../../context/StoreContext";
 import { ImageSourceControl } from "../../components/ImageSourceControl";
 import { MultiGalleryImageControl } from "../../components/MultiGalleryImageControl";
+import { CustomSelect, CustomSelectOption } from "../../components/CustomSelect";
 import {
   Artwork,
   Order,
@@ -76,6 +77,38 @@ import {
   signOutAdminUser,
   getCurrentAdminSession,
 } from "../../lib/supabase";
+
+// Category options for custom dropdowns (Bookmarks removed per request)
+const CATEGORY_OPTIONS: CustomSelectOption[] = [
+  { value: "calligraphy", label: "Arabic Calligraphy" },
+  { value: "canvas", label: "Canvas Paintings" },
+  { value: "mini-easels", label: "Mini Easels" },
+  { value: "custom-orders", label: "Custom Orders" },
+];
+
+const CAROUSEL_CATEGORY_OPTIONS: CustomSelectOption[] = [
+  { value: "calligraphy", label: "Arabic Calligraphy" },
+  { value: "canvas", label: "Canvas Paintings" },
+  { value: "mini-easels", label: "Mini Easels & Desk Canvas" },
+  { value: "custom-orders", label: "Custom Orders" },
+];
+
+const ORDER_STATUS_OPTIONS: CustomSelectOption[] = [
+  { value: "pending", label: "PENDING" },
+  { value: "confirmed", label: "CONFIRMED" },
+  { value: "painting", label: "IN PAINTING" },
+  { value: "framing", label: "IN FRAMING" },
+  { value: "shipped", label: "SHIPPED" },
+  { value: "delivered", label: "DELIVERED" },
+  { value: "cancelled", label: "CANCELLED" },
+];
+
+const INQUIRY_STATUS_OPTIONS: CustomSelectOption[] = [
+  { value: "new", label: "NEW INQUIRY" },
+  { value: "contacted", label: "CONTACTED" },
+  { value: "confirmed", label: "CONFIRMED" },
+  { value: "completed", label: "COMPLETED" },
+];
 
 // List of available authentic FB artwork image paths
 const GALLERY_IMAGE_PRESETS = [
@@ -1270,7 +1303,6 @@ If you have any questions or would like preview photos of your canvas, reply to 
                     { id: "calligraphy", label: "Arabic Calligraphy" },
                     { id: "canvas", label: "Canvas Paintings" },
                     { id: "mini-easels", label: "Mini Easels" },
-                    { id: "bookmarks", label: "Bookmarks" },
                     { id: "custom-orders", label: "Custom Orders" },
                   ].map((c) => (
                     <button
@@ -2732,24 +2764,17 @@ If you have any questions or would like preview photos of your canvas, reply to 
 
                             <td className="p-4 align-top space-y-2">
                               {/* Status Dropdown */}
-                              <select
+                              <CustomSelect
                                 value={ord.status}
-                                onChange={(e) =>
+                                onChange={(val) =>
                                   updateOrderStatus(
                                     ord.id,
-                                    e.target.value as OrderStatus
+                                    val as OrderStatus
                                   )
                                 }
-                                className="w-full px-2.5 py-1.5 rounded-lg bg-[#07160f] border border-white/10 text-white text-xs font-semibold focus:outline-none focus:border-[#d4af37]"
-                              >
-                                <option value="pending">PENDING</option>
-                                <option value="confirmed">CONFIRMED</option>
-                                <option value="painting">IN PAINTING</option>
-                                <option value="framing">IN FRAMING</option>
-                                <option value="shipped">SHIPPED</option>
-                                <option value="delivered">DELIVERED</option>
-                                <option value="cancelled">CANCELLED</option>
-                              </select>
+                                options={ORDER_STATUS_OPTIONS}
+                                buttonClassName="py-1.5 text-xs font-semibold"
+                              />
 
                               {/* Action Buttons */}
                               <div className="flex items-center gap-1.5 pt-1">
@@ -2858,21 +2883,18 @@ If you have any questions or would like preview photos of your canvas, reply to 
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <select
+                        <CustomSelect
                           value={inq.status}
-                          onChange={(e) =>
+                          onChange={(val) =>
                             updateInquiryStatus(
                               inq.id,
-                              e.target.value as CustomInquiry["status"]
+                              val as CustomInquiry["status"]
                             )
                           }
-                          className="px-2.5 py-1.5 rounded-lg bg-[#07160f] border border-white/10 text-xs font-semibold text-[#f4dc8a] focus:outline-none"
-                        >
-                          <option value="new">NEW INQUIRY</option>
-                          <option value="contacted">CONTACTED</option>
-                          <option value="confirmed">CONFIRMED</option>
-                          <option value="completed">COMPLETED</option>
-                        </select>
+                          options={INQUIRY_STATUS_OPTIONS}
+                          buttonClassName="py-1.5 text-xs font-semibold text-[#f4dc8a]"
+                          className="w-36"
+                        />
 
                         <a
                           href={`tel:${inq.phone}`}
@@ -3972,22 +3994,16 @@ If you have any questions or would like preview photos of your canvas, reply to 
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-[#c4d7cc] mb-1">Category</label>
-                  <select
+                  <CustomSelect
                     value={newArtForm.category}
-                    onChange={(e) =>
+                    onChange={(val) =>
                       setNewArtForm({
                         ...newArtForm,
-                        category: e.target.value as ArtworkCategory,
+                        category: val as ArtworkCategory,
                       })
                     }
-                    className="w-full px-3 py-2 rounded-lg bg-[#07160f] border border-white/10 text-white"
-                  >
-                    <option value="calligraphy">Arabic Calligraphy</option>
-                    <option value="canvas">Canvas Paintings</option>
-                    <option value="mini-easels">Mini Easels</option>
-                    <option value="bookmarks">Bookmarks</option>
-                    <option value="custom-orders">Custom Orders</option>
-                  </select>
+                    options={CATEGORY_OPTIONS}
+                  />
                 </div>
                 <div>
                   <label className="block text-[#c4d7cc] mb-1">Price (৳ BDT) *</label>
@@ -4194,22 +4210,16 @@ If you have any questions or would like preview photos of your canvas, reply to 
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-[#c4d7cc] mb-1">Category</label>
-                  <select
+                  <CustomSelect
                     value={editingArtwork.category}
-                    onChange={(e) =>
+                    onChange={(val) =>
                       setEditingArtwork({
                         ...editingArtwork,
-                        category: e.target.value as ArtworkCategory,
+                        category: val as ArtworkCategory,
                       })
                     }
-                    className="w-full px-3 py-2 rounded-lg bg-[#07160f] border border-white/10 text-white"
-                  >
-                    <option value="calligraphy">Arabic Calligraphy</option>
-                    <option value="canvas">Canvas Paintings</option>
-                    <option value="mini-easels">Mini Easels</option>
-                    <option value="bookmarks">Bookmarks</option>
-                    <option value="custom-orders">Custom Orders</option>
-                  </select>
+                    options={CATEGORY_OPTIONS}
+                  />
                 </div>
                 <div>
                   <label className="block text-[#c4d7cc] mb-1">Price (৳ BDT) *</label>
@@ -4605,22 +4615,17 @@ If you have any questions or would like preview photos of your canvas, reply to 
                   <label className="block text-[11px] font-semibold text-[#c4d7cc] mb-1">
                     ক্যাটাগরি
                   </label>
-                  <select
+                  <CustomSelect
                     value={newSlideData.category}
-                    onChange={(e) =>
+                    onChange={(val) =>
                       setNewSlideData({
                         ...newSlideData,
-                        category: e.target.value as ArtworkCategory,
+                        category: val as ArtworkCategory,
                       })
                     }
-                    className="w-full px-2.5 py-2 text-xs rounded-xl bg-[#07160f] border border-white/15 text-white focus:outline-none focus:border-[#d4af37]"
-                  >
-                    <option value="calligraphy">Arabic Calligraphy</option>
-                    <option value="canvas">Canvas Paintings</option>
-                    <option value="mini-easels">Mini Easels &amp; Desk Canvas</option>
-                    <option value="bookmarks">Bookmarks &amp; Hampers</option>
-                    <option value="custom-orders">Custom Orders</option>
-                  </select>
+                    options={CAROUSEL_CATEGORY_OPTIONS}
+                    buttonClassName="py-2 text-xs rounded-xl"
+                  />
                 </div>
 
                 <div>

@@ -265,7 +265,7 @@ export const initialArtworks: Artwork[] = [
     id: "art-14",
     title: "Artisan Calligraphy Leather & Resin Bookmark Trio",
     titleBangla: "হস্তনির্মিত ক্যালিগ্রাফি বুকমার্ক (৩ টির সেট)",
-    category: "bookmarks",
+    category: "calligraphy",
     price: 650,
     originalPrice: 800,
     description:

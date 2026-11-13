@@ -32,7 +32,6 @@ export const FeaturedCollection: React.FC = () => {
     { label: t("colCatCalligraphy"), value: "calligraphy" },
     { label: t("colCatCanvas"), value: "canvas" },
     { label: t("colCatMiniEasels"), value: "mini-easels" },
-    { label: t("colCatBookmarks"), value: "bookmarks" },
     { label: t("colCatCustom"), value: "custom-orders" },
   ];
 

@@ -73,7 +73,7 @@ export const GalleryLightbox: React.FC = () => {
               { id: "all", label: `${t("galTabAll")} (${artworks.length})` },
               { id: "calligraphy", label: t("galTabCalligraphy") },
               { id: "canvas", label: t("galTabCanvas") },
-              { id: "bookmarks", label: t("galTabBookmarks") },
+              { id: "mini-easels", label: t("colCatMiniEasels") || "Mini Easels" },
               { id: "custom-orders", label: t("galTabCustom") },
             ].map((tab) => (
               <button

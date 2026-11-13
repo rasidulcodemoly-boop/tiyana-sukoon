@@ -18,6 +18,19 @@ import {
 export const Footer: React.FC = () => {
   const { settings, language, t } = useStore();
 
+  const footCMS = settings.footerCMS;
+  const navCMS = settings.navbarCMS;
+
+  const brandName =
+    language === "bn"
+      ? (navCMS?.brandNameBangla || "তিয়ানা'স সুকূন")
+      : (navCMS?.brandName || "Tiyana's Sukoon");
+
+  const aboutText =
+    language === "bn"
+      ? (footCMS?.aboutTextBangla || footCMS?.aboutText || t("footDesc"))
+      : (footCMS?.aboutText || t("footDesc"));
+
   return (
     <footer className="bg-[#050e08] border-t border-white/10 pt-16 pb-12 relative text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -28,7 +41,7 @@ export const Footer: React.FC = () => {
               <div className="relative w-10 h-10 rounded-full p-[2px] bg-gradient-to-tr from-[#d4af37] to-[#10b981]">
                 <div className="w-full h-full rounded-full overflow-hidden bg-[#06110a]">
                   <Image
-                    src="/brand/logo.jpg"
+                    src={settings.siteLogo || "/brand/logo.jpg"}
                     alt="Tiyana's Sukoon Logo"
                     width={40}
                     height={40}
@@ -38,7 +51,7 @@ export const Footer: React.FC = () => {
               </div>
               <div>
                 <span className="font-bold text-base text-white tracking-tight">
-                  {language === "bn" ? "তিয়ানা'স সুকূন" : "Tiyana's Sukoon"}
+                  {brandName}
                 </span>
                 <p className="text-[11px] text-[#8fa89a]">
                   {t("brandTagline")}
@@ -47,31 +60,35 @@ export const Footer: React.FC = () => {
             </Link>
 
             <p className="text-[#9cb5a6] leading-relaxed max-w-sm">
-              {t("footDesc")}
+              {aboutText}
             </p>
 
             <div className="flex items-center gap-3 pt-1">
-              <a
-                href={settings.facebookUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-3d-dark px-3 py-1.5 text-xs text-[#f4dc8a] flex items-center gap-1.5"
-              >
-                <span>Facebook Page</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
+              {footCMS?.showFacebookButton !== false && (
+                <a
+                  href={settings.facebookUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-3d-dark px-3 py-1.5 text-xs text-[#f4dc8a] flex items-center gap-1.5"
+                >
+                  <span>Facebook Page</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
 
-              <a
-                href={`https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(
-                  "Assalamu Alaikum! Inquiring from Tiyana's Sukoon website."
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-3d-emerald px-3 py-1.5 text-xs flex items-center gap-1.5"
-              >
-                <MessageCircle className="w-3 h-3" />
-                <span>WhatsApp</span>
-              </a>
+              {footCMS?.showWhatsAppButton !== false && (
+                <a
+                  href={`https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(
+                    "Assalamu Alaikum! Inquiring from Tiyana's Sukoon website."
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-3d-emerald px-3 py-1.5 text-xs flex items-center gap-1.5"
+                >
+                  <MessageCircle className="w-3 h-3" />
+                  <span>WhatsApp</span>
+                </a>
+              )}
             </div>
           </div>
 
@@ -160,7 +177,7 @@ export const Footer: React.FC = () => {
         {/* Bottom copyright row */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[#758a7e]">
           <p>
-            &copy; {new Date().getFullYear()} {t("footCopyright")}
+            {footCMS?.copyrightText || `© ${new Date().getFullYear()} ${t("footCopyright")}`}
           </p>
           <div className="flex items-center gap-4 text-[11px]">
             <span>{t("footBadge1")}</span>

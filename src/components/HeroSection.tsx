@@ -68,6 +68,39 @@ export const HeroSection: React.FC = () => {
     touchStartX.current = e.targetTouches[0].clientX;
   };
 
+  // Dynamic Hero CMS Settings from Store
+  const heroCMS = settings.heroCMS;
+
+  const eyebrow =
+    language === "bn"
+      ? (heroCMS?.eyebrowBangla || heroCMS?.eyebrow || t("heroEyebrow"))
+      : (heroCMS?.eyebrow || t("heroEyebrow"));
+
+  const headline1 =
+    language === "bn"
+      ? (heroCMS?.headline1Bangla || heroCMS?.headline1 || t("heroHeadline1"))
+      : (heroCMS?.headline1 || t("heroHeadline1"));
+
+  const headline2 =
+    language === "bn"
+      ? (heroCMS?.headline2Bangla || heroCMS?.headline2 || t("heroHeadline2"))
+      : (heroCMS?.headline2 || t("heroHeadline2"));
+
+  const description =
+    language === "bn"
+      ? (heroCMS?.descriptionBangla || heroCMS?.description || t("heroSubheadline"))
+      : (heroCMS?.description || t("heroSubheadline"));
+
+  const primaryBtnText =
+    language === "bn"
+      ? (heroCMS?.primaryBtnTextBangla || heroCMS?.primaryBtnText || t("heroBtnCollections"))
+      : (heroCMS?.primaryBtnText || t("heroBtnCollections"));
+
+  const secondaryBtnText =
+    language === "bn"
+      ? (heroCMS?.secondaryBtnTextBangla || heroCMS?.secondaryBtnText || t("heroBtnCustom"))
+      : (heroCMS?.secondaryBtnText || t("heroBtnCustom"));
+
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current !== null) {
       const touchEndX = e.changedTouches[0].clientX;
@@ -99,15 +132,17 @@ export const HeroSection: React.FC = () => {
           {/* Left Side: Eyebrow + Headline */}
           <div className="lg:col-span-7 space-y-4 text-center lg:text-left">
             {/* Eyebrow Text (Clean - No Icon, No Outline) */}
-            <p className="text-xs sm:text-sm font-semibold text-[#d4af37] tracking-wider uppercase">
-              {t("heroEyebrow")}
-            </p>
+            {heroCMS?.showEyebrow !== false && (
+              <p className="text-xs sm:text-sm font-semibold text-[#d4af37] tracking-wider uppercase">
+                {eyebrow}
+              </p>
+            )}
 
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
-              {t("heroHeadline1")} <br />
+              {headline1} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#fceb9e] via-[#d4af37] to-[#e6bc42] drop-shadow-[0_2px_12px_rgba(212,175,55,0.25)]">
-                {t("heroHeadline2")}
+                {headline2}
               </span>
             </h1>
           </div>
@@ -116,32 +151,36 @@ export const HeroSection: React.FC = () => {
           <div className="lg:col-span-5 space-y-5 text-center lg:text-left lg:pb-1">
             {/* Sub-headline Text */}
             <p className="text-base sm:text-lg text-[#9cb5a6] font-normal leading-relaxed max-w-xl mx-auto lg:mx-0">
-              {t("heroSubheadline")}
+              {description}
             </p>
 
-            {/* Exactly 2 Buttons */}
+            {/* Action Buttons (Configurable in Hero CMS) */}
             <div className="flex flex-wrap justify-center lg:justify-start items-center gap-3.5 pt-1">
-              <a
-                href="#collections"
-                className="btn-3d-gold px-6 py-3.5 text-xs sm:text-sm tracking-wide font-bold flex items-center gap-2"
-              >
-                <span>{t("heroBtnCollections")}</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
+              {heroCMS?.showPrimaryBtn !== false && (
+                <a
+                  href={heroCMS?.primaryBtnUrl || "#collections"}
+                  className="btn-3d-gold px-6 py-3.5 text-xs sm:text-sm tracking-wide font-bold flex items-center gap-2"
+                >
+                  <span>{primaryBtnText}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              )}
 
-              <a
-                href="#custom-commission"
-                className="btn-3d-dark px-6 py-3.5 text-xs sm:text-sm tracking-wide text-[#e5ede7] border border-white/10 hover:border-[#d4af37]/40 flex items-center gap-2"
-              >
-                <span>{t("heroBtnCustom")}</span>
-              </a>
+              {heroCMS?.showSecondaryBtn !== false && (
+                <a
+                  href={heroCMS?.secondaryBtnUrl || "#custom-commission"}
+                  className="btn-3d-dark px-6 py-3.5 text-xs sm:text-sm tracking-wide text-[#e5ede7] border border-white/10 hover:border-[#d4af37]/40 flex items-center gap-2"
+                >
+                  <span>{secondaryBtnText}</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* CAROUSEL SECTION (ONLY RENDER IF SLIDES ARE CONFIGURED) */}
-      {carouselArtworks.length > 0 && (
+      {/* CAROUSEL SECTION (ONLY RENDER IF SLIDES ARE CONFIGURED & ENABLED) */}
+      {heroCMS?.showCarousel !== false && carouselArtworks.length > 0 && (
         <>
           {/* MOBILE VIEW ONLY: 2 Images displayed side-by-side, changing 1-by-1 every 3 seconds */}
           <div className="block md:hidden mt-8 px-4 w-full max-w-md mx-auto">

@@ -16,28 +16,58 @@ import { useStore } from "../context/StoreContext";
 export const BrandStory: React.FC = () => {
   const { settings, language, t } = useStore();
 
-  const PILLARS = [
-    {
-      icon: Feather,
-      title: t("pillar1Title"),
-      desc: t("pillar1Desc"),
-    },
-    {
-      icon: Sparkles,
-      title: t("pillar2Title"),
-      desc: t("pillar2Desc"),
-    },
-    {
-      icon: Layers,
-      title: t("pillar3Title"),
-      desc: t("pillar3Desc"),
-    },
-    {
-      icon: Shield,
-      title: t("pillar4Title"),
-      desc: t("pillar4Desc"),
-    },
-  ];
+  const brandCMS = settings.brandStoryCMS;
+  const storyHeading =
+    language === "bn"
+      ? (brandCMS?.titleBangla || brandCMS?.title || t("storyHeading"))
+      : (brandCMS?.title || t("storyHeading"));
+
+  const storyP1 =
+    language === "bn"
+      ? (brandCMS?.paragraph1Bangla || brandCMS?.paragraph1 || t("storyP1"))
+      : (brandCMS?.paragraph1 || t("storyP1"));
+
+  const storyP2 =
+    language === "bn"
+      ? (brandCMS?.paragraph2Bangla || brandCMS?.paragraph2 || t("storyP2"))
+      : (brandCMS?.paragraph2 || t("storyP2"));
+
+  const iconMap: Record<string, any> = {
+    Feather,
+    Sparkles,
+    Layers,
+    Shield,
+    Heart,
+  };
+
+  const PILLARS = (brandCMS?.pillars && brandCMS.pillars.length > 0)
+    ? brandCMS.pillars.map((p, idx) => ({
+        icon: iconMap[p.iconName || ""] || [Feather, Sparkles, Layers, Shield][idx % 4],
+        title: language === "bn" && p.titleBangla ? p.titleBangla : p.title,
+        desc: language === "bn" && p.descBangla ? p.descBangla : p.desc,
+      }))
+    : [
+        {
+          icon: Feather,
+          title: t("pillar1Title"),
+          desc: t("pillar1Desc"),
+        },
+        {
+          icon: Sparkles,
+          title: t("pillar2Title"),
+          desc: t("pillar2Desc"),
+        },
+        {
+          icon: Layers,
+          title: t("pillar3Title"),
+          desc: t("pillar3Desc"),
+        },
+        {
+          icon: Shield,
+          title: t("pillar4Title"),
+          desc: t("pillar4Desc"),
+        },
+      ];
 
   return (
     <section id="philosophy" className="py-20 bg-[#07150e] relative linear-grid">
@@ -84,15 +114,15 @@ export const BrandStory: React.FC = () => {
           {/* Right Column: Story Copy & Pillars */}
           <div className="lg:col-span-7 space-y-6">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-              {t("storyHeading")}
+              {storyHeading}
             </h2>
 
             <div className="space-y-4 text-sm text-[#9cb5a6] leading-relaxed">
               <p>
-                {t("storyP1")}
+                {storyP1}
               </p>
               <p>
-                {t("storyP2")}
+                {storyP2}
               </p>
             </div>
 

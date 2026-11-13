@@ -64,9 +64,28 @@ const FAQS_BN: FAQItem[] = [
 ];
 
 export const FAQSection: React.FC = () => {
-  const { language, t } = useStore();
+  const { settings, language, t } = useStore();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const activeFaqs = language === "bn" ? FAQS_BN : FAQS_EN;
+
+  const faqCMS = settings.faqCMS;
+  const faqHeading =
+    language === "bn"
+      ? (faqCMS?.titleBangla || faqCMS?.title || t("faqHeading"))
+      : (faqCMS?.title || t("faqHeading"));
+
+  const faqDesc =
+    language === "bn"
+      ? (faqCMS?.subtitleBangla || faqCMS?.subtitle || t("faqDesc"))
+      : (faqCMS?.subtitle || t("faqDesc"));
+
+  const activeFaqs = (faqCMS?.items && faqCMS.items.length > 0)
+    ? faqCMS.items
+        .filter((item) => item.isActive)
+        .map((item) => ({
+          q: language === "bn" && item.questionBangla ? item.questionBangla : item.question,
+          a: language === "bn" && item.answerBangla ? item.answerBangla : item.answer,
+        }))
+    : (language === "bn" ? FAQS_BN : FAQS_EN);
 
   const toggle = (idx: number) => {
     setOpenIndex((prev) => (prev === idx ? null : idx));
@@ -78,10 +97,10 @@ export const FAQSection: React.FC = () => {
         {/* Header */}
         <div className="text-center space-y-3 mb-12">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            {t("faqHeading")}
+            {faqHeading}
           </h2>
           <p className="text-[#9cb5a6] text-sm">
-            {t("faqDesc")}
+            {faqDesc}
           </p>
         </div>
 

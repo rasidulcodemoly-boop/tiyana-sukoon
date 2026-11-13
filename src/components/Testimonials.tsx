@@ -6,7 +6,18 @@ import { initialReviews } from "../data/initialData";
 import { useStore } from "../context/StoreContext";
 
 export const Testimonials: React.FC = () => {
-  const { t } = useStore();
+  const { settings, language, t } = useStore();
+
+  const testCMS = settings.testimonialsCMS;
+  const revHeading =
+    language === "bn"
+      ? (testCMS?.titleBangla || testCMS?.title || t("revHeading"))
+      : (testCMS?.title || t("revHeading"));
+
+  const revDesc =
+    language === "bn"
+      ? (testCMS?.subtitleBangla || testCMS?.subtitle || t("revDesc"))
+      : (testCMS?.subtitle || t("revDesc"));
 
   return (
     <section id="reviews" className="py-20 bg-[#06110a] relative">
@@ -14,10 +25,10 @@ export const Testimonials: React.FC = () => {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto space-y-3 mb-14">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            {t("revHeading")}
+            {revHeading}
           </h2>
           <p className="text-[#9cb5a6] text-sm">
-            {t("revDesc")}
+            {revDesc}
           </p>
         </div>
 

@@ -7,6 +7,7 @@ import { StoreProvider, useStore } from "../../context/StoreContext";
 import { ImageSourceControl } from "../../components/ImageSourceControl";
 import { MultiGalleryImageControl } from "../../components/MultiGalleryImageControl";
 import { CustomSelect, CustomSelectOption } from "../../components/CustomSelect";
+import { SiteCMSControl } from "../../components/admin/SiteCMSControl";
 import {
   Artwork,
   Order,
@@ -67,6 +68,7 @@ import {
   CheckSquare,
   Square,
   Hash,
+  Layers,
 } from "lucide-react";
 import {
   getSupabaseConfig,
@@ -306,7 +308,7 @@ const AdminDashboardInner: React.FC = () => {
   }, []);
 
   // Navigation tabs
-  type AdminTab = "dashboard" | "artworks" | "media" | "orders" | "inquiries" | "settings" | "supabase";
+  type AdminTab = "dashboard" | "artworks" | "media" | "cms" | "orders" | "inquiries" | "settings" | "supabase";
   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
 
   // Filtering states
@@ -983,6 +985,23 @@ If you have any questions or would like preview photos of your canvas, reply to 
             </div>
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#d4af37]/20 text-[#f4dc8a]">
               Edit All
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("cms")}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+              activeTab === "cms"
+                ? "bg-[#102d1d] text-[#f4dc8a] border border-[#d4af37]/40 shadow-sm"
+                : "text-[#9cb5a6] hover:bg-white/5 hover:text-white"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <Layers className="w-4 h-4 text-[#d4af37]" />
+              <span>Pages &amp; Sections CMS</span>
+            </div>
+            <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#d4af37]/25 text-[#f4dc8a] border border-[#d4af37]/30">
+              CMS
             </span>
           </button>
 
@@ -2601,6 +2620,16 @@ If you have any questions or would like preview photos of your canvas, reply to 
               </div>
             );
           })()}
+
+          {/* TAB: WEBSITE PAGES & SECTIONS CMS */}
+          {activeTab === "cms" && (
+            <SiteCMSControl
+              settings={settingsForm}
+              onUpdateSettings={setSettingsForm}
+              onSave={handleSaveStoreSettings}
+              isSaving={isSavingSettings}
+            />
+          )}
 
           {/* TAB 4: STUDIO ORDERS MANAGEMENT */}
           {activeTab === "orders" && (

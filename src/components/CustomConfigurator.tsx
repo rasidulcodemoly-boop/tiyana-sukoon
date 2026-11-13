@@ -139,16 +139,27 @@ ${customerNotes ? `- Notes: ${customerNotes}` : ""}`;
     return `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(text)}`;
   };
 
+  const confCMS = settings.customConfiguratorCMS;
+  const confHeading =
+    language === "bn"
+      ? (confCMS?.titleBangla || confCMS?.title || t("confHeading"))
+      : (confCMS?.title || t("confHeading"));
+
+  const confDesc =
+    language === "bn"
+      ? (confCMS?.subtitleBangla || confCMS?.subtitle || t("confDesc"))
+      : (confCMS?.subtitle || t("confDesc"));
+
   return (
     <section id="custom-commission" className="py-20 bg-[#07150e] relative linear-grid-gold">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-14">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            {t("confHeading")}
+            {confHeading}
           </h2>
           <p className="text-[#9cb5a6] text-sm">
-            {t("confDesc")}
+            {confDesc}
           </p>
         </div>
 

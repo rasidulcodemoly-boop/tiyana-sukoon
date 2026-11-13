@@ -93,6 +93,18 @@ export const FeaturedCollection: React.FC = () => {
   const showOriginalPrice = settings.cardShowOriginalPrice !== false;
   const buttonMode = settings.cardButtonMode || "both";
 
+  // Dynamic Collections CMS Settings from Store
+  const colCMS = settings.collectionsCMS;
+  const colHeading =
+    language === "bn"
+      ? (colCMS?.titleBangla || colCMS?.title || t("colHeading"))
+      : (colCMS?.title || t("colHeading"));
+
+  const colDesc =
+    language === "bn"
+      ? (colCMS?.subtitleBangla || colCMS?.subtitle || t("colDesc"))
+      : (colCMS?.subtitle || t("colDesc"));
+
   return (
     <section id="collections" className="py-20 bg-[#06110a] relative">
       {/* Background ambient lighting */}
@@ -103,42 +115,46 @@ export const FeaturedCollection: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              {t("colHeading")}
+              {colHeading}
             </h2>
             <p className="text-[#9cb5a6] text-sm max-w-xl">
-              {t("colDesc")}
+              {colDesc}
             </p>
           </div>
 
           {/* Search Box */}
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-[#8fa89a] absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder={t("colSearchPlaceholder")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-[#0b1f14] border border-white/10 text-white placeholder-[#6b8275] focus:outline-none focus:border-[#d4af37] transition-all"
-            />
-          </div>
+          {colCMS?.showSearchBar !== false && (
+            <div className="relative w-full md:w-72">
+              <Search className="w-4 h-4 text-[#8fa89a] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder={t("colSearchPlaceholder")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-[#0b1f14] border border-white/10 text-white placeholder-[#6b8275] focus:outline-none focus:border-[#d4af37] transition-all"
+              />
+            </div>
+          )}
         </div>
 
         {/* Category Filter Tabs (Linear Pill Switcher) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
-          {categories.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => setActiveCategory(cat.value)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
-                activeCategory === cat.value
-                  ? "bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] text-[#0a150e] shadow-[0_4px_12px_rgba(212,175,55,0.25)] border border-[#ffd86b]"
-                  : "bg-[#0b1f14]/80 text-[#9cb5a6] hover:text-white border border-white/5 hover:border-white/15"
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
+        {colCMS?.showCategoryFilters !== false && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
+            {categories.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => setActiveCategory(cat.value)}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
+                  activeCategory === cat.value
+                    ? "bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] text-[#0a150e] shadow-[0_4px_12px_rgba(212,175,55,0.25)] border border-[#ffd86b]"
+                    : "bg-[#0b1f14]/80 text-[#9cb5a6] hover:text-white border border-white/5 hover:border-white/15"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Artwork Grid */}
         {filteredArtworks.length === 0 ? (

@@ -24,6 +24,28 @@ export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Dynamic Navbar CMS Content from settings
+  const navCMS = settings.navbarCMS;
+  const brandName =
+    language === "bn"
+      ? (navCMS?.brandNameBangla || "তিয়ানা'স সুকূন")
+      : (navCMS?.brandName || "Tiyana's Sukoon");
+
+  const brandTagline =
+    language === "bn"
+      ? (navCMS?.taglineBangla || t("brandTagline"))
+      : (navCMS?.tagline || t("brandTagline"));
+
+  const menuItems = (navCMS?.menuItems && navCMS.menuItems.length > 0)
+    ? navCMS.menuItems.filter((m) => m.isActive)
+    : [
+        { id: "nav-col", label: t("navCollections"), labelBangla: "কালেকশন", url: "#collections", isActive: true },
+        { id: "nav-custom", label: t("navCustomArt"), labelBangla: "কাস্টম আর্ট", url: "#custom-commission", isActive: true },
+        { id: "nav-gallery", label: t("navGallery"), labelBangla: "গ্যালারি", url: "#gallery", isActive: true },
+        { id: "nav-philosophy", label: t("navPhilosophy"), labelBangla: "দর্শন", url: "#philosophy", isActive: true },
+        { id: "nav-reviews", label: t("navReviews"), labelBangla: "রিভিউ", url: "#reviews", isActive: true },
+      ];
+
   // Handle scroll detection
   useEffect(() => {
     const handleScroll = () => {
@@ -105,111 +127,98 @@ export const Navbar: React.FC = () => {
             className="flex items-center gap-2.5 sm:gap-3 group min-w-0"
           >
             {/* Studio Logo Emblem */}
-            <div className="relative w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full p-[2px] bg-gradient-to-tr from-[#d4af37] via-[#f5d77f] to-[#0e2a1b] shadow-[0_0_15px_rgba(212,175,55,0.25)] transition-transform duration-300 group-hover:scale-105">
-              <div className="w-full h-full rounded-full overflow-hidden bg-[#06110a]">
-                <Image
-                  src={settings.siteLogo || "/brand/logo.jpg"}
-                  alt="Tiyana's Sukoon Logo"
-                  width={44}
-                  height={44}
-                  priority
-                  className="w-full h-full object-cover"
-                />
+            {navCMS?.showLogo !== false && (
+              <div className="relative w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full p-[2px] bg-gradient-to-tr from-[#d4af37] via-[#f5d77f] to-[#0e2a1b] shadow-[0_0_15px_rgba(212,175,55,0.25)] transition-transform duration-300 group-hover:scale-105">
+                <div className="w-full h-full rounded-full overflow-hidden bg-[#06110a]">
+                  <Image
+                    src={settings.siteLogo || "/brand/logo.jpg"}
+                    alt="Tiyana's Sukoon Logo"
+                    width={44}
+                    height={44}
+                    priority
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Brand Title and Tagline (Desktop Only - Strictly Hidden on Mobile & Tablet) */}
             <div className="hidden md:flex min-w-0 flex-col justify-center">
               <span className="font-bold text-sm sm:text-base md:text-lg tracking-tight text-white group-hover:text-[#f4dc8a] transition-colors truncate">
-                {language === "bn" ? "তিয়ানা'স সুকূন" : "Tiyana's Sukoon"}
+                {brandName}
               </span>
               <p className="text-[10px] sm:text-[11px] text-[#8fa89a] font-normal tracking-wide truncate">
-                {t("brandTagline")}
+                {brandTagline}
               </p>
             </div>
           </Link>
 
           {/* Desktop Navigation Links (Linear Pill Style) */}
           <nav className="hidden md:flex items-center gap-1 bg-[#0b1f14]/85 p-1.5 rounded-full border border-white/10 shadow-inner backdrop-blur-md">
-            <a
-              href="#collections"
-              className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all"
-            >
-              {t("navCollections")}
-            </a>
-            <a
-              href="#custom-commission"
-              className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all"
-            >
-              {t("navCustomArt")}
-            </a>
-            <a
-              href="#gallery"
-              className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all"
-            >
-              {t("navGallery")}
-            </a>
-            <a
-              href="#philosophy"
-              className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all"
-            >
-              {t("navPhilosophy")}
-            </a>
-            <a
-              href="#reviews"
-              className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all"
-            >
-              {t("navReviews")}
-            </a>
+            {menuItems.map((item) => (
+              <a
+                key={item.id}
+                href={item.url}
+                target={item.isExternal ? "_blank" : undefined}
+                rel={item.isExternal ? "noopener noreferrer" : undefined}
+                className="px-4 py-1.5 text-xs font-medium text-[#c4d7cc] hover:text-white hover:bg-white/5 rounded-full transition-all whitespace-nowrap"
+              >
+                {language === "bn" && item.labelBangla ? item.labelBangla : item.label}
+              </a>
+            ))}
           </nav>
 
           {/* Right Action Area: Language Switcher, Cart & Mobile Hamburger */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Language Toggle Button (EN | বাং) */}
-            <div
-              className="flex items-center rounded-xl bg-[#091e13] border border-[#d4af37]/35 p-0.5 shadow-sm"
-              role="group"
-              aria-label="Language selection"
-            >
-              <button
-                type="button"
-                onClick={() => setLanguage("en")}
-                className={`px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold font-mono transition-all duration-200 ${
-                  language === "en"
-                    ? "bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] text-[#06110a] shadow-[0_2px_8px_rgba(212,175,55,0.3)] font-black"
-                    : "text-[#8fa89a] hover:text-white"
-                }`}
-                title="Switch to English (Default)"
+            {navCMS?.showLanguageSwitcher !== false && (
+              <div
+                className="flex items-center rounded-xl bg-[#091e13] border border-[#d4af37]/35 p-0.5 shadow-sm"
+                role="group"
+                aria-label="Language selection"
               >
-                EN
-              </button>
-              <button
-                type="button"
-                onClick={() => setLanguage("bn")}
-                className={`px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold transition-all duration-200 ${
-                  language === "bn"
-                    ? "bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] text-[#06110a] shadow-[0_2px_8px_rgba(212,175,55,0.3)] font-black"
-                    : "text-[#8fa89a] hover:text-white"
-                }`}
-                title="বাংলায় পরিবর্তন করুন"
-              >
-                বাং
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => setLanguage("en")}
+                  className={`px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold font-mono transition-all duration-200 ${
+                    language === "en"
+                      ? "bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] text-[#06110a] shadow-[0_2px_8px_rgba(212,175,55,0.3)] font-black"
+                      : "text-[#8fa89a] hover:text-white"
+                  }`}
+                  title="Switch to English (Default)"
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage("bn")}
+                  className={`px-2 py-1 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold transition-all duration-200 ${
+                    language === "bn"
+                      ? "bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] text-[#06110a] shadow-[0_2px_8px_rgba(212,175,55,0.3)] font-black"
+                      : "text-[#8fa89a] hover:text-white"
+                  }`}
+                  title="বাংলায় পরিবর্তন করুন"
+                >
+                  বাং
+                </button>
+              </div>
+            )}
 
             {/* Cart Trigger Button (3D Dark Bevel) */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative p-2 sm:p-2.5 rounded-xl btn-3d-dark text-[#e5ede7] flex items-center justify-center transition-all hover:scale-105"
-              aria-label="View Shopping Cart"
-            >
-              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-[#f4dc8a]" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] text-[#06110a] text-[10px] sm:text-[11px] font-bold w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center shadow-md animate-pulse">
-                  {cartCount}
-                </span>
-              )}
-            </button>
+            {navCMS?.showCartButton !== false && (
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative p-2 sm:p-2.5 rounded-xl btn-3d-dark text-[#e5ede7] flex items-center justify-center transition-all hover:scale-105"
+                aria-label="View Shopping Cart"
+              >
+                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-[#f4dc8a]" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-gradient-to-r from-[#d4af37] to-[#f4dc8a] text-[#06110a] text-[10px] sm:text-[11px] font-bold w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center shadow-md animate-pulse">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            )}
 
             {/* Mobile Hamburger Toggle Button */}
             <button
@@ -266,70 +275,24 @@ export const Navbar: React.FC = () => {
                 </div>
               </div>
 
-              {/* Navigation Links Grid */}
+              {/* Navigation Links Grid (Dynamically populated from Navbar CMS) */}
               <div className="space-y-1">
-                <a
-                  href="#collections"
-                  onClick={closeMenu}
-                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#dce7e1] hover:text-[#f4dc8a] hover:bg-[#0c2417] transition-all border border-transparent hover:border-white/5"
-                >
-                  <div className="flex items-center gap-3">
-                    <Palette className="w-4 h-4 text-[#d4af37]" />
-                    <span>{t("navCollections")}</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[#6e8578]" />
-                </a>
-
-                <a
-                  href="#custom-commission"
-                  onClick={closeMenu}
-                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#fceb9e] bg-[#0c2619]/60 hover:bg-[#0c2619] transition-all border border-[#d4af37]/25"
-                >
-                  <div className="flex items-center gap-3">
-                    <Sparkles className="w-4 h-4 text-[#d4af37]" />
-                    <span>{t("navCustomArt")}</span>
-                  </div>
-                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-[#d4af37]/20 text-[#fceb9e] border border-[#d4af37]/40">
-                    Bespoke
-                  </span>
-                </a>
-
-                <a
-                  href="#gallery"
-                  onClick={closeMenu}
-                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#dce7e1] hover:text-[#f4dc8a] hover:bg-[#0c2417] transition-all border border-transparent hover:border-white/5"
-                >
-                  <div className="flex items-center gap-3">
-                    <ImageIcon className="w-4 h-4 text-[#d4af37]" />
-                    <span>{t("navGallery")}</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[#6e8578]" />
-                </a>
-
-                <a
-                  href="#philosophy"
-                  onClick={closeMenu}
-                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#dce7e1] hover:text-[#f4dc8a] hover:bg-[#0c2417] transition-all border border-transparent hover:border-white/5"
-                >
-                  <div className="flex items-center gap-3">
-                    <Heart className="w-4 h-4 text-[#d4af37]" />
-                    <span>{t("navPhilosophy")}</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[#6e8578]" />
-                </a>
-
-                <a
-                  href="#reviews"
-                  onClick={closeMenu}
-                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#dce7e1] hover:text-[#f4dc8a] hover:bg-[#0c2417] transition-all border border-transparent hover:border-white/5"
-                >
-                  <div className="flex items-center gap-3">
-                    <Star className="w-4 h-4 text-[#d4af37] fill-[#d4af37]" />
-                    <span>{t("navReviews")}</span>
-                  </div>
-                  <span className="text-xs text-[#fceb9e] font-bold">5.0 ★</span>
-                </a>
-
+                {menuItems.map((item) => (
+                  <a
+                    key={item.id}
+                    href={item.url}
+                    onClick={closeMenu}
+                    target={item.isExternal ? "_blank" : undefined}
+                    rel={item.isExternal ? "noopener noreferrer" : undefined}
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-[#dce7e1] hover:text-[#f4dc8a] hover:bg-[#0c2417] transition-all border border-transparent hover:border-white/5"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Sparkles className="w-4 h-4 text-[#d4af37]" />
+                      <span>{language === "bn" && item.labelBangla ? item.labelBangla : item.label}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-[#6e8578]" />
+                  </a>
+                ))}
               </div>
 
               {/* Action Buttons Section */}

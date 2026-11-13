@@ -15,7 +15,7 @@ import {
 
 export const GalleryLightbox: React.FC = () => {
   const router = useRouter();
-  const { artworks, addToCart, setSelectedArtworkForModal, language, t } = useStore();
+  const { artworks, addToCart, setSelectedArtworkForModal, settings, language, t } = useStore();
   const [activeTab, setActiveTab] = useState<string>("all");
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
     null
@@ -53,6 +53,17 @@ export const GalleryLightbox: React.FC = () => {
   const currentArt =
     selectedPhotoIndex !== null ? filteredArtworks[selectedPhotoIndex] : null;
 
+  const galCMS = settings.galleryCMS;
+  const galHeading =
+    language === "bn"
+      ? (galCMS?.titleBangla || galCMS?.title || t("galHeading"))
+      : (galCMS?.title || t("galHeading"));
+
+  const galDesc =
+    language === "bn"
+      ? (galCMS?.subtitleBangla || galCMS?.subtitle || t("galDesc"))
+      : (galCMS?.subtitle || t("galDesc"));
+
   return (
     <section id="gallery" className="py-20 bg-[#06110a] relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -60,35 +71,37 @@ export const GalleryLightbox: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              {t("galHeading")}
+              {galHeading}
             </h2>
             <p className="text-[#9cb5a6] text-sm max-w-xl">
-              {t("galDesc")}
+              {galDesc}
             </p>
           </div>
 
           {/* Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none">
-            {[
-              { id: "all", label: `${t("galTabAll")} (${artworks.length})` },
-              { id: "calligraphy", label: t("galTabCalligraphy") },
-              { id: "canvas", label: t("galTabCanvas") },
-              { id: "mini-easels", label: t("colCatMiniEasels") || "Mini Easels" },
-              { id: "custom-orders", label: t("galTabCustom") },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  activeTab === tab.id
-                    ? "bg-[#d4af37] text-[#06110a] font-bold shadow-md"
-                    : "bg-[#0b1f14] text-[#8fa89a] hover:text-white border border-white/5"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          {galCMS?.showTabs !== false && (
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none">
+              {[
+                { id: "all", label: `${t("galTabAll")} (${artworks.length})` },
+                { id: "calligraphy", label: t("galTabCalligraphy") },
+                { id: "canvas", label: t("galTabCanvas") },
+                { id: "mini-easels", label: t("colCatMiniEasels") || "Mini Easels" },
+                { id: "custom-orders", label: t("galTabCustom") },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    activeTab === tab.id
+                      ? "bg-[#d4af37] text-[#06110a] font-bold shadow-md"
+                      : "bg-[#0b1f14] text-[#8fa89a] hover:text-white border border-white/5"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Masonry / Responsive Grid */}
